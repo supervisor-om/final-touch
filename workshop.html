@@ -517,6 +517,14 @@ label{font-size:14px;}
 .sidebar-footer{font-size:12px;}
 .logo-title{font-size:20px;}
 .auth-logo-title{font-size:24px;}
+
+/* ── Quick Status Popup ──────────────────────────────────────────── */
+.qs-popup{position:fixed;z-index:9999;background:var(--primary);border:1px solid var(--border);border-radius:14px;box-shadow:0 12px 40px rgba(0,0,0,.5);padding:8px;min-width:170px;animation:fadeIn .15s ease;}
+.qs-item{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:10px;cursor:pointer;font-size:14px;font-weight:600;color:var(--text);transition:background .15s;white-space:nowrap;}
+.qs-item:hover{background:rgba(255,255,255,.08);}
+.qs-item.qs-active{background:rgba(79,172,254,.15);color:#4facfe;}
+.qs-badge{cursor:pointer;transition:opacity .2s;}
+.qs-badge:hover{opacity:.75;}
 </style>
 </head>
 <body>
@@ -1285,6 +1293,49 @@ function editCar(id){
   updateStageUI();calcRemaining();
   openModal('modal-update-car');
 }
+// QUICK STATUS CHANGE (click badge in table)
+const QS_STAGES=[
+  {icon:'📋',label:'استلام',    stage:0},
+  {icon:'🔍',label:'تشخيص',    stage:1},
+  {icon:'🔧',label:'إصلاح',    stage:2},
+  {icon:'🎨',label:'دهان',     stage:3},
+  {icon:'✅',label:'جاهزة',    stage:4},
+  {icon:'📦',label:'تسليم',    stage:5},
+];
+function quickStatus(carId,e){
+  e.stopPropagation();
+  document.getElementById('qs-popup')?.remove();
+  const car=state.cars.find(c=>c.id===carId);
+  if(!car)return;
+  const popup=document.createElement('div');
+  popup.id='qs-popup';popup.className='qs-popup';
+  const rect=e.currentTarget.getBoundingClientRect();
+  popup.style.top=(rect.bottom+6)+'px';
+  popup.style.right=(window.innerWidth-rect.right)+'px';
+  popup.innerHTML=QS_STAGES.map(s=>`
+    <div class="qs-item${car.stage===s.stage?' qs-active':''}" onclick="applyQuickStatus('${carId}',${s.stage})">
+      ${s.icon} ${s.label}
+    </div>`).join('');
+  document.body.appendChild(popup);
+  setTimeout(()=>document.addEventListener('click',closeQsPopup,{once:true}),0);
+}
+function closeQsPopup(){document.getElementById('qs-popup')?.remove();}
+function applyQuickStatus(carId,stage){
+  closeQsPopup();
+  const car=state.cars.find(c=>c.id===carId);
+  if(!car)return;
+  const prevStage=car.stage;
+  car.stage=stage;
+  car.status=statusFromStage(stage);
+  if(car.status==='delivered'&&!car.dateOut){
+    car.dateOut=today();
+    const inv={id:state.invoiceCounter++,carId:car.id,owner:car.owner,plate:car.plate,model:car.model,service:car.service,amount:car.estimate||0,deposit:car.deposit||0,paid:car.paidTotal||0,date:today(),notes:car.notes||''};
+    state.invoices.push(inv);
+  }
+  saveState();renderAll();
+  if(car.stage!==prevStage)sendPushNotification(car);
+}
+
 function setStage(i){currentStage=i;updateStageUI();}
 function updateStageUI(){
   for(let i=0;i<6;i++){
@@ -1682,7 +1733,7 @@ function renderCarsTable(){
       </td>`:''}
       <td style="color:${over?'var(--danger)':'var(--success)'};">${days}${over?' ⚠️':''}</td>
       <td>${c.expectedDate?`<span style="font-size:12px;color:${new Date(c.expectedDate)<new Date()?'var(--danger)':'var(--success)'};">${formatDate(c.expectedDate)}</span>`:'<span style="color:var(--muted);font-size:12px;">—</span>'}</td>
-      <td>${statusBadge(c.status)}</td>
+      <td><span class="qs-badge" onclick="quickStatus('${c.id}',event)" title="انقر لتغيير الحالة">${statusBadge(c.status)}</span></td>
       <td><div style="display:flex;gap:5px;">
         <button class="btn btn-primary btn-sm" onclick="editCar('${c.id}')">✏️</button>
         ${isAdmin?`<button class="btn btn-danger btn-sm" onclick="deleteCar('${c.id}')">🗑️</button>`:''}
