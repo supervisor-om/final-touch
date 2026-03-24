@@ -1193,7 +1193,19 @@ function stageFromStatus(s){return{waiting:0,progress:2,done:4,delivered:5}[s]||
 function statusFromStage(i){return i>=5?'delivered':i>=4?'done':i>=1?'progress':'waiting';}
 
 // NAVIGATION
+const ADMIN_PAGES_SET = ['dashboard','invoices','expenses','reports'];
 function showPage(id){
+  // Role-based access check
+  try{
+    var _sess=JSON.parse(sessionStorage.getItem('ft_session'));
+    if(_sess && _sess.role!=='admin' && ADMIN_PAGES_SET.indexOf(id)!==-1){
+      var b=document.createElement('div');
+      b.style.cssText='position:fixed;top:80px;left:50%;transform:translateX(-50%);background:rgba(233,69,96,.9);color:#fff;padding:12px 24px;border-radius:12px;font-weight:700;font-size:13px;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,.4);';
+      b.textContent='🔒 هذه الصفحة للمسؤول فقط';
+      document.body.appendChild(b);setTimeout(function(){b.remove();},2500);
+      return;
+    }
+  }catch(e){}
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   document.getElementById('page-'+id).classList.add('active');
@@ -2839,36 +2851,32 @@ if ('serviceWorker' in navigator) {
      AUTH — ROLE-BASED ACCESS CONTROL
      ═══════════════════════════════════════════════════ -->
 <script>
-// ── Constants ───────────────────────────────────────────────────────
-const ADMIN_PAGES  = new Set(['dashboard','invoices','expenses','reports']);
-const USERS_KEY    = 'ft_users';
-const SESSION_KEY  = 'ft_session';
-
-// ── Default users (first run) ────────────────────────────────────────
+// ── Auth helpers (no top-level const to avoid script-block conflicts) ─
 function getUsers() {
-  const raw = localStorage.getItem(USERS_KEY);
-  if (raw) return JSON.parse(raw);
-  const defaults = [
-    { username: 'admin',  password: 'admin@2024', role: 'admin'  },
-    { username: 'worker', password: '1234',        role: 'worker' }
+  try {
+    var raw = localStorage.getItem('ft_users');
+    if (raw) return JSON.parse(raw);
+  } catch(e) {}
+  var defaults = [
+    { username: 'admin',  password: 'admin1234', role: 'admin'  },
+    { username: 'worker', password: '1234',       role: 'worker' }
   ];
-  localStorage.setItem(USERS_KEY, JSON.stringify(defaults));
+  try { localStorage.setItem('ft_users', JSON.stringify(defaults)); } catch(e) {}
   return defaults;
 }
-function saveUsers(users) { localStorage.setItem(USERS_KEY, JSON.stringify(users)); }
+function saveUsers(u) { try{localStorage.setItem('ft_users',JSON.stringify(u));}catch(e){} }
 
-// ── Session ──────────────────────────────────────────────────────────
 function getSession() {
-  try { return JSON.parse(sessionStorage.getItem(SESSION_KEY)); } catch(e) { return null; }
+  try { return JSON.parse(sessionStorage.getItem('ft_session')); } catch(e) { return null; }
 }
-function setSession(user) { sessionStorage.setItem(SESSION_KEY, JSON.stringify(user)); }
-function clearSession()   { sessionStorage.removeItem(SESSION_KEY); }
+function setSession(u) { try{sessionStorage.setItem('ft_session',JSON.stringify(u));}catch(e){} }
+function clearSession() { try{sessionStorage.removeItem('ft_session');}catch(e){} }
 
 // ── Login ────────────────────────────────────────────────────────────
 function doLogin() {
-  const username = document.getElementById('auth-username').value.trim();
-  const password = document.getElementById('auth-password').value;
-  const errEl    = document.getElementById('auth-error');
+  var username = document.getElementById('auth-username').value.trim();
+  var password = document.getElementById('auth-password').value;
+  var errEl    = document.getElementById('auth-error');
   errEl.style.display = 'none';
 
   if (!username || !password) {
@@ -2876,7 +2884,14 @@ function doLogin() {
     errEl.style.display = 'block'; return;
   }
 
-  const user = getUsers().find(u => u.username === username && u.password === password);
+  var users = getUsers();
+  var user = null;
+  for (var i = 0; i < users.length; i++) {
+    if (users[i].username === username && users[i].password === password) {
+      user = users[i]; break;
+    }
+  }
+
   if (!user) {
     errEl.textContent = '❌ اسم المستخدم أو كلمة المرور غير صحيحة';
     errEl.style.display = 'block';
@@ -2899,51 +2914,42 @@ function logout() {
   document.getElementById('auth-overlay').style.display = 'flex';
 }
 
-// ── Apply role: show/hide nav items, redirect if needed ──────────────
+// ── Apply role UI ─────────────────────────────────────────────────────
 function applyRole(user) {
-  const isAdmin = user.role === 'admin';
+  var isAdmin = (user.role === 'admin');
 
-  // Show/hide admin-only nav items
-  document.querySelectorAll('.admin-only').forEach(el => {
+  document.querySelectorAll('.admin-only').forEach(function(el){
     el.classList.toggle('worker-hidden', !isAdmin);
   });
 
-  // Update user info in sidebar
   document.getElementById('auth-user-name').textContent = '👤 ' + user.username;
   document.getElementById('auth-user-role').textContent = isAdmin ? '👑 مسؤول' : '👷 عامل';
 
-  // If worker lands on restricted page → redirect to cars
-  const activePage = document.querySelector('.page.active');
-  if (!isAdmin && activePage) {
-    const pageId = activePage.id.replace('page-', '');
-    if (ADMIN_PAGES.has(pageId)) showPage('cars');
-  }
-  // If admin → make sure dashboard is accessible (default first page)
   if (isAdmin) {
-    const activePage2 = document.querySelector('.page.active');
-    if (!activePage2 || activePage2.id === 'page-cars') showPage('dashboard');
+    showPage('dashboard');
+  } else {
+    var active = document.querySelector('.page.active');
+    if (active) {
+      var pid = active.id.replace('page-','');
+      var restricted = ['dashboard','invoices','expenses','reports'];
+      if (restricted.indexOf(pid) !== -1) showPage('cars');
+    }
   }
 }
 
-// ── Guard showPage ───────────────────────────────────────────────────
-const _origShowPageAuth = showPage;
-showPage = function(id) {
-  const session = getSession();
-  if (session && session.role !== 'admin' && ADMIN_PAGES.has(id)) {
-    // Show access denied flash
-    const banner = document.createElement('div');
-    banner.style.cssText = 'position:fixed;top:80px;left:50%;transform:translateX(-50%);background:rgba(233,69,96,.9);color:#fff;padding:12px 24px;border-radius:12px;font-weight:700;font-size:13px;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,.4);';
-    banner.textContent = '🔒 هذه الصفحة للمسؤول فقط';
-    document.body.appendChild(banner);
-    setTimeout(() => banner.remove(), 2500);
-    return;
-  }
-  _origShowPageAuth(id);
-};
-
 // ── Init on load ─────────────────────────────────────────────────────
 function initAuth() {
-  const session = getSession();
+  // Reset old password format if needed (migration)
+  try {
+    var raw = localStorage.getItem('ft_users');
+    if (raw) {
+      var u = JSON.parse(raw);
+      var needsReset = u.some(function(x){ return x.password === 'admin@2024'; });
+      if (needsReset) localStorage.removeItem('ft_users');
+    }
+  } catch(e) { localStorage.removeItem('ft_users'); }
+
+  var session = getSession();
   if (session) {
     applyRole(session);
     document.getElementById('auth-overlay').style.display = 'none';
