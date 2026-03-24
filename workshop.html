@@ -1120,6 +1120,7 @@ function calcRemaining(){
 function updateCar(){
   const car=state.cars.find(c=>c.id===state.currentEditCar);
   if(!car)return;
+  const prevStage=car.stage;
   car.stage=currentStage;
   car.status=statusFromStage(currentStage);
   car.estimate=parseFloat(document.getElementById('update-amount').value)||0;
@@ -1132,6 +1133,8 @@ function updateCar(){
     state.invoices.push(inv);
   }
   saveState();closeModal('modal-update-car');renderAll();
+  // Send push notification if stage changed
+  if(car.stage!==prevStage) sendPushNotification(car);
 }
 
 // RECEIPT
@@ -1273,6 +1276,16 @@ function printReceipt(){
         <div id="trk-notes-text" style="font-size:13px;color:#eaeaea;line-height:1.7;"></div>
       </div>
 
+      <!-- Push Notification Subscribe -->
+      <div id="trk-notify-box" style="background:rgba(79,172,254,0.06);border:1px solid rgba(79,172,254,0.2);border-radius:16px;padding:18px;margin-bottom:12px;text-align:center;">
+        <div style="font-size:13px;color:#8892a4;margin-bottom:12px;">🔔 فعّل الإشعارات لتلقّي تحديثات فورية عند تغيير مرحلة سيارتك</div>
+        <button id="trk-notify-btn" onclick="subscribeToNotifications(window._trkCarId)"
+          style="padding:11px 24px;background:linear-gradient(135deg,#4facfe,#00f2fe);border:none;border-radius:12px;color:#0a1628;font-family:'Cairo',sans-serif;font-size:13px;font-weight:800;cursor:pointer;width:100%;">
+          🔔 تفعيل إشعارات سيارتي
+        </button>
+        <div id="trk-notify-status" style="font-size:12px;margin-top:8px;min-height:16px;"></div>
+      </div>
+
       <!-- Search again -->
       <button onclick="resetTracking()" style="width:100%;padding:13px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:12px;color:#eaeaea;font-family:'Cairo',sans-serif;font-size:14px;font-weight:600;cursor:pointer;margin-bottom:10px;">🔍 البحث عن سيارة أخرى</button>
     </div>
@@ -1286,25 +1299,59 @@ function printReceipt(){
 
 <!-- Firebase Setup Modal -->
 <div class="modal-overlay" id="modal-firebase">
-  <div class="modal">
+  <div class="modal modal-lg">
     <div class="modal-header">
-      <div class="modal-title">☁️ إعداد المزامنة السحابية</div>
+      <div class="modal-title">☁️ إعداد المزامنة والإشعارات</div>
       <button class="modal-close" onclick="closeModal('modal-firebase')">✕</button>
     </div>
     <div class="modal-body">
-      <div style="background:rgba(79,172,254,.07);border:1px solid rgba(79,172,254,.2);border-radius:12px;padding:16px;margin-bottom:16px;font-size:13px;line-height:1.8;">
-        <div style="font-weight:700;color:#4facfe;margin-bottom:8px;">📋 خطوات الإعداد:</div>
-        <div>1. اذهب إلى <a href="https://console.firebase.google.com" target="_blank" style="color:#4facfe;">console.firebase.google.com</a></div>
-        <div>2. أنشئ مشروعاً جديداً → <strong>Add project</strong></div>
-        <div>3. من Firestore Database → <strong>Create database</strong> → Test mode</div>
-        <div>4. من إعدادات المشروع ⚙️ → <strong>Add app</strong> → Web</div>
-        <div>5. انسخ الـ <strong>firebaseConfig</strong> والصقه أدناه</div>
+      <div class="tabs" style="margin-bottom:16px;">
+        <button class="tab active" id="fb-tab-cloud-btn" onclick="switchFbTab('cloud',this)">☁️ مزامنة السحابة</button>
+        <button class="tab" id="fb-tab-push-btn" onclick="switchFbTab('push',this)">🔔 إشعارات Push</button>
       </div>
-      <div class="form-group">
-        <label>الصق firebaseConfig هنا</label>
-        <textarea id="firebase-config-input" rows="8" placeholder='const firebaseConfig = {&#10;  apiKey: "AIza...",&#10;  authDomain: "...",&#10;  projectId: "...",&#10;  storageBucket: "...",&#10;  messagingSenderId: "...",&#10;  appId: "..."&#10;};' style="font-family:monospace;font-size:12px;direction:ltr;"></textarea>
+
+      <!-- Tab: Cloud sync -->
+      <div id="fb-tab-cloud">
+        <div style="background:rgba(79,172,254,.07);border:1px solid rgba(79,172,254,.2);border-radius:12px;padding:14px;margin-bottom:14px;font-size:13px;line-height:1.8;">
+          <div style="font-weight:700;color:#4facfe;margin-bottom:6px;">📋 خطوات الإعداد:</div>
+          <div>1. اذهب إلى <a href="https://console.firebase.google.com" target="_blank" style="color:#4facfe;">console.firebase.google.com</a></div>
+          <div>2. أنشئ مشروعاً جديداً → <strong>Add project</strong></div>
+          <div>3. من Firestore Database → <strong>Create database</strong> → Test mode</div>
+          <div>4. من إعدادات المشروع ⚙️ → <strong>Add app</strong> → Web</div>
+          <div>5. انسخ الـ <strong>firebaseConfig</strong> والصقه أدناه</div>
+        </div>
+        <div class="form-group">
+          <label>الصق firebaseConfig هنا</label>
+          <textarea id="firebase-config-input" rows="7" placeholder='const firebaseConfig = {&#10;  apiKey: "AIza...",&#10;  authDomain: "...",&#10;  projectId: "...",&#10;  storageBucket: "...",&#10;  messagingSenderId: "...",&#10;  appId: "..."&#10;};' style="font-family:monospace;font-size:12px;direction:ltr;"></textarea>
+        </div>
       </div>
-      <div id="firebase-status" style="margin-top:8px;font-size:12px;"></div>
+
+      <!-- Tab: Push Notifications -->
+      <div id="fb-tab-push" style="display:none;">
+        <div style="background:rgba(245,166,35,.07);border:1px solid rgba(245,166,35,.2);border-radius:12px;padding:14px;margin-bottom:14px;font-size:13px;line-height:1.7;">
+          <div style="font-weight:700;color:#f5a623;margin-bottom:6px;">📋 خطوات تفعيل Push Notifications:</div>
+          <div>1. في Firebase Console → <strong>Project Settings ⚙️</strong> → <strong>Cloud Messaging</strong></div>
+          <div>2. من <strong>Web Push certificates</strong> → انسخ <strong>Key pair (VAPID)</strong></div>
+          <div>3. من <strong>Cloud Messaging API (Legacy)</strong> → انسخ <strong>Server key</strong></div>
+          <div style="margin-top:6px;color:#e94560;font-size:11px;">⚠️ المفتاح السري للاستخدام الداخلي فقط — لا تشاركه</div>
+        </div>
+        <div class="form-grid">
+          <div class="form-group full">
+            <label>🔑 VAPID Public Key — Web Push Certificate</label>
+            <input type="text" id="fcm-vapid-key" placeholder="BK... (مفتاح VAPID العام)" style="font-family:monospace;font-size:11px;direction:ltr;">
+          </div>
+          <div class="form-group full">
+            <label>🔐 FCM Server Key (Legacy)</label>
+            <input type="password" id="fcm-server-key" placeholder="AAAA... (مفتاح الخادم السري)" style="font-family:monospace;font-size:11px;direction:ltr;">
+          </div>
+        </div>
+        <div style="background:rgba(0,212,170,.06);border:1px solid rgba(0,212,170,.15);border-radius:10px;padding:12px;margin-top:10px;font-size:12px;color:#00d4aa;line-height:1.7;">
+          ✅ بعد الحفظ: يستطيع العميل تفعيل الإشعارات من صفحة تتبع سيارته<br>
+          وسيصله إشعار تلقائي عند كل تغيير في مرحلة إصلاح سيارته
+        </div>
+      </div>
+
+      <div id="firebase-status" style="margin-top:10px;font-size:12px;"></div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-outline" onclick="closeModal('modal-firebase')">إلغاء</button>
@@ -1743,6 +1790,16 @@ function exportPDF(){
         <div id="trk-notes-text" style="font-size:13px;color:#eaeaea;line-height:1.7;"></div>
       </div>
 
+      <!-- Push Notification Subscribe -->
+      <div id="trk-notify-box" style="background:rgba(79,172,254,0.06);border:1px solid rgba(79,172,254,0.2);border-radius:16px;padding:18px;margin-bottom:12px;text-align:center;">
+        <div style="font-size:13px;color:#8892a4;margin-bottom:12px;">🔔 فعّل الإشعارات لتلقّي تحديثات فورية عند تغيير مرحلة سيارتك</div>
+        <button id="trk-notify-btn" onclick="subscribeToNotifications(window._trkCarId)"
+          style="padding:11px 24px;background:linear-gradient(135deg,#4facfe,#00f2fe);border:none;border-radius:12px;color:#0a1628;font-family:'Cairo',sans-serif;font-size:13px;font-weight:800;cursor:pointer;width:100%;">
+          🔔 تفعيل إشعارات سيارتي
+        </button>
+        <div id="trk-notify-status" style="font-size:12px;margin-top:8px;min-height:16px;"></div>
+      </div>
+
       <!-- Search again -->
       <button onclick="resetTracking()" style="width:100%;padding:13px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:12px;color:#eaeaea;font-family:'Cairo',sans-serif;font-size:14px;font-weight:600;cursor:pointer;margin-bottom:10px;">🔍 البحث عن سيارة أخرى</button>
     </div>
@@ -1756,25 +1813,59 @@ function exportPDF(){
 
 <!-- Firebase Setup Modal -->
 <div class="modal-overlay" id="modal-firebase">
-  <div class="modal">
+  <div class="modal modal-lg">
     <div class="modal-header">
-      <div class="modal-title">☁️ إعداد المزامنة السحابية</div>
+      <div class="modal-title">☁️ إعداد المزامنة والإشعارات</div>
       <button class="modal-close" onclick="closeModal('modal-firebase')">✕</button>
     </div>
     <div class="modal-body">
-      <div style="background:rgba(79,172,254,.07);border:1px solid rgba(79,172,254,.2);border-radius:12px;padding:16px;margin-bottom:16px;font-size:13px;line-height:1.8;">
-        <div style="font-weight:700;color:#4facfe;margin-bottom:8px;">📋 خطوات الإعداد:</div>
-        <div>1. اذهب إلى <a href="https://console.firebase.google.com" target="_blank" style="color:#4facfe;">console.firebase.google.com</a></div>
-        <div>2. أنشئ مشروعاً جديداً → <strong>Add project</strong></div>
-        <div>3. من Firestore Database → <strong>Create database</strong> → Test mode</div>
-        <div>4. من إعدادات المشروع ⚙️ → <strong>Add app</strong> → Web</div>
-        <div>5. انسخ الـ <strong>firebaseConfig</strong> والصقه أدناه</div>
+      <div class="tabs" style="margin-bottom:16px;">
+        <button class="tab active" id="fb-tab-cloud-btn" onclick="switchFbTab('cloud',this)">☁️ مزامنة السحابة</button>
+        <button class="tab" id="fb-tab-push-btn" onclick="switchFbTab('push',this)">🔔 إشعارات Push</button>
       </div>
-      <div class="form-group">
-        <label>الصق firebaseConfig هنا</label>
-        <textarea id="firebase-config-input" rows="8" placeholder='const firebaseConfig = {&#10;  apiKey: "AIza...",&#10;  authDomain: "...",&#10;  projectId: "...",&#10;  storageBucket: "...",&#10;  messagingSenderId: "...",&#10;  appId: "..."&#10;};' style="font-family:monospace;font-size:12px;direction:ltr;"></textarea>
+
+      <!-- Tab: Cloud sync -->
+      <div id="fb-tab-cloud">
+        <div style="background:rgba(79,172,254,.07);border:1px solid rgba(79,172,254,.2);border-radius:12px;padding:14px;margin-bottom:14px;font-size:13px;line-height:1.8;">
+          <div style="font-weight:700;color:#4facfe;margin-bottom:6px;">📋 خطوات الإعداد:</div>
+          <div>1. اذهب إلى <a href="https://console.firebase.google.com" target="_blank" style="color:#4facfe;">console.firebase.google.com</a></div>
+          <div>2. أنشئ مشروعاً جديداً → <strong>Add project</strong></div>
+          <div>3. من Firestore Database → <strong>Create database</strong> → Test mode</div>
+          <div>4. من إعدادات المشروع ⚙️ → <strong>Add app</strong> → Web</div>
+          <div>5. انسخ الـ <strong>firebaseConfig</strong> والصقه أدناه</div>
+        </div>
+        <div class="form-group">
+          <label>الصق firebaseConfig هنا</label>
+          <textarea id="firebase-config-input" rows="7" placeholder='const firebaseConfig = {&#10;  apiKey: "AIza...",&#10;  authDomain: "...",&#10;  projectId: "...",&#10;  storageBucket: "...",&#10;  messagingSenderId: "...",&#10;  appId: "..."&#10;};' style="font-family:monospace;font-size:12px;direction:ltr;"></textarea>
+        </div>
       </div>
-      <div id="firebase-status" style="margin-top:8px;font-size:12px;"></div>
+
+      <!-- Tab: Push Notifications -->
+      <div id="fb-tab-push" style="display:none;">
+        <div style="background:rgba(245,166,35,.07);border:1px solid rgba(245,166,35,.2);border-radius:12px;padding:14px;margin-bottom:14px;font-size:13px;line-height:1.7;">
+          <div style="font-weight:700;color:#f5a623;margin-bottom:6px;">📋 خطوات تفعيل Push Notifications:</div>
+          <div>1. في Firebase Console → <strong>Project Settings ⚙️</strong> → <strong>Cloud Messaging</strong></div>
+          <div>2. من <strong>Web Push certificates</strong> → انسخ <strong>Key pair (VAPID)</strong></div>
+          <div>3. من <strong>Cloud Messaging API (Legacy)</strong> → انسخ <strong>Server key</strong></div>
+          <div style="margin-top:6px;color:#e94560;font-size:11px;">⚠️ المفتاح السري للاستخدام الداخلي فقط — لا تشاركه</div>
+        </div>
+        <div class="form-grid">
+          <div class="form-group full">
+            <label>🔑 VAPID Public Key — Web Push Certificate</label>
+            <input type="text" id="fcm-vapid-key" placeholder="BK... (مفتاح VAPID العام)" style="font-family:monospace;font-size:11px;direction:ltr;">
+          </div>
+          <div class="form-group full">
+            <label>🔐 FCM Server Key (Legacy)</label>
+            <input type="password" id="fcm-server-key" placeholder="AAAA... (مفتاح الخادم السري)" style="font-family:monospace;font-size:11px;direction:ltr;">
+          </div>
+        </div>
+        <div style="background:rgba(0,212,170,.06);border:1px solid rgba(0,212,170,.15);border-radius:10px;padding:12px;margin-top:10px;font-size:12px;color:#00d4aa;line-height:1.7;">
+          ✅ بعد الحفظ: يستطيع العميل تفعيل الإشعارات من صفحة تتبع سيارته<br>
+          وسيصله إشعار تلقائي عند كل تغيير في مرحلة إصلاح سيارته
+        </div>
+      </div>
+
+      <div id="firebase-status" style="margin-top:10px;font-size:12px;"></div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-outline" onclick="closeModal('modal-firebase')">إلغاء</button>
@@ -1798,22 +1889,45 @@ function switchTab(btn,targetId){
 
 
 
+function switchFbTab(tab, btn) {
+  document.getElementById('fb-tab-cloud').style.display = tab === 'cloud' ? '' : 'none';
+  document.getElementById('fb-tab-push').style.display  = tab === 'push'  ? '' : 'none';
+  btn.closest('.tabs').querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+}
+
 function openFirebaseSetup() {
-  // Pre-fill if config already saved
   const saved = localStorage.getItem('firebase_config');
   if (saved) document.getElementById('firebase-config-input').value = saved;
+  const vapid = localStorage.getItem('fcm_vapid_key');
+  const srvKey = localStorage.getItem('fcm_server_key');
+  if (vapid)  document.getElementById('fcm-vapid-key').value  = vapid;
+  if (srvKey) document.getElementById('fcm-server-key').value = srvKey;
+  // reset to cloud tab
+  switchFbTab('cloud', document.getElementById('fb-tab-cloud-btn'));
   openModal('modal-firebase');
 }
 
 async function applyFirebaseConfig() {
   const statusEl = document.getElementById('firebase-status');
-  statusEl.innerHTML = '<span style="color:#f5a623;">⏳ جاري الاتصال...</span>';
+
+  // Save FCM push keys if filled
+  const vapid  = document.getElementById('fcm-vapid-key').value.trim();
+  const srvKey = document.getElementById('fcm-server-key').value.trim();
+  if (vapid)  localStorage.setItem('fcm_vapid_key',  vapid);
+  if (srvKey) localStorage.setItem('fcm_server_key', srvKey);
+  if (vapid || srvKey) {
+    statusEl.innerHTML = '<span style="color:#00d4aa;">🔔 تم حفظ مفاتيح الإشعارات.</span>';
+  }
+
+  // Try Firebase connection
+  statusEl.innerHTML = '<span style="color:#f5a623;">⏳ جاري الاتصال بالسحابة...</span>';
   const ok = await checkFirebase();
   if (ok) {
     statusEl.innerHTML = '<span style="color:#00d4aa;">✅ تم الاتصال! البيانات تُحفظ على السحابة الآن.</span>';
     setTimeout(() => closeModal('modal-firebase'), 2000);
   } else {
-    statusEl.innerHTML = '<span style="color:#e94560;">⚠️ تعذّر الاتصال. تأكد من Firestore Rules.</span>';
+    statusEl.innerHTML = '<span style="color:#e94560;">⚠️ تعذّر الاتصال بـ Firestore. تحقق من الإعدادات.</span>';
   }
 }
 
@@ -2108,6 +2222,24 @@ function showCarTracking(car) {
   if (car.notes) {
     document.getElementById('trk-notes-text').textContent = car.notes;
     document.getElementById('trk-notes-box').style.display = 'block';
+  }
+
+  // Push notification state
+  window._trkCarId = car.id;
+  const notifyBox = document.getElementById('trk-notify-box');
+  const notifyBtn = document.getElementById('trk-notify-btn');
+  const notifyStatus = document.getElementById('trk-notify-status');
+  if (notifyBox && notifyBtn) {
+    if (car.fcmToken || car.pushSubscription) {
+      notifyBtn.style.display = 'none';
+      notifyStatus.textContent = '✅ الإشعارات مفعّلة لهذه السيارة';
+      notifyStatus.style.color = '#00d4aa';
+    } else if (!('Notification' in window)) {
+      notifyBox.style.display = 'none';
+    } else {
+      notifyBtn.style.display = '';
+      notifyStatus.textContent = '';
+    }
   }
 
   document.getElementById('trk-result').style.display = 'block';
@@ -2454,6 +2586,16 @@ window.addEventListener('load', () => {
         <div id="trk-notes-text" style="font-size:13px;color:#eaeaea;line-height:1.7;"></div>
       </div>
 
+      <!-- Push Notification Subscribe -->
+      <div id="trk-notify-box" style="background:rgba(79,172,254,0.06);border:1px solid rgba(79,172,254,0.2);border-radius:16px;padding:18px;margin-bottom:12px;text-align:center;">
+        <div style="font-size:13px;color:#8892a4;margin-bottom:12px;">🔔 فعّل الإشعارات لتلقّي تحديثات فورية عند تغيير مرحلة سيارتك</div>
+        <button id="trk-notify-btn" onclick="subscribeToNotifications(window._trkCarId)"
+          style="padding:11px 24px;background:linear-gradient(135deg,#4facfe,#00f2fe);border:none;border-radius:12px;color:#0a1628;font-family:'Cairo',sans-serif;font-size:13px;font-weight:800;cursor:pointer;width:100%;">
+          🔔 تفعيل إشعارات سيارتي
+        </button>
+        <div id="trk-notify-status" style="font-size:12px;margin-top:8px;min-height:16px;"></div>
+      </div>
+
       <!-- Search again -->
       <button onclick="resetTracking()" style="width:100%;padding:13px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:12px;color:#eaeaea;font-family:'Cairo',sans-serif;font-size:14px;font-weight:600;cursor:pointer;margin-bottom:10px;">🔍 البحث عن سيارة أخرى</button>
     </div>
@@ -2467,25 +2609,59 @@ window.addEventListener('load', () => {
 
 <!-- Firebase Setup Modal -->
 <div class="modal-overlay" id="modal-firebase">
-  <div class="modal">
+  <div class="modal modal-lg">
     <div class="modal-header">
-      <div class="modal-title">☁️ إعداد المزامنة السحابية</div>
+      <div class="modal-title">☁️ إعداد المزامنة والإشعارات</div>
       <button class="modal-close" onclick="closeModal('modal-firebase')">✕</button>
     </div>
     <div class="modal-body">
-      <div style="background:rgba(79,172,254,.07);border:1px solid rgba(79,172,254,.2);border-radius:12px;padding:16px;margin-bottom:16px;font-size:13px;line-height:1.8;">
-        <div style="font-weight:700;color:#4facfe;margin-bottom:8px;">📋 خطوات الإعداد:</div>
-        <div>1. اذهب إلى <a href="https://console.firebase.google.com" target="_blank" style="color:#4facfe;">console.firebase.google.com</a></div>
-        <div>2. أنشئ مشروعاً جديداً → <strong>Add project</strong></div>
-        <div>3. من Firestore Database → <strong>Create database</strong> → Test mode</div>
-        <div>4. من إعدادات المشروع ⚙️ → <strong>Add app</strong> → Web</div>
-        <div>5. انسخ الـ <strong>firebaseConfig</strong> والصقه أدناه</div>
+      <div class="tabs" style="margin-bottom:16px;">
+        <button class="tab active" id="fb-tab-cloud-btn" onclick="switchFbTab('cloud',this)">☁️ مزامنة السحابة</button>
+        <button class="tab" id="fb-tab-push-btn" onclick="switchFbTab('push',this)">🔔 إشعارات Push</button>
       </div>
-      <div class="form-group">
-        <label>الصق firebaseConfig هنا</label>
-        <textarea id="firebase-config-input" rows="8" placeholder='const firebaseConfig = {&#10;  apiKey: "AIza...",&#10;  authDomain: "...",&#10;  projectId: "...",&#10;  storageBucket: "...",&#10;  messagingSenderId: "...",&#10;  appId: "..."&#10;};' style="font-family:monospace;font-size:12px;direction:ltr;"></textarea>
+
+      <!-- Tab: Cloud sync -->
+      <div id="fb-tab-cloud">
+        <div style="background:rgba(79,172,254,.07);border:1px solid rgba(79,172,254,.2);border-radius:12px;padding:14px;margin-bottom:14px;font-size:13px;line-height:1.8;">
+          <div style="font-weight:700;color:#4facfe;margin-bottom:6px;">📋 خطوات الإعداد:</div>
+          <div>1. اذهب إلى <a href="https://console.firebase.google.com" target="_blank" style="color:#4facfe;">console.firebase.google.com</a></div>
+          <div>2. أنشئ مشروعاً جديداً → <strong>Add project</strong></div>
+          <div>3. من Firestore Database → <strong>Create database</strong> → Test mode</div>
+          <div>4. من إعدادات المشروع ⚙️ → <strong>Add app</strong> → Web</div>
+          <div>5. انسخ الـ <strong>firebaseConfig</strong> والصقه أدناه</div>
+        </div>
+        <div class="form-group">
+          <label>الصق firebaseConfig هنا</label>
+          <textarea id="firebase-config-input" rows="7" placeholder='const firebaseConfig = {&#10;  apiKey: "AIza...",&#10;  authDomain: "...",&#10;  projectId: "...",&#10;  storageBucket: "...",&#10;  messagingSenderId: "...",&#10;  appId: "..."&#10;};' style="font-family:monospace;font-size:12px;direction:ltr;"></textarea>
+        </div>
       </div>
-      <div id="firebase-status" style="margin-top:8px;font-size:12px;"></div>
+
+      <!-- Tab: Push Notifications -->
+      <div id="fb-tab-push" style="display:none;">
+        <div style="background:rgba(245,166,35,.07);border:1px solid rgba(245,166,35,.2);border-radius:12px;padding:14px;margin-bottom:14px;font-size:13px;line-height:1.7;">
+          <div style="font-weight:700;color:#f5a623;margin-bottom:6px;">📋 خطوات تفعيل Push Notifications:</div>
+          <div>1. في Firebase Console → <strong>Project Settings ⚙️</strong> → <strong>Cloud Messaging</strong></div>
+          <div>2. من <strong>Web Push certificates</strong> → انسخ <strong>Key pair (VAPID)</strong></div>
+          <div>3. من <strong>Cloud Messaging API (Legacy)</strong> → انسخ <strong>Server key</strong></div>
+          <div style="margin-top:6px;color:#e94560;font-size:11px;">⚠️ المفتاح السري للاستخدام الداخلي فقط — لا تشاركه</div>
+        </div>
+        <div class="form-grid">
+          <div class="form-group full">
+            <label>🔑 VAPID Public Key — Web Push Certificate</label>
+            <input type="text" id="fcm-vapid-key" placeholder="BK... (مفتاح VAPID العام)" style="font-family:monospace;font-size:11px;direction:ltr;">
+          </div>
+          <div class="form-group full">
+            <label>🔐 FCM Server Key (Legacy)</label>
+            <input type="password" id="fcm-server-key" placeholder="AAAA... (مفتاح الخادم السري)" style="font-family:monospace;font-size:11px;direction:ltr;">
+          </div>
+        </div>
+        <div style="background:rgba(0,212,170,.06);border:1px solid rgba(0,212,170,.15);border-radius:10px;padding:12px;margin-top:10px;font-size:12px;color:#00d4aa;line-height:1.7;">
+          ✅ بعد الحفظ: يستطيع العميل تفعيل الإشعارات من صفحة تتبع سيارته<br>
+          وسيصله إشعار تلقائي عند كل تغيير في مرحلة إصلاح سيارته
+        </div>
+      </div>
+
+      <div id="firebase-status" style="margin-top:10px;font-size:12px;"></div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-outline" onclick="closeModal('modal-firebase')">إلغاء</button>
@@ -2500,6 +2676,122 @@ if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js')
       .catch(() => {});
   });
+}
+</script>
+
+<!-- ═══════════════════════════════════════════════════
+     PUSH NOTIFICATIONS — Web Push + FCM
+     ═══════════════════════════════════════════════════ -->
+<script>
+// ── Helpers ────────────────────────────────────────────────────
+function _urlBase64ToUint8Array(b64) {
+  const pad = '='.repeat((4 - b64.length % 4) % 4);
+  const raw = atob((b64 + pad).replace(/-/g, '+').replace(/_/g, '/'));
+  return Uint8Array.from([...raw].map(c => c.charCodeAt(0)));
+}
+
+// ── Send FCM Push (from workshop when stage changes) ──────────
+async function sendPushNotification(car) {
+  const srvKey = localStorage.getItem('fcm_server_key');
+  const token  = car.fcmToken;
+  if (!token || !srvKey) return;
+
+  const STAGES_AR    = ['استلام','تشخيص','إصلاح','دهان','جاهزة للتسليم','تم التسليم'];
+  const STAGE_EMOJIS = ['📋','🔍','🔧','🎨','✅','📦'];
+  const idx   = car.stage || 0;
+  const label = (STAGE_EMOJIS[idx] || '🚗') + ' ' + (STAGES_AR[idx] || '');
+  const trackUrl = (typeof getTrackingUrl === 'function') ? getTrackingUrl(car.id) : '/track.html';
+
+  try {
+    const res = await fetch('https://fcm.googleapis.com/fcm/send', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'key=' + srvKey
+      },
+      body: JSON.stringify({
+        to: token,
+        notification: {
+          title: `🚗 تحديث: ${car.plate}`,
+          body: `وصلت سيارتك إلى مرحلة: ${label}`,
+          icon: '/icon-192.png',
+          click_action: trackUrl
+        },
+        webpush: {
+          headers: { Urgency: 'high' },
+          notification: { dir: 'rtl', requireInteraction: true },
+          fcm_options: { link: trackUrl }
+        },
+        data: { url: trackUrl, stage: String(idx), plate: car.plate }
+      })
+    });
+    if (res.ok) {
+      const j = await res.json();
+      if (j.success) console.log('✅ Push sent:', car.plate);
+      else           console.warn('FCM error:', j);
+    }
+  } catch(e) {
+    console.warn('sendPushNotification failed:', e);
+  }
+}
+
+// ── Customer Subscribe (from tracking overlay) ────────────────
+async function subscribeToNotifications(carId) {
+  const car = (state.cars || []).find(c => c.id === carId);
+  if (!car) return;
+
+  if (!('Notification' in window)) {
+    return alert('متصفحك لا يدعم الإشعارات. جرّب Chrome أو Edge.');
+  }
+
+  _setNotifyUI('loading');
+
+  const perm = await Notification.requestPermission();
+  if (perm !== 'granted') { _setNotifyUI('denied'); return; }
+
+  const vapidKey = localStorage.getItem('fcm_vapid_key');
+  let subscribed = false;
+
+  // 1. Try standard Web Push subscription (works with VAPID)
+  try {
+    const sw = await navigator.serviceWorker.ready;
+    const opts = { userVisibleOnly: true };
+    if (vapidKey) opts.applicationServerKey = _urlBase64ToUint8Array(vapidKey);
+    const sub = await sw.pushManager.subscribe(opts);
+    car.pushSubscription = JSON.stringify(sub.toJSON());
+    subscribed = true;
+  } catch(e) {
+    console.warn('Web Push subscribe failed:', e);
+  }
+
+  if (subscribed) {
+    saveState();
+    _setNotifyUI('subscribed');
+  } else {
+    _setNotifyUI('error');
+  }
+}
+
+function _setNotifyUI(state_) {
+  const btn    = document.getElementById('trk-notify-btn');
+  const status = document.getElementById('trk-notify-status');
+  if (!btn || !status) return;
+  const map = {
+    loading:    ['⏳ جاري التفعيل...', '#f5a623', false],
+    subscribed: ['✅ تم تفعيل الإشعارات! ستصلك تحديثات سيارتك تلقائياً', '#00d4aa', true],
+    denied:     ['❌ رُفض الإذن. يرجى السماح بالإشعارات من إعدادات المتصفح', '#e94560', false],
+    error:      ['⚠️ تعذّر التفعيل. تأكد أن المتصفح يدعم الإشعارات', '#e94560', false]
+  };
+  const [msg, color, hide] = map[state_] || map.error;
+  status.textContent = msg;
+  status.style.color = color;
+  if (hide) btn.style.display = 'none';
+}
+
+// ── Show push status in workshop cars table ───────────────────
+function pushStatusIcon(car) {
+  if (car.fcmToken || car.pushSubscription) return '<span title="الإشعارات مفعّلة" style="color:#00d4aa;font-size:14px;">🔔</span>';
+  return '<span title="الإشعارات غير مفعّلة" style="color:#444;font-size:12px;">🔕</span>';
 }
 </script>
 </body>

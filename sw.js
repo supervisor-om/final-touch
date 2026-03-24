@@ -1,4 +1,41 @@
-const CACHE_NAME = 'final-touch-v1';
+const CACHE_NAME = 'final-touch-v2';
+
+// ─── PUSH NOTIFICATIONS ──────────────────────────────────────────────
+self.addEventListener('push', event => {
+  if (!event.data) return;
+  let data = {};
+  try { data = event.data.json(); } catch(e) { data.body = event.data.text(); }
+  const opts = {
+    body: data.body || 'تم تحديث حالة سيارتك',
+    icon: '/icon-192.png',
+    badge: '/icon-192.png',
+    dir: 'rtl',
+    lang: 'ar',
+    vibrate: [300, 100, 300, 100, 300],
+    tag: data.tag || 'car-update',
+    renotify: true,
+    requireInteraction: true,
+    data: { url: data.url || '/track.html' }
+  };
+  event.waitUntil(
+    self.registration.showNotification(data.title || '🚗 اللمسة الأخيرة', opts)
+  );
+});
+
+self.addEventListener('notificationclick', event => {
+  event.notification.close();
+  const url = (event.notification.data && event.notification.data.url) || '/track.html';
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(cs => {
+      for (const c of cs) {
+        if (c.url.includes('track') && 'focus' in c) return c.focus();
+      }
+      return clients.openWindow(url);
+    })
+  );
+});
+// ─────────────────────────────────────────────────────────────────────
+
 
 const STATIC_ASSETS = [
   '/workshop.html',

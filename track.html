@@ -171,6 +171,16 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
       <div class="notes-text" id="r-notes"></div>
     </div>
 
+    <!-- Push Notification Subscribe -->
+    <div id="t-notify-box" style="background:rgba(79,172,254,0.08);border:1px solid rgba(79,172,254,0.25);border-radius:16px;padding:18px;margin-bottom:14px;text-align:center;">
+      <div style="font-size:13px;color:#8892a4;margin-bottom:12px;">🔔 فعّل الإشعارات لتلقّي تحديثات فورية عند تغيير مرحلة سيارتك</div>
+      <button id="t-notify-btn" onclick="subscribeTrackPush()"
+        style="padding:11px 24px;background:linear-gradient(135deg,#4facfe,#00f2fe);border:none;border-radius:12px;color:#0a1628;font-family:'Cairo',sans-serif;font-size:13px;font-weight:800;cursor:pointer;width:100%;">
+        🔔 تفعيل إشعارات سيارتي
+      </button>
+      <div id="t-notify-status" style="font-size:12px;margin-top:8px;min-height:16px;"></div>
+    </div>
+
     <button class="back-btn" onclick="goBack()">🔍 البحث عن سيارة أخرى</button>
   </div>
 
@@ -414,6 +424,91 @@ if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js')
       .catch(() => {});
   });
+}
+</script>
+
+<!-- ═══ PUSH NOTIFICATIONS ═══ -->
+<script>
+let _trackCurrentCar = null;
+
+// Inject car into notify state after showResult
+const _origShowResult = showResult;
+showResult = function(car) {
+  _trackCurrentCar = car;
+  _origShowResult(car);
+  _refreshNotifyUI(car);
+};
+
+function _refreshNotifyUI(car) {
+  const box    = document.getElementById('t-notify-box');
+  const btn    = document.getElementById('t-notify-btn');
+  const status = document.getElementById('t-notify-status');
+  if (!box) return;
+  if (!('Notification' in window)) { box.style.display = 'none'; return; }
+  if (car && (car.fcmToken || car.pushSubscription)) {
+    btn.style.display = 'none';
+    status.textContent = '✅ الإشعارات مفعّلة — ستصلك تحديثات سيارتك تلقائياً';
+    status.style.color = '#00d4aa';
+  } else {
+    btn.style.display = '';
+    status.textContent = '';
+  }
+}
+
+async function subscribeTrackPush() {
+  if (!_trackCurrentCar) return;
+  if (!('Notification' in window)) return alert('متصفحك لا يدعم الإشعارات. جرّب Chrome.');
+
+  _setTrackNotify('loading');
+  const perm = await Notification.requestPermission();
+  if (perm !== 'granted') { _setTrackNotify('denied'); return; }
+
+  // Read VAPID key from localStorage (set by workshop app)
+  const vapidKey = localStorage.getItem('fcm_vapid_key');
+  try {
+    const sw = await navigator.serviceWorker.ready;
+    const opts = { userVisibleOnly: true };
+    if (vapidKey) opts.applicationServerKey = _urlB64ToUint8(_vapidKey = vapidKey);
+    const sub = await sw.pushManager.subscribe(opts);
+
+    // Save subscription into the car record so workshop can retrieve it
+    _trackCurrentCar.pushSubscription = JSON.stringify(sub.toJSON());
+
+    // Persist in localStorage under the shared key
+    const STORAGE_KEY = 'finaltouchv2';
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      try {
+        const st = JSON.parse(raw);
+        const c = (st.cars || []).find(c => c.id === _trackCurrentCar.id);
+        if (c) { c.pushSubscription = _trackCurrentCar.pushSubscription; localStorage.setItem(STORAGE_KEY, JSON.stringify(st)); }
+      } catch(e) {}
+    }
+    _setTrackNotify('subscribed');
+  } catch(e) {
+    console.warn('Push subscribe failed:', e);
+    _setTrackNotify('error');
+  }
+}
+
+function _setTrackNotify(s) {
+  const btn = document.getElementById('t-notify-btn');
+  const status = document.getElementById('t-notify-status');
+  const map = {
+    loading:    ['⏳ جاري التفعيل...', '#f5a623', false],
+    subscribed: ['✅ تم التفعيل! ستصلك إشعارات عند تحديث سيارتك', '#00d4aa', true],
+    denied:     ['❌ رُفض الإذن — فعّل من إعدادات المتصفح', '#e94560', false],
+    error:      ['⚠️ تعذّر التفعيل — تأكد من دعم المتصفح', '#e94560', false]
+  };
+  const [msg, color, hide] = map[s] || map.error;
+  if (status) { status.textContent = msg; status.style.color = color; }
+  if (btn && hide) btn.style.display = 'none';
+}
+
+function _urlB64ToUint8(b64) {
+  const pad = '='.repeat((4 - b64.length % 4) % 4);
+  const raw = atob((b64 + pad).replace(/-/g,'+').replace(/_/g,'/'));
+  return Uint8Array.from([...raw].map(c => c.charCodeAt(0)));
 }
 </script>
 </body>
