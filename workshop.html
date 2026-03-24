@@ -499,7 +499,7 @@ label{font-size:11px;letter-spacing:.5px;}
 <div id="auth-overlay">
   <div class="auth-box">
     <div class="auth-logo">
-      <div style="font-size:40px;">🔧</div>
+      <img id="auth-logo-img" src="" alt="logo" style="width:120px;height:120px;object-fit:contain;display:block;margin:0 auto 8px;filter:drop-shadow(0 4px 20px rgba(233,69,96,.5));">
       <div class="auth-logo-title">اللمسة الأخيرة</div>
       <div class="auth-logo-sub">THE FINAL TOUCH</div>
     </div>
@@ -2939,6 +2939,13 @@ function applyRole(user) {
 
 // ── Init on load ─────────────────────────────────────────────────────
 function initAuth() {
+  // Copy logo from sidebar to login screen
+  try {
+    var sidebarImg = document.querySelector('.logo-area img');
+    var authImg    = document.getElementById('auth-logo-img');
+    if (sidebarImg && authImg) authImg.src = sidebarImg.src;
+  } catch(e) {}
+
   // Reset old password format if needed (migration)
   try {
     var raw = localStorage.getItem('ft_users');
