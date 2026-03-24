@@ -2420,7 +2420,6 @@ window.addEventListener('load', initCustomerTracking);
 document.getElementById('today-date').textContent=new Date().toLocaleDateString('ar-SA',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
 document.getElementById('exp-date').value=today();
 renderAll();
-initAuth();
 
 
 // ══════════════════════════════════════════
@@ -3003,6 +3002,9 @@ function deleteUser(idx) {
   saveUsers(users);
   renderUsersList();
 }
+
+// Run auth check after all scripts are parsed
+initAuth();
 </script>
 
 <!-- ═══════════════════════════════════════════════════
