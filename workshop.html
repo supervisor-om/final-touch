@@ -632,7 +632,6 @@ label{font-size:14px;}
       <button onclick="logout()" title="تسجيل الخروج" style="background:rgba(233,69,96,.15);border:1px solid rgba(233,69,96,.25);color:#e94560;border-radius:8px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;" data-i18n="btn_logout">خروج ↩</button>
     </div>
     <div id="sync-indicator-side" style="margin-bottom:8px;"></div>
-    <button onclick="openFirebaseSetup()" style="background:rgba(79,172,254,.1);border:1px solid rgba(79,172,254,.2);color:#4facfe;border-radius:8px;padding:6px 12px;font-family:var(--font-main);font-size:11px;font-weight:700;cursor:pointer;width:100%;margin-bottom:8px;" data-i18n="btn_cloud_setup">☁️ إعداد السحابة</button>
     📅 <span id="today-date"></span>
   </div>
 </aside>
@@ -1911,60 +1910,6 @@ function exportPDF(){
   </div>
 </div>
 
-
-<!-- Firebase Setup Modal -->
-<div class="modal-overlay" id="modal-firebase">
-  <div class="modal modal-lg">
-    <div class="modal-header">
-      <div class="modal-title" data-i18n="card_firebase">☁️ إعداد المزامنة والإشعارات</div>
-      <button class="modal-close" onclick="closeModal('modal-firebase')">✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="tabs" style="margin-bottom:16px;">
-        <button class="tab active" id="fb-tab-cloud-btn" onclick="switchFbTab('cloud',this)">☁️ مزامنة السحابة</button>
-        <button class="tab" id="fb-tab-push-btn" onclick="switchFbTab('push',this)">📱 إشعارات WhatsApp</button>
-      </div>
-
-      <!-- Tab: Cloud sync -->
-      <div id="fb-tab-cloud">
-        <div style="background:rgba(79,172,254,.07);border:1px solid rgba(79,172,254,.2);border-radius:12px;padding:14px;margin-bottom:14px;font-size:13px;line-height:1.8;">
-          <div style="font-weight:700;color:#4facfe;margin-bottom:6px;">📋 خطوات الإعداد:</div>
-          <div>1. اذهب إلى <a href="https://console.firebase.google.com" target="_blank" style="color:#4facfe;">console.firebase.google.com</a></div>
-          <div>2. أنشئ مشروعاً جديداً → <strong>Add project</strong></div>
-          <div>3. من Firestore Database → <strong>Create database</strong> → Test mode</div>
-          <div>4. من إعدادات المشروع ⚙️ → <strong>Add app</strong> → Web</div>
-          <div>5. انسخ الـ <strong>firebaseConfig</strong> والصقه أدناه</div>
-        </div>
-        <div class="form-group">
-          <label>الصق firebaseConfig هنا</label>
-          <textarea id="firebase-config-input" rows="7" placeholder='const firebaseConfig = {&#10;  apiKey: "AIza...",&#10;  authDomain: "...",&#10;  projectId: "...",&#10;  storageBucket: "...",&#10;  messagingSenderId: "...",&#10;  appId: "..."&#10;};' style="font-family:monospace;font-size:12px;direction:ltr;"></textarea>
-        </div>
-      </div>
-
-      <!-- Tab: WhatsApp Notifications via CallMeBot -->
-      <div id="fb-tab-push" style="display:none;">
-        <div style="background:rgba(37,211,102,.07);border:1px solid rgba(37,211,102,.25);border-radius:12px;padding:14px;margin-bottom:14px;font-size:13px;line-height:1.8;">
-          <div style="font-weight:700;color:#25d366;margin-bottom:6px;">📋 كيفية تفعيل إشعارات WhatsApp للعميل:</div>
-          <div>1. اطلب من العميل إرسال الرسالة التالية على WhatsApp لهذا الرقم: <strong dir="ltr">+34 644 597 364</strong></div>
-          <div style="background:rgba(255,255,255,.06);border-radius:8px;padding:8px;margin:6px 0;font-family:monospace;direction:ltr;font-size:12px;">I allow callmebot to send me messages</div>
-          <div>2. سيصله رد برقم API Key الخاص به</div>
-          <div>3. أدخل هذا المفتاح في حقل <strong>"مفتاح WhatsApp"</strong> عند تعديل سيارته</div>
-          <div>4. عند كل تغيير في مرحلة السيارة، سترسل له رسالة WhatsApp تلقائياً ✅</div>
-        </div>
-        <div style="background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.2);border-radius:10px;padding:12px;font-size:12px;color:#f5a623;line-height:1.6;">
-          💡 <strong>بدون مفتاح API:</strong> سيفتح واتساب تلقائياً مع رسالة جاهزة للإرسال اليدوي
-        </div>
-      </div>
-
-      <div id="firebase-status" style="margin-top:10px;font-size:12px;"></div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-outline" onclick="closeModal('modal-firebase')">إلغاء</button>
-      <button class="btn btn-info" onclick="applyFirebaseConfig()">☁️ تطبيق وربط السحابة</button>
-    </div>
-  </div>
-</div>
-
 </body></html>`);
   w.document.close();w.print();
 }
@@ -2555,9 +2500,18 @@ saveState = function() {
   if (syncEnabled) saveToCloud(false);
 };
 
-// ── Init ─────────────────────────────────────────────────────────────────────
-window.addEventListener('load', () => {
-  checkFirebase();
+// ── Init — auto-connect & retry every 30s if offline ─────────────────────────
+window.addEventListener('load', async () => {
+  const ok = await checkFirebase();
+  if (!ok) {
+    let retryCount = 0;
+    const retryInterval = setInterval(async () => {
+      retryCount++;
+      const connected = await checkFirebase();
+      if (connected) clearInterval(retryInterval);
+      if (retryCount >= 20) clearInterval(retryInterval); // stop after 10 min
+    }, 30000);
+  }
 });
 
 </script>
@@ -2676,60 +2630,6 @@ window.addEventListener('load', () => {
 
     <div style="text-align:center;margin-top:20px;font-size:11px;color:#4a5568;">
       © اللمسة الأخيرة للصيانة والسمكرة والدهان
-    </div>
-  </div>
-</div>
-
-
-<!-- Firebase Setup Modal -->
-<div class="modal-overlay" id="modal-firebase">
-  <div class="modal modal-lg">
-    <div class="modal-header">
-      <div class="modal-title" data-i18n="card_firebase">☁️ إعداد المزامنة والإشعارات</div>
-      <button class="modal-close" onclick="closeModal('modal-firebase')">✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="tabs" style="margin-bottom:16px;">
-        <button class="tab active" id="fb-tab-cloud-btn" onclick="switchFbTab('cloud',this)">☁️ مزامنة السحابة</button>
-        <button class="tab" id="fb-tab-push-btn" onclick="switchFbTab('push',this)">📱 إشعارات WhatsApp</button>
-      </div>
-
-      <!-- Tab: Cloud sync -->
-      <div id="fb-tab-cloud">
-        <div style="background:rgba(79,172,254,.07);border:1px solid rgba(79,172,254,.2);border-radius:12px;padding:14px;margin-bottom:14px;font-size:13px;line-height:1.8;">
-          <div style="font-weight:700;color:#4facfe;margin-bottom:6px;">📋 خطوات الإعداد:</div>
-          <div>1. اذهب إلى <a href="https://console.firebase.google.com" target="_blank" style="color:#4facfe;">console.firebase.google.com</a></div>
-          <div>2. أنشئ مشروعاً جديداً → <strong>Add project</strong></div>
-          <div>3. من Firestore Database → <strong>Create database</strong> → Test mode</div>
-          <div>4. من إعدادات المشروع ⚙️ → <strong>Add app</strong> → Web</div>
-          <div>5. انسخ الـ <strong>firebaseConfig</strong> والصقه أدناه</div>
-        </div>
-        <div class="form-group">
-          <label>الصق firebaseConfig هنا</label>
-          <textarea id="firebase-config-input" rows="7" placeholder='const firebaseConfig = {&#10;  apiKey: "AIza...",&#10;  authDomain: "...",&#10;  projectId: "...",&#10;  storageBucket: "...",&#10;  messagingSenderId: "...",&#10;  appId: "..."&#10;};' style="font-family:monospace;font-size:12px;direction:ltr;"></textarea>
-        </div>
-      </div>
-
-      <!-- Tab: WhatsApp Notifications via CallMeBot -->
-      <div id="fb-tab-push" style="display:none;">
-        <div style="background:rgba(37,211,102,.07);border:1px solid rgba(37,211,102,.25);border-radius:12px;padding:14px;margin-bottom:14px;font-size:13px;line-height:1.8;">
-          <div style="font-weight:700;color:#25d366;margin-bottom:6px;">📋 كيفية تفعيل إشعارات WhatsApp للعميل:</div>
-          <div>1. اطلب من العميل إرسال الرسالة التالية على WhatsApp لهذا الرقم: <strong dir="ltr">+34 644 597 364</strong></div>
-          <div style="background:rgba(255,255,255,.06);border-radius:8px;padding:8px;margin:6px 0;font-family:monospace;direction:ltr;font-size:12px;">I allow callmebot to send me messages</div>
-          <div>2. سيصله رد برقم API Key الخاص به</div>
-          <div>3. أدخل هذا المفتاح في حقل <strong>"مفتاح WhatsApp"</strong> عند تعديل سيارته</div>
-          <div>4. عند كل تغيير في مرحلة السيارة، سترسل له رسالة WhatsApp تلقائياً ✅</div>
-        </div>
-        <div style="background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.2);border-radius:10px;padding:12px;font-size:12px;color:#f5a623;line-height:1.6;">
-          💡 <strong>بدون مفتاح API:</strong> سيفتح واتساب تلقائياً مع رسالة جاهزة للإرسال اليدوي
-        </div>
-      </div>
-
-      <div id="firebase-status" style="margin-top:10px;font-size:12px;"></div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-outline" onclick="closeModal('modal-firebase')">إلغاء</button>
-      <button class="btn btn-info" onclick="applyFirebaseConfig()">☁️ تطبيق وربط السحابة</button>
     </div>
   </div>
 </div>
