@@ -2344,6 +2344,7 @@ async function checkFirebase() {
     if (res.status === 200 || res.status === 404) {
       syncEnabled = true;
       await loadFromCloud();
+      showSyncBanner('ok', '☁️ السحابة متصلة — بياناتك محفوظة تلقائياً');
       return true;
     }
     if (res.status === 403) {
