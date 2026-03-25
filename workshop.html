@@ -2351,12 +2351,20 @@ function documentToData(doc) {
   return Object.fromEntries(Object.entries(doc.fields).map(([k,v]) => [k, fromFirestore(v)]));
 }
 
+// ── Firestore fetch with timeout ─────────────────────────────────────────────
+function fetchWithTimeout(url, options = {}, ms = 10000) {
+  const ctrl = new AbortController();
+  const id = setTimeout(() => ctrl.abort(), ms);
+  return fetch(url, { ...options, signal: ctrl.signal })
+    .finally(() => clearTimeout(id));
+}
+
 // ── Check connection ─────────────────────────────────────────────────────────
 async function checkFirebase() {
   try {
     showSyncStatus('saving');
     const url = FB_BASE_URL + '/' + FB_DOC_PATH + '?key=' + FB_API_KEY;
-    const res = await fetch(url);
+    const res = await fetchWithTimeout(url);
 
     if (res.status === 200 || res.status === 404) {
       syncEnabled = true;
@@ -2365,25 +2373,24 @@ async function checkFirebase() {
       return true;
     }
     if (res.status === 403) {
-      const body = await res.json().catch(() => ({}));
-      showSyncBanner('error', '⚠️ خطأ في الصلاحيات — اذهب إلى Firestore Rules وانشر القاعدة: allow read, write: if true');
-      console.error('Firestore 403:', body);
+      showSyncBanner('error', '⚠️ خطأ في الصلاحيات — تحقق من Firestore Rules');
       return false;
     }
     if (res.status === 400) {
-      showSyncBanner('error', '⚠️ قاعدة البيانات غير موجودة — أنشئ Firestore Database من Firebase Console');
+      showSyncBanner('error', '⚠️ قاعدة البيانات غير موجودة في Firebase Console');
       return false;
     }
     throw new Error('HTTP ' + res.status);
   } catch(e) {
-    if (e.name === 'TypeError' && e.message.includes('fetch')) {
+    if (e.name === 'AbortError') {
+      showSyncBanner('warn', '⚠️ انتهت مهلة الاتصال — سيُعاد المحاولة تلقائياً');
+    } else if (e.name === 'TypeError') {
       showSyncBanner('warn', '⚠️ لا يوجد اتصال بالإنترنت — البيانات محفوظة محلياً');
     } else {
       showSyncBanner('error', '⚠️ ' + e.message);
     }
     syncEnabled = false;
     showSyncStatus('offline');
-    console.warn('Firebase REST error:', e.message);
     return false;
   }
 }
@@ -2411,7 +2418,7 @@ function showSyncBanner(type, msg) {
 async function loadFromCloud() {
   try {
     const url = `${FB_BASE_URL}/${FB_DOC_PATH}?key=${FB_API_KEY}`;
-    const res = await fetch(url);
+    const res = await fetchWithTimeout(url);
     if (res.status === 404) {
       // No data yet — push local
       await saveToCloud(true);
@@ -2478,7 +2485,7 @@ async function saveToCloud(immediate = false) {
   try {
     const url = `${FB_BASE_URL}/${FB_DOC_PATH}?key=${FB_API_KEY}`;
     const body = JSON.stringify(dataToDocument(dataToSave));
-    const res  = await fetch(url, {
+    const res  = await fetchWithTimeout(url, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body,
@@ -2532,7 +2539,7 @@ async function pollCloud() {
   if (!syncEnabled) return;
   try {
     const url = `${FB_BASE_URL}/${FB_DOC_PATH}?key=${FB_API_KEY}&mask.fieldPaths=updatedAt`;
-    const res = await fetch(url);
+    const res = await fetchWithTimeout(url, {}, 8000);
     if (!res.ok) return;
     const doc  = await res.json();
     const fld  = doc.fields && doc.fields.updatedAt;
