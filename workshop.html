@@ -2315,9 +2315,11 @@ let syncEnabled  = false;
 let saveTimeout  = null;
 let lastSaveHash = '';
 
-document.getElementById('today-date').textContent=new Date().toLocaleDateString('ar-SA',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
-document.getElementById('exp-date').value=today();
-renderAll();
+try {
+  document.getElementById('today-date').textContent=new Date().toLocaleDateString('ar-SA',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  document.getElementById('exp-date').value=today();
+  renderAll();
+} catch(e) { console.warn('Init render error:', e); }
 
 // ── Firestore value converters ──────────────────────────────────────────────
 function toFirestore(val) {
@@ -2368,7 +2370,8 @@ async function checkFirebase() {
 
     if (res.status === 200 || res.status === 404) {
       syncEnabled = true;
-      await loadFromCloud();
+      try { await loadFromCloud(); } catch(e) { console.warn('loadFromCloud error:', e); }
+      showSyncStatus('online');
       showSyncBanner('ok', '☁️ السحابة متصلة — بياناتك محفوظة تلقائياً');
       return true;
     }
@@ -2428,7 +2431,7 @@ async function loadFromCloud() {
     if (!res.ok) throw new Error('Load failed: ' + res.status);
     const doc  = await res.json();
     const data = documentToData(doc);
-    if (!data) return;
+    if (!data) { showSyncStatus('online'); return; }
 
     const remoteTime = data.updatedAt ? new Date(data.updatedAt) : new Date(0);
     const localTime  = state.updatedAt ? new Date(state.updatedAt) : new Date(0);
@@ -2554,21 +2557,35 @@ async function pollCloud() {
 
 // ── Init — called directly (not waiting for 'load') so CDN delays don't block
 (async function initFirebase() {
-  const ok = await checkFirebase();
-  // Poll every 15s for live updates from other browsers/devices
-  setInterval(pollCloud, 15000);
-  if (!ok) {
-    // Retry every 30s until connected (max 10 min)
-    let retryCount = 0;
-    const retryInterval = setInterval(async () => {
-      if (syncEnabled) { clearInterval(retryInterval); return; }
-      retryCount++;
-      await checkFirebase();
-      if (retryCount >= 20) clearInterval(retryInterval);
-    }, 30000);
+  try {
+    const ok = await checkFirebase();
+    // Poll every 15s for live updates from other browsers/devices
+    setInterval(pollCloud, 15000);
+    if (!ok) {
+      // Retry every 30s until connected (max 10 min)
+      let retryCount = 0;
+      const retryInterval = setInterval(async () => {
+        if (syncEnabled) { clearInterval(retryInterval); return; }
+        retryCount++;
+        await checkFirebase();
+        if (retryCount >= 20) clearInterval(retryInterval);
+      }, 30000);
+    }
+  } catch(e) {
+    console.error('Firebase init error:', e);
+    showSyncStatus('offline');
   }
 })();
 
+</script>
+
+<!-- Fallback: if main script block fails, try Firebase from a separate block -->
+<script>
+if (typeof syncEnabled !== 'undefined' && !syncEnabled) {
+  (async function() {
+    try { await checkFirebase(); setInterval(pollCloud, 15000); } catch(e) {}
+  })();
+}
 </script>
 
 <!-- ═══════════════════════════════════════════
