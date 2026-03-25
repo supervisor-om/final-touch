@@ -2438,10 +2438,10 @@ async function loadFromCloud() {
         alertDays:      data.alertDays      || state.alertDays,
         updatedAt:      data.updatedAt,
       });
-      saveState();
+      _origSaveState(); // save locally only — don't re-upload to cloud
       renderAll();
       showSyncStatus('synced');
-    showSyncBanner('ok', '✅ تم التزامن مع السحابة بنجاح');
+      showSyncBanner('ok', '🔄 تم استقبال تحديثات جديدة من السحابة');
     } else {
       // Local is newer → push to cloud
       await saveToCloud(true);
@@ -2527,7 +2527,25 @@ saveState = function() {
   if (syncEnabled) saveToCloud(false);
 };
 
-// ── Init — auto-connect & retry every 30s if offline ─────────────────────────
+// ── Poll cloud every 15s for changes from other browsers ─────────────────────
+async function pollCloud() {
+  if (!syncEnabled) return;
+  try {
+    const url = `${FB_BASE_URL}/${FB_DOC_PATH}?key=${FB_API_KEY}&mask.fieldPaths=updatedAt`;
+    const res = await fetch(url);
+    if (!res.ok) return;
+    const doc  = await res.json();
+    const fld  = doc.fields && doc.fields.updatedAt;
+    if (!fld) return;
+    const remoteTime = new Date(fld.stringValue || 0);
+    const localTime  = state.updatedAt ? new Date(state.updatedAt) : new Date(0);
+    if (remoteTime > localTime) {
+      await loadFromCloud(); // pull full data
+    }
+  } catch(e) { /* silent */ }
+}
+
+// ── Init — auto-connect & retry, then start polling ──────────────────────────
 window.addEventListener('load', async () => {
   const ok = await checkFirebase();
   if (!ok) {
@@ -2536,9 +2554,11 @@ window.addEventListener('load', async () => {
       retryCount++;
       const connected = await checkFirebase();
       if (connected) clearInterval(retryInterval);
-      if (retryCount >= 20) clearInterval(retryInterval); // stop after 10 min
+      if (retryCount >= 20) clearInterval(retryInterval);
     }, 30000);
   }
+  // Poll every 15 seconds for updates from other browsers/devices
+  setInterval(pollCloud, 15000);
 });
 
 </script>
