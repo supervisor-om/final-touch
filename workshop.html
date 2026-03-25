@@ -768,7 +768,7 @@ label{font-size:14px;}
   <!-- SERVICES -->
   <div class="page" id="page-services">
     <div style="display:flex;justify-content:flex-end;margin-bottom:14px;">
-      <button class="btn btn-primary" onclick="openModal('modal-add-service')" data-i18n="btn_add_service">➕ إضافة خدمة</button>
+      <button class="btn btn-primary" onclick="addService()" data-i18n="btn_add_service">➕ إضافة خدمة</button>
     </div>
     <div class="card">
       <div class="card-header"><div class="card-title" data-i18n="card_services_list">🛠️ قائمة الخدمات والأسعار</div></div>
@@ -1147,8 +1147,9 @@ label{font-size:14px;}
       </div>
     </div>
     <div class="modal-footer">
+      <input type="hidden" id="svc-edit-id">
       <button class="btn btn-outline" onclick="closeModal('modal-add-service')" data-i18n="btn_cancel">إلغاء</button>
-      <button class="btn btn-primary" onclick="addService()" data-i18n="btn_save">✓ حفظ</button>
+      <button class="btn btn-primary" onclick="saveService()" data-i18n="btn_save">✓ حفظ</button>
     </div>
   </div>
 </div>
@@ -1440,11 +1441,34 @@ function addOrder(){
 
 // ADD SERVICE
 function addService(){
+  document.getElementById('svc-edit-id').value='';
+  ['svc-name','svc-price','svc-desc'].forEach(id=>{document.getElementById(id).value='';});
+  document.getElementById('svc-type').value='صيانة';
+  document.getElementById('modal-add-service').querySelector('.modal-title').textContent='🛠️ إضافة خدمة';
+  openModal('modal-add-service');
+}
+function editService(id){
+  const s=state.services.find(x=>x.id===id);if(!s)return;
+  document.getElementById('svc-edit-id').value=id;
+  document.getElementById('svc-name').value=s.name;
+  document.getElementById('svc-type').value=s.type;
+  document.getElementById('svc-price').value=s.price;
+  document.getElementById('svc-desc').value=s.desc||'';
+  document.getElementById('modal-add-service').querySelector('.modal-title').textContent='✏️ تعديل الخدمة';
+  openModal('modal-add-service');
+}
+function saveService(){
   const name=document.getElementById('svc-name').value.trim();
   if(!name)return;
-  state.services.push({id:genId(),name,type:document.getElementById('svc-type').value,price:parseFloat(document.getElementById('svc-price').value)||0,desc:document.getElementById('svc-desc').value});
+  const editId=document.getElementById('svc-edit-id').value;
+  const data={name,type:document.getElementById('svc-type').value,price:parseFloat(document.getElementById('svc-price').value)||0,desc:document.getElementById('svc-desc').value};
+  if(editId){
+    const idx=state.services.findIndex(s=>s.id===editId);
+    if(idx!==-1)state.services[idx]={...state.services[idx],...data};
+  }else{
+    state.services.push({id:genId(),...data});
+  }
   saveState();closeModal('modal-add-service');
-  ['svc-name','svc-price','svc-desc'].forEach(id=>{document.getElementById(id).value='';});
   renderAll();
 }
 
@@ -1613,7 +1637,7 @@ function renderServicesTable(){
     <td><strong>${s.name}</strong></td><td>${serviceBadge(s.type)}</td>
     <td><strong style="color:var(--gold);">${parseFloat(s.price).toFixed(3)}</strong></td>
     <td style="font-size:12px;">${s.desc||'—'}</td>
-    <td><button class="btn btn-danger btn-sm" onclick="deleteService('${s.id}')">🗑️</button></td>
+    <td><div style="display:flex;gap:5px;"><button class="btn btn-outline btn-sm" onclick="editService('${s.id}')">✏️</button><button class="btn btn-danger btn-sm" onclick="deleteService('${s.id}')">🗑️</button></div></td>
   </tr>`).join('');
 }
 
