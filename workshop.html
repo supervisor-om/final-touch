@@ -3201,17 +3201,25 @@ function clearSession() { try{sessionStorage.removeItem('ft_session');}catch(e){
 
 // ── Login ────────────────────────────────────────────────────────────
 function doLogin() {
-  var username = document.getElementById('auth-username').value.trim();
-  var password = document.getElementById('auth-password').value;
+  var username = (document.getElementById('auth-username').value || '').trim();
+  var password = document.getElementById('auth-password').value || '';
   var errEl    = document.getElementById('auth-error');
-  errEl.style.display = 'none';
 
-  if (!username || !password) {
-    errEl.textContent = '⚠️ '+t('msg_fill_fields');
-    errEl.style.display = 'block'; return;
+  function showErr(msg) {
+    errEl.textContent = msg;
+    errEl.style.cssText = 'display:block!important';
   }
 
-  var users = getUsers();
+  errEl.style.cssText = 'display:none!important';
+
+  if (!username || !password) {
+    showErr('⚠️ ' + (typeof t === 'function' ? t('msg_fill_fields') : 'يرجى ملء جميع الحقول'));
+    return;
+  }
+
+  var users = [];
+  try { users = getUsers(); } catch(e) { users = []; }
+
   var user = null;
   for (var i = 0; i < users.length; i++) {
     if (users[i].username === username && users[i].password === password) {
@@ -3220,15 +3228,18 @@ function doLogin() {
   }
 
   if (!user) {
-    errEl.textContent = '❌ '+t('msg_wrong_credentials');
-    errEl.style.display = 'block';
+    showErr('❌ ' + (typeof t === 'function' ? t('msg_wrong_credentials') : 'اسم المستخدم أو كلمة المرور غير صحيحة'));
     document.getElementById('auth-password').value = '';
     return;
   }
 
-  setSession(user);
-  applyRole(user);
+  // Hide overlay first, then apply role
   document.getElementById('auth-overlay').style.display = 'none';
+  try { setSession(user); } catch(e) {}
+  try { applyRole(user); } catch(e) {
+    // fallback: reload page to apply session
+    location.reload();
+  }
 }
 
 // ── Logout ───────────────────────────────────────────────────────────
