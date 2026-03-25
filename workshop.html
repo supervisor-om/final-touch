@@ -2758,7 +2758,7 @@ window.addEventListener('load', initCustomerTracking);
 
 document.getElementById('today-date').textContent=new Date().toLocaleDateString(currentLang==='ar'?'ar-SA':'en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
 document.getElementById('exp-date').value=today();
-renderAll();
+// renderAll() is called by initAuth() after auth state is confirmed
 
 
 // ══════════════════════════════════════════
@@ -3193,10 +3193,18 @@ function getUsers() {
 }
 function saveUsers(u) { try{localStorage.setItem('ft_users',JSON.stringify(u));}catch(e){} }
 
+var SESSION_TTL = 8 * 60 * 60 * 1000; // 8 hours
 function getSession() {
-  try { return JSON.parse(sessionStorage.getItem('ft_session')); } catch(e) { return null; }
+  try {
+    var s = JSON.parse(sessionStorage.getItem('ft_session'));
+    if (!s) return null;
+    if (s._ts && (Date.now() - s._ts) > SESSION_TTL) { clearSession(); return null; }
+    return s;
+  } catch(e) { return null; }
 }
-function setSession(u) { try{sessionStorage.setItem('ft_session',JSON.stringify(u));}catch(e){} }
+function setSession(u) {
+  try { sessionStorage.setItem('ft_session', JSON.stringify(Object.assign({}, u, {_ts: Date.now()}))); } catch(e) {}
+}
 function clearSession() { try{sessionStorage.removeItem('ft_session');}catch(e){} }
 
 // ── Login ────────────────────────────────────────────────────────────
@@ -3294,9 +3302,11 @@ function initAuth() {
   var session = getSession();
   if (session) {
     document.getElementById('auth-overlay').style.display = 'none';
-    try { applyRole(session); } catch(e) {}
+    try { applyRole(session); } catch(e) { renderAll(); }
+  } else {
+    // No session — show login, but still render background data
+    renderAll();
   }
-  // overlay stays visible if no session
 }
 
 // ── User Management ──────────────────────────────────────────────────
@@ -3351,18 +3361,9 @@ function deleteUser(idx) {
   renderUsersList();
 }
 
-// Run auth check after all scripts are parsed
+// Apply language first, then run auth check (initAuth calls renderAll internally)
+setLang(currentLang);
 initAuth();
-// Apply initial language direction
-(function() {
-  const lang = localStorage.getItem('ft_lang') || 'ar';
-  const isRtl = lang === 'ar';
-  document.documentElement.lang = lang;
-  document.documentElement.dir = isRtl ? 'rtl' : 'ltr';
-  document.body.style.direction = isRtl ? 'rtl' : 'ltr';
-  const btn = document.getElementById('lang-toggle-btn');
-  if (btn) btn.textContent = lang === 'ar' ? '🌐 EN' : '🌐 عربي';
-})();
 </script>
 
 <!-- ═══════════════════════════════════════════════════
