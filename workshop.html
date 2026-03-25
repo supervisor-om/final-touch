@@ -649,7 +649,7 @@ label{font-size:14px;}
         <span style="color:#8892a4;font-size:12px;font-weight:700;" data-i18n="lbl_local_only">💾 محلي فقط</span>
       </div>
       <button id="lang-toggle-btn" onclick="setLang(currentLang==='ar'?'en':'ar')" style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);color:#fff;border-radius:20px;padding:5px 14px;font-family:var(--font-main);font-size:12px;font-weight:700;cursor:pointer;">🌐 EN</button>
-      <button class="btn btn-primary" onclick="openModal('modal-add-car')">➕ إضافة سيارة</button>
+      <button class="btn btn-primary" onclick="openModal('modal-add-car')" data-i18n="btn_add_car">➕ إضافة سيارة</button>
     </div>
   </div>
 
@@ -657,11 +657,11 @@ label{font-size:14px;}
   <div class="page active" id="page-dashboard">
     <div id="alert-banner-area"></div>
     <div class="stats-grid">
-      <div class="stat-card blue"><span class="stat-icon">🚗</span><div class="stat-value" id="stat-cars">0</div><div class="stat-label">سيارات في الورشة</div></div>
-      <div class="stat-card green"><span class="stat-icon">💰</span><div class="stat-value" id="stat-revenue">0 ر.ع</div><div class="stat-label">إجمالي الإيرادات</div></div>
-      <div class="stat-card red"><span class="stat-icon">💸</span><div class="stat-value" id="stat-expenses">0 ر.ع</div><div class="stat-label">إجمالي المصروفات</div></div>
-      <div class="stat-card gold"><span class="stat-icon">📦</span><div class="stat-value" id="stat-profit">0 ر.ع</div><div class="stat-label">صافي الربح</div></div>
-      <div class="stat-card purple"><span class="stat-icon">⏳</span><div class="stat-value" id="stat-pending">0 ر.ع</div><div class="stat-label">مبالغ معلقة (غير مقبوضة)</div></div>
+      <div class="stat-card blue"><span class="stat-icon">🚗</span><div class="stat-value" id="stat-cars">0</div><div class="stat-label" data-i18n="stat_cars_workshop">سيارات في الورشة</div></div>
+      <div class="stat-card green"><span class="stat-icon">💰</span><div class="stat-value" id="stat-revenue">0 ر.ع</div><div class="stat-label" data-i18n="stat_revenue">إجمالي الإيرادات</div></div>
+      <div class="stat-card red"><span class="stat-icon">💸</span><div class="stat-value" id="stat-expenses">0 ر.ع</div><div class="stat-label" data-i18n="stat_expenses">إجمالي المصروفات</div></div>
+      <div class="stat-card gold"><span class="stat-icon">📦</span><div class="stat-value" id="stat-profit">0 ر.ع</div><div class="stat-label" data-i18n="stat_profit">صافي الربح</div></div>
+      <div class="stat-card purple"><span class="stat-icon">⏳</span><div class="stat-value" id="stat-pending">0 ر.ع</div><div class="stat-label" data-i18n="stat_pending">مبالغ معلقة (غير مقبوضة)</div></div>
     </div>
     <div class="two-col-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:18px;">
       <div class="card">
@@ -677,7 +677,7 @@ label{font-size:14px;}
       <div class="card">
         <div class="card-header"><div class="card-title">🚗 أحدث السيارات</div></div>
         <div class="card-body" style="padding:0;">
-          <table><thead><tr><th>اللوحة</th><th>المالك</th><th>الحالة</th><th>الأيام</th></tr></thead>
+          <table><thead><tr><th data-i18n="th_plate">اللوحة</th><th data-i18n="th_owner">المالك</th><th data-i18n="th_status">الحالة</th><th data-i18n="th_days">الأيام</th></tr></thead>
           <tbody id="dash-cars-table"></tbody></table>
         </div>
       </div>
@@ -700,13 +700,13 @@ label{font-size:14px;}
         <option value="سمكرة">سمكرة</option>
         <option value="دهان">دهان</option>
       </select>
-      <button class="btn btn-primary" onclick="openModal('modal-add-car')">➕ إضافة سيارة</button>
+      <button class="btn btn-primary" onclick="openModal('modal-add-car')" data-i18n="btn_add_car">➕ إضافة سيارة</button>
     </div>
     <div class="card">
       <div class="card-header"><div class="card-title">🚗 السيارات في الورشة (<span id="cars-count">0</span>)</div></div>
       <div class="card-body" style="padding:0;">
         <div class="table-wrap">
-          <table><thead><tr><th>#</th><th>اللوحة</th><th>المالك</th><th>الهاتف</th><th>السيارة</th><th>الخدمة</th><th>المرحلة</th><th>الدفع</th><th>الأيام</th><th>التسليم المتوقع</th><th>الحالة</th><th>إجراءات</th></tr></thead>
+          <table><thead><tr><th data-i18n="th_no">#</th><th data-i18n="th_plate">اللوحة</th><th data-i18n="th_owner">المالك</th><th data-i18n="th_phone">الهاتف</th><th data-i18n="th_car">السيارة</th><th data-i18n="th_service">الخدمة</th><th data-i18n="th_stage">المرحلة</th><th data-i18n="th_payment">الدفع</th><th data-i18n="th_days">الأيام</th><th data-i18n="th_expected_delivery">التسليم المتوقع</th><th data-i18n="th_status">الحالة</th><th data-i18n="th_actions">إجراءات</th></tr></thead>
           <tbody id="cars-table-body"></tbody></table>
         </div>
       </div>
@@ -719,7 +719,7 @@ label{font-size:14px;}
       <div class="card-header"><div class="card-title">✅ السيارات المُسلَّمة (<span id="delivered-count">0</span>)</div></div>
       <div class="card-body" style="padding:0;">
         <div class="table-wrap">
-          <table><thead><tr><th>اللوحة</th><th>المالك</th><th>السيارة</th><th>الخدمة</th><th>المبلغ</th><th>المدفوع</th><th>تاريخ الدخول</th><th>تاريخ التسليم</th><th>الأيام</th><th>إجراءات</th></tr></thead>
+          <table><thead><tr><th data-i18n="th_plate">اللوحة</th><th data-i18n="th_owner">المالك</th><th data-i18n="th_car">السيارة</th><th data-i18n="th_service">الخدمة</th><th data-i18n="th_amount">المبلغ</th><th data-i18n="th_paid">المدفوع</th><th data-i18n="th_entry_date">تاريخ الدخول</th><th data-i18n="th_delivery_date">تاريخ التسليم</th><th data-i18n="th_days">الأيام</th><th data-i18n="th_actions">إجراءات</th></tr></thead>
           <tbody id="delivered-table-body"></tbody></table>
         </div>
       </div>
@@ -732,7 +732,7 @@ label{font-size:14px;}
       <div class="card-header"><div class="card-title">🔔 سيارات تجاوزت المدة المحددة</div></div>
       <div class="card-body" style="padding:0;">
         <div class="table-wrap">
-          <table><thead><tr><th>اللوحة</th><th>المالك</th><th>السيارة</th><th>الخدمة</th><th>الأيام في الورشة</th><th>الحالة</th><th>إجراءات</th></tr></thead>
+          <table><thead><tr><th data-i18n="th_plate">اللوحة</th><th data-i18n="th_owner">المالك</th><th data-i18n="th_car">السيارة</th><th data-i18n="th_service">الخدمة</th><th data-i18n="th_days_workshop">الأيام في الورشة</th><th data-i18n="th_status">الحالة</th><th data-i18n="th_actions">إجراءات</th></tr></thead>
           <tbody id="alerts-table-body"></tbody></table>
         </div>
       </div>
@@ -752,13 +752,13 @@ label{font-size:14px;}
   <!-- MAINTENANCE -->
   <div class="page" id="page-maintenance">
     <div style="display:flex;justify-content:flex-end;margin-bottom:14px;">
-      <button class="btn btn-primary" onclick="openModal('modal-add-order')">➕ إضافة أمر صيانة</button>
+      <button class="btn btn-primary" onclick="openModal('modal-add-order')" data-i18n="btn_add_order">➕ إضافة أمر صيانة</button>
     </div>
     <div class="card">
       <div class="card-header"><div class="card-title">⚙️ أوامر الصيانة</div></div>
       <div class="card-body" style="padding:0;">
         <div class="table-wrap">
-          <table><thead><tr><th>#</th><th>السيارة</th><th>نوع العمل</th><th>الوصف</th><th>التكلفة</th><th>الفني</th><th>الحالة</th><th>إجراءات</th></tr></thead>
+          <table><thead><tr><th data-i18n="th_no">#</th><th data-i18n="th_car">السيارة</th><th data-i18n="th_work_type">نوع العمل</th><th data-i18n="th_description">الوصف</th><th data-i18n="th_cost">التكلفة</th><th data-i18n="th_technician">الفني</th><th data-i18n="th_status">الحالة</th><th data-i18n="th_actions">إجراءات</th></tr></thead>
           <tbody id="orders-table-body"></tbody></table>
         </div>
       </div>
@@ -768,7 +768,7 @@ label{font-size:14px;}
   <!-- SERVICES -->
   <div class="page" id="page-services">
     <div style="display:flex;justify-content:flex-end;margin-bottom:14px;">
-      <button class="btn btn-primary" onclick="openModal('modal-add-service')">➕ إضافة خدمة</button>
+      <button class="btn btn-primary" onclick="openModal('modal-add-service')" data-i18n="btn_add_service">➕ إضافة خدمة</button>
     </div>
     <div class="card">
       <div class="card-header"><div class="card-title">🛠️ قائمة الخدمات والأسعار</div></div>
@@ -797,7 +797,7 @@ label{font-size:14px;}
   <!-- EXPENSES -->
   <div class="page" id="page-expenses">
     <div style="display:flex;justify-content:flex-end;margin-bottom:14px;">
-      <button class="btn btn-primary" onclick="openModal('modal-add-expense')">➕ إضافة مصروف</button>
+      <button class="btn btn-primary" onclick="openModal('modal-add-expense')" data-i18n="btn_add_expense">➕ إضافة مصروف</button>
     </div>
     <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);">
       <div class="stat-card red"><span class="stat-icon">🔧</span><div class="stat-value" id="exp-parts">0 ر.ع</div><div class="stat-label">قطع الغيار</div></div>
