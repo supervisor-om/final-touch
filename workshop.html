@@ -562,7 +562,7 @@ label{font-size:14px;}
 <div class="modal-overlay" id="modal-users">
   <div class="modal">
     <div class="modal-header">
-      <div class="modal-title">👥 إدارة المستخدمين</div>
+      <div class="modal-title" data-i18n="card_users_mgmt">👥 إدارة المستخدمين</div>
       <button class="modal-close" onclick="closeModal('modal-users')">✕</button>
     </div>
     <div class="modal-body">
@@ -668,14 +668,14 @@ label{font-size:14px;}
         <div class="card-header"><div class="card-title" data-i18n="card_service_dist">📊 توزيع الخدمات</div></div>
         <div class="card-body">
           <div style="display:flex;flex-direction:column;gap:14px;">
-            <div><div style="display:flex;justify-content:space-between;margin-bottom:5px;"><span style="font-size:13px;">🔧 صيانة ميكانيكية</span><span style="font-size:13px;color:var(--info);" id="pct-maint">0%</span></div><div class="progress-bar"><div class="progress-fill" id="bar-maint" style="width:0%;background:linear-gradient(90deg,#4facfe,#00f2fe)"></div></div></div>
-            <div><div style="display:flex;justify-content:space-between;margin-bottom:5px;"><span style="font-size:13px;">🔨 سمكرة وهيكل</span><span style="font-size:13px;color:var(--accent);" id="pct-body">0%</span></div><div class="progress-bar"><div class="progress-fill" id="bar-body" style="width:0%;background:linear-gradient(90deg,#e94560,#ff6b35)"></div></div></div>
-            <div><div style="display:flex;justify-content:space-between;margin-bottom:5px;"><span style="font-size:13px;">🎨 دهان وتلميع</span><span style="font-size:13px;color:#9b59b6;" id="pct-paint">0%</span></div><div class="progress-bar"><div class="progress-fill" id="bar-paint" style="width:0%;background:linear-gradient(90deg,#9b59b6,#e74c3c)"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;margin-bottom:5px;"><span style="font-size:13px;" data-i18n="lbl_maint_mech">🔧 صيانة ميكانيكية</span><span style="font-size:13px;color:var(--info);" id="pct-maint">0%</span></div><div class="progress-bar"><div class="progress-fill" id="bar-maint" style="width:0%;background:linear-gradient(90deg,#4facfe,#00f2fe)"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;margin-bottom:5px;"><span style="font-size:13px;" data-i18n="lbl_body_work">🔨 سمكرة وهيكل</span><span style="font-size:13px;color:var(--accent);" id="pct-body">0%</span></div><div class="progress-bar"><div class="progress-fill" id="bar-body" style="width:0%;background:linear-gradient(90deg,#e94560,#ff6b35)"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;margin-bottom:5px;"><span style="font-size:13px;" data-i18n="lbl_paint_polish">🎨 دهان وتلميع</span><span style="font-size:13px;color:#9b59b6;" id="pct-paint">0%</span></div><div class="progress-bar"><div class="progress-fill" id="bar-paint" style="width:0%;background:linear-gradient(90deg,#9b59b6,#e74c3c)"></div></div></div>
           </div>
         </div>
       </div>
       <div class="card">
-        <div class="card-header"><div class="card-title">🚗 أحدث السيارات</div></div>
+        <div class="card-header"><div class="card-title" data-i18n="card_latest_cars">🚗 أحدث السيارات</div></div>
         <div class="card-body" style="padding:0;">
           <table><thead><tr><th data-i18n="th_plate">اللوحة</th><th data-i18n="th_owner">المالك</th><th data-i18n="th_status">الحالة</th><th data-i18n="th_days">الأيام</th></tr></thead>
           <tbody id="dash-cars-table"></tbody></table>
@@ -703,7 +703,7 @@ label{font-size:14px;}
       <button class="btn btn-primary" onclick="openModal('modal-add-car')" data-i18n="btn_add_car">➕ إضافة سيارة</button>
     </div>
     <div class="card">
-      <div class="card-header"><div class="card-title">🚗 السيارات في الورشة (<span id="cars-count">0</span>)</div></div>
+      <div class="card-header"><div class="card-title"><span data-i18n="card_cars_workshop">🚗 السيارات في الورشة</span> (<span id="cars-count">0</span>)</div></div>
       <div class="card-body" style="padding:0;">
         <div class="table-wrap">
           <table><thead><tr><th data-i18n="th_no">#</th><th data-i18n="th_plate">اللوحة</th><th data-i18n="th_owner">المالك</th><th data-i18n="th_phone">الهاتف</th><th data-i18n="th_car">السيارة</th><th data-i18n="th_service">الخدمة</th><th data-i18n="th_stage">المرحلة</th><th data-i18n="th_payment">الدفع</th><th data-i18n="th_days">الأيام</th><th data-i18n="th_expected_delivery">التسليم المتوقع</th><th data-i18n="th_status">الحالة</th><th data-i18n="th_actions">إجراءات</th></tr></thead>
@@ -716,7 +716,7 @@ label{font-size:14px;}
   <!-- DELIVERED -->
   <div class="page" id="page-delivered">
     <div class="card">
-      <div class="card-header"><div class="card-title">✅ السيارات المُسلَّمة (<span id="delivered-count">0</span>)</div></div>
+      <div class="card-header"><div class="card-title"><span data-i18n="card_delivered">✅ السيارات المُسلَّمة</span> (<span id="delivered-count">0</span>)</div></div>
       <div class="card-body" style="padding:0;">
         <div class="table-wrap">
           <table><thead><tr><th data-i18n="th_plate">اللوحة</th><th data-i18n="th_owner">المالك</th><th data-i18n="th_car">السيارة</th><th data-i18n="th_service">الخدمة</th><th data-i18n="th_amount">المبلغ</th><th data-i18n="th_paid">المدفوع</th><th data-i18n="th_entry_date">تاريخ الدخول</th><th data-i18n="th_delivery_date">تاريخ التسليم</th><th data-i18n="th_days">الأيام</th><th data-i18n="th_actions">إجراءات</th></tr></thead>
@@ -729,7 +729,7 @@ label{font-size:14px;}
   <!-- ALERTS -->
   <div class="page" id="page-alerts">
     <div class="card">
-      <div class="card-header"><div class="card-title">🔔 سيارات تجاوزت المدة المحددة</div></div>
+      <div class="card-header"><div class="card-title" data-i18n="card_alerts_exceeded">🔔 سيارات تجاوزت المدة المحددة</div></div>
       <div class="card-body" style="padding:0;">
         <div class="table-wrap">
           <table><thead><tr><th data-i18n="th_plate">اللوحة</th><th data-i18n="th_owner">المالك</th><th data-i18n="th_car">السيارة</th><th data-i18n="th_service">الخدمة</th><th data-i18n="th_days_workshop">الأيام في الورشة</th><th data-i18n="th_status">الحالة</th><th data-i18n="th_actions">إجراءات</th></tr></thead>
@@ -738,12 +738,12 @@ label{font-size:14px;}
       </div>
     </div>
     <div class="card">
-      <div class="card-header"><div class="card-title">⚙️ إعداد حد التنبيه</div></div>
+      <div class="card-header"><div class="card-title" data-i18n="card_alert_settings">⚙️ إعداد حد التنبيه</div></div>
       <div class="card-body">
         <div style="display:flex;align-items:center;gap:14px;">
-          <label style="font-size:14px;color:var(--text);">تنبيه عند تجاوز:</label>
+          <label style="font-size:14px;color:var(--text);" data-i18n="lbl_alert_at">تنبيه عند تجاوز:</label>
           <input type="number" id="alert-days" value="3" style="width:80px;" min="1" max="30" onchange="saveAlertDays()">
-          <span style="color:var(--muted);">أيام</span>
+          <span style="color:var(--muted);" data-i18n="lbl_days_unit">أيام</span>
         </div>
       </div>
     </div>
@@ -755,7 +755,7 @@ label{font-size:14px;}
       <button class="btn btn-primary" onclick="openModal('modal-add-order')" data-i18n="btn_add_order">➕ إضافة أمر صيانة</button>
     </div>
     <div class="card">
-      <div class="card-header"><div class="card-title">⚙️ أوامر الصيانة</div></div>
+      <div class="card-header"><div class="card-title" data-i18n="card_maintenance">⚙️ أوامر الصيانة</div></div>
       <div class="card-body" style="padding:0;">
         <div class="table-wrap">
           <table><thead><tr><th data-i18n="th_no">#</th><th data-i18n="th_car">السيارة</th><th data-i18n="th_work_type">نوع العمل</th><th data-i18n="th_description">الوصف</th><th data-i18n="th_cost">التكلفة</th><th data-i18n="th_technician">الفني</th><th data-i18n="th_status">الحالة</th><th data-i18n="th_actions">إجراءات</th></tr></thead>
@@ -771,10 +771,10 @@ label{font-size:14px;}
       <button class="btn btn-primary" onclick="openModal('modal-add-service')" data-i18n="btn_add_service">➕ إضافة خدمة</button>
     </div>
     <div class="card">
-      <div class="card-header"><div class="card-title">🛠️ قائمة الخدمات والأسعار</div></div>
+      <div class="card-header"><div class="card-title" data-i18n="card_services_list">🛠️ قائمة الخدمات والأسعار</div></div>
       <div class="card-body" style="padding:0;">
         <div class="table-wrap">
-          <table><thead><tr><th>الخدمة</th><th>النوع</th><th>السعر (ر.ع)</th><th>الوصف</th><th>إجراءات</th></tr></thead>
+          <table><thead><tr><th data-i18n="th_svc_name">الخدمة</th><th data-i18n="th_type">النوع</th><th data-i18n="th_price_omr">السعر (ر.ع)</th><th data-i18n="th_description">الوصف</th><th data-i18n="th_actions">إجراءات</th></tr></thead>
           <tbody id="services-table-body"></tbody></table>
         </div>
       </div>
@@ -784,10 +784,10 @@ label{font-size:14px;}
   <!-- INVOICES -->
   <div class="page" id="page-invoices">
     <div class="card">
-      <div class="card-header"><div class="card-title">🧾 الفواتير والإيصالات</div></div>
+      <div class="card-header"><div class="card-title" data-i18n="card_invoices">🧾 الفواتير والإيصالات</div></div>
       <div class="card-body" style="padding:0;">
         <div class="table-wrap">
-          <table><thead><tr><th>رقم الفاتورة</th><th>المالك</th><th>السيارة</th><th>الخدمة</th><th>المبلغ الكلي</th><th>المقدمة</th><th>المدفوع</th><th>المتبقي</th><th>التاريخ</th><th>إجراءات</th></tr></thead>
+          <table><thead><tr><th data-i18n="th_invoice_no">رقم الفاتورة</th><th data-i18n="th_owner">المالك</th><th data-i18n="th_car">السيارة</th><th data-i18n="th_svc_name">الخدمة</th><th data-i18n="th_total_amount">المبلغ الكلي</th><th data-i18n="th_deposit_hdr">المقدمة</th><th data-i18n="th_paid">المدفوع</th><th data-i18n="th_remaining">المتبقي</th><th data-i18n="th_date">التاريخ</th><th data-i18n="th_actions">إجراءات</th></tr></thead>
           <tbody id="invoices-table-body"></tbody></table>
         </div>
       </div>
@@ -800,15 +800,15 @@ label{font-size:14px;}
       <button class="btn btn-primary" onclick="openModal('modal-add-expense')" data-i18n="btn_add_expense">➕ إضافة مصروف</button>
     </div>
     <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);">
-      <div class="stat-card red"><span class="stat-icon">🔧</span><div class="stat-value" id="exp-parts">0 ر.ع</div><div class="stat-label">قطع الغيار</div></div>
-      <div class="stat-card gold"><span class="stat-icon">💡</span><div class="stat-value" id="exp-util">0 ر.ع</div><div class="stat-label">المرافق والتشغيل</div></div>
-      <div class="stat-card blue"><span class="stat-icon">👷</span><div class="stat-value" id="exp-labor">0 ر.ع</div><div class="stat-label">الرواتب والعمالة</div></div>
+      <div class="stat-card red"><span class="stat-icon">🔧</span><div class="stat-value" id="exp-parts">0 ر.ع</div><div class="stat-label" data-i18n="lbl_spare_parts">قطع الغيار</div></div>
+      <div class="stat-card gold"><span class="stat-icon">💡</span><div class="stat-value" id="exp-util">0 ر.ع</div><div class="stat-label" data-i18n="lbl_utilities">المرافق والتشغيل</div></div>
+      <div class="stat-card blue"><span class="stat-icon">👷</span><div class="stat-value" id="exp-labor">0 ر.ع</div><div class="stat-label" data-i18n="lbl_labor_sal">الرواتب والعمالة</div></div>
     </div>
     <div class="card">
-      <div class="card-header"><div class="card-title">💸 سجل المصروفات</div></div>
+      <div class="card-header"><div class="card-title" data-i18n="card_expenses_log">💸 سجل المصروفات</div></div>
       <div class="card-body" style="padding:0;">
         <div class="table-wrap">
-          <table><thead><tr><th>التاريخ</th><th>البيان</th><th>النوع</th><th>المبلغ</th><th>إجراءات</th></tr></thead>
+          <table><thead><tr><th data-i18n="th_date">التاريخ</th><th data-i18n="th_statement">البيان</th><th data-i18n="th_type">النوع</th><th data-i18n="th_amount">المبلغ</th><th data-i18n="th_actions">إجراءات</th></tr></thead>
           <tbody id="expenses-table-body"></tbody></table>
         </div>
       </div>
@@ -818,36 +818,36 @@ label{font-size:14px;}
   <!-- REPORTS -->
   <div class="page" id="page-reports">
     <div class="tabs">
-      <button class="tab active" onclick="switchTab(this,'report-financial')">📊 المالي</button>
-      <button class="tab" onclick="switchTab(this,'report-services')">🔧 الخدمات</button>
-      <button class="tab" onclick="switchTab(this,'report-cars')">🚗 السيارات</button>
+      <button class="tab active" onclick="switchTab(this,'report-financial')" data-i18n="tab_financial">📊 المالي</button>
+      <button class="tab" onclick="switchTab(this,'report-services')" data-i18n="tab_services_rpt">🔧 الخدمات</button>
+      <button class="tab" onclick="switchTab(this,'report-cars')" data-i18n="tab_cars_rpt">🚗 السيارات</button>
     </div>
     <div id="report-financial">
       <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);">
-        <div class="stat-card green"><span class="stat-icon">💰</span><div class="stat-value" id="rpt-revenue">0 ر.ع</div><div class="stat-label">إجمالي الإيرادات</div></div>
-        <div class="stat-card red"><span class="stat-icon">💸</span><div class="stat-value" id="rpt-expenses">0 ر.ع</div><div class="stat-label">إجمالي المصروفات</div></div>
-        <div class="stat-card gold"><span class="stat-icon">📈</span><div class="stat-value" id="rpt-profit">0 ر.ع</div><div class="stat-label">صافي الربح</div></div>
+        <div class="stat-card green"><span class="stat-icon">💰</span><div class="stat-value" id="rpt-revenue">0 ر.ع</div><div class="stat-label" data-i18n="lbl_total_revenue">إجمالي الإيرادات</div></div>
+        <div class="stat-card red"><span class="stat-icon">💸</span><div class="stat-value" id="rpt-expenses">0 ر.ع</div><div class="stat-label" data-i18n="lbl_total_expenses_rpt">إجمالي المصروفات</div></div>
+        <div class="stat-card gold"><span class="stat-icon">📈</span><div class="stat-value" id="rpt-profit">0 ر.ع</div><div class="stat-label" data-i18n="lbl_net_profit_rpt">صافي الربح</div></div>
       </div>
       <div class="card">
-        <div class="card-header"><div class="card-title">📋 ملخص مالي</div><button class="btn btn-danger btn-sm" onclick="exportPDF()">📄 تصدير PDF</button></div>
+        <div class="card-header"><div class="card-title" data-i18n="card_financial_summary">📋 ملخص مالي</div><button class="btn btn-danger btn-sm" onclick="exportPDF()" data-i18n="btn_export_pdf">📄 تصدير PDF</button></div>
         <div class="card-body" id="financial-summary"></div>
       </div>
     </div>
     <div id="report-services" style="display:none;">
-      <div class="card"><div class="card-header"><div class="card-title">🔧 تحليل الخدمات</div></div><div class="card-body" id="services-report"></div></div>
+      <div class="card"><div class="card-header"><div class="card-title" data-i18n="card_services_analysis">🔧 تحليل الخدمات</div></div><div class="card-body" id="services-report"></div></div>
     </div>
     <div id="report-cars" style="display:none;">
-      <div class="card"><div class="card-header"><div class="card-title">🚗 إحصائيات السيارات</div></div><div class="card-body" id="cars-report"></div></div>
+      <div class="card"><div class="card-header"><div class="card-title" data-i18n="card_cars_stats">🚗 إحصائيات السيارات</div></div><div class="card-body" id="cars-report"></div></div>
     </div>
   </div>
 
   <!-- CUSTOMERS -->
   <div class="page" id="page-customers">
     <div class="card">
-      <div class="card-header"><div class="card-title">👤 العملاء</div></div>
+      <div class="card-header"><div class="card-title" data-i18n="card_customers">👤 العملاء</div></div>
       <div class="card-body" style="padding:0;">
         <div class="table-wrap">
-          <table><thead><tr><th>الاسم</th><th>الهاتف</th><th>عدد السيارات</th><th>إجمالي المدفوع</th><th>المتبقي</th></tr></thead>
+          <table><thead><tr><th data-i18n="th_cust_name">الاسم</th><th data-i18n="th_phone">الهاتف</th><th data-i18n="th_cars_count_hdr">عدد السيارات</th><th data-i18n="th_total_paid_hdr">إجمالي المدفوع</th><th data-i18n="th_remaining">المتبقي</th></tr></thead>
           <tbody id="customers-table-body"></tbody></table>
         </div>
       </div>
@@ -859,30 +859,28 @@ label{font-size:14px;}
     <div class="two-col-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:20px;">
       <!-- Whatsapp sender -->
       <div class="card">
-        <div class="card-header"><div class="card-title">📱 إرسال رابط التتبع عبر واتساب</div></div>
+        <div class="card-header"><div class="card-title" data-i18n="card_tracking_wa">📱 إرسال رابط التتبع عبر واتساب</div></div>
         <div class="card-body">
           <p style="font-size:13px;color:var(--muted);margin-bottom:14px;">اختر سيارة وأرسل رابط التتبع للعميل مباشرة عبر واتساب — يرى حالة سيارته لحظة بلحظة.</p>
           <div class="form-group" style="margin-bottom:12px;">
-            <label>اختر السيارة</label>
+            <label data-i18n="lbl_choose_car">اختر السيارة</label>
             <select id="wa-car-select" onchange="previewWA()"></select>
           </div>
           <div id="wa-preview" style="background:rgba(37,211,102,0.08);border:1px solid rgba(37,211,102,0.25);border-radius:12px;padding:14px;margin-bottom:14px;display:none;">
-            <div style="font-size:12px;color:#25d366;font-weight:700;margin-bottom:8px;">📋 معاينة الرسالة</div>
+            <div style="font-size:12px;color:#25d366;font-weight:700;margin-bottom:8px;" data-i18n="lbl_msg_preview_title">📋 معاينة الرسالة</div>
             <div id="wa-msg-preview" style="font-size:13px;color:var(--text);line-height:1.7;direction:rtl;"></div>
           </div>
-          <button class="btn btn-success" style="width:100%;justify-content:center;" onclick="sendWhatsApp()">
-            <span style="font-size:16px;">📱</span> فتح واتساب وإرسال الرابط
-          </button>
+          <button class="btn btn-success" style="width:100%;justify-content:center;" onclick="sendWhatsApp()" data-i18n="btn_send_wa">📱 فتح واتساب وإرسال الرابط</button>
         </div>
       </div>
 
       <!-- Tracking link preview -->
       <div class="card">
-        <div class="card-header"><div class="card-title">🔗 روابط التتبع النشطة</div></div>
+        <div class="card-header"><div class="card-title" data-i18n="card_active_links">🔗 روابط التتبع النشطة</div></div>
         <div class="card-body" style="padding:0;">
           <div class="table-wrap">
             <table>
-              <thead><tr><th>اللوحة</th><th>المالك</th><th>المرحلة</th><th>رابط التتبع</th></tr></thead>
+              <thead><tr><th data-i18n="th_plate">اللوحة</th><th data-i18n="th_owner">المالك</th><th data-i18n="th_stage">المرحلة</th><th data-i18n="th_tracking_link">رابط التتبع</th></tr></thead>
               <tbody id="tracking-links-table"></tbody>
             </table>
           </div>
@@ -892,24 +890,24 @@ label{font-size:14px;}
 
     <!-- Stats -->
     <div class="card">
-      <div class="card-header"><div class="card-title">📊 إحصائيات التتبع</div></div>
+      <div class="card-header"><div class="card-title" data-i18n="card_tracking_stats">📊 إحصائيات التتبع</div></div>
       <div class="card-body">
         <div class="four-col-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;text-align:center;">
           <div style="background:rgba(79,172,254,0.1);border:1px solid rgba(79,172,254,0.2);border-radius:10px;padding:16px;">
             <div style="font-size:24px;font-weight:900;color:var(--info);" id="trk-total">0</div>
-            <div style="font-size:12px;color:var(--muted);">إجمالي السيارات</div>
+            <div style="font-size:12px;color:var(--muted);" data-i18n="trk_total_cars">إجمالي السيارات</div>
           </div>
           <div style="background:rgba(245,166,35,0.1);border:1px solid rgba(245,166,35,0.2);border-radius:10px;padding:16px;">
             <div style="font-size:24px;font-weight:900;color:var(--gold);" id="trk-waiting">0</div>
-            <div style="font-size:12px;color:var(--muted);">في الانتظار</div>
+            <div style="font-size:12px;color:var(--muted);" data-i18n="trk_waiting">في الانتظار</div>
           </div>
           <div style="background:rgba(233,69,96,0.1);border:1px solid rgba(233,69,96,0.2);border-radius:10px;padding:16px;">
             <div style="font-size:24px;font-weight:900;color:var(--accent);" id="trk-progress">0</div>
-            <div style="font-size:12px;color:var(--muted);">تحت الإصلاح</div>
+            <div style="font-size:12px;color:var(--muted);" data-i18n="trk_in_progress">تحت الإصلاح</div>
           </div>
           <div style="background:rgba(0,212,170,0.1);border:1px solid rgba(0,212,170,0.2);border-radius:10px;padding:16px;">
             <div style="font-size:24px;font-weight:900;color:var(--success);" id="trk-done">0</div>
-            <div style="font-size:12px;color:var(--muted);">جاهزة للتسليم</div>
+            <div style="font-size:12px;color:var(--muted);" data-i18n="trk_ready">جاهزة للتسليم</div>
           </div>
         </div>
       </div>
@@ -923,12 +921,12 @@ label{font-size:14px;}
 <!-- Add Car -->
 <div class="modal-overlay" id="modal-add-car">
   <div class="modal">
-    <div class="modal-header"><div class="modal-title">🚗 إضافة سيارة جديدة</div><button class="modal-close" onclick="closeModal('modal-add-car')">✕</button></div>
+    <div class="modal-header"><div class="modal-title" data-i18n="modal_add_car">🚗 إضافة سيارة جديدة</div><button class="modal-close" onclick="closeModal('modal-add-car')">✕</button></div>
     <div class="modal-body" style="padding:16px 22px;">
 
       <!-- QUICK CUSTOMER SEARCH -->
       <div style="margin-bottom:14px;">
-        <label style="font-size:12px;font-weight:700;color:var(--muted);">👤 بحث عن عميل سابق</label>
+        <label style="font-size:12px;font-weight:700;color:var(--muted);" data-i18n="lbl_search_prev_cust">👤 بحث عن عميل سابق</label>
         <div style="position:relative;margin-top:5px;">
           <input type="text" id="customer-search" placeholder="اكتب اسم العميل أو رقم الهاتف..."
             oninput="searchCustomers(this.value)"
@@ -939,7 +937,7 @@ label{font-size:14px;}
 
       <!-- QUICK SERVICE BUTTONS -->
       <div style="margin-bottom:14px;">
-        <label style="font-size:12px;font-weight:700;color:var(--muted);">⚡ خدمة سريعة</label>
+        <label style="font-size:12px;font-weight:700;color:var(--muted);" data-i18n="lbl_quick_service">⚡ خدمة سريعة</label>
         <div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:7px;">
           <button type="button" class="quick-svc-btn" onclick="setQuickService('صيانة ميكانيكية')">🔧 صيانة</button>
           <button type="button" class="quick-svc-btn" onclick="setQuickService('سمكرة وهيكل')">🔨 سمكرة</button>
@@ -954,7 +952,7 @@ label{font-size:14px;}
 
       <!-- CAR TEMPLATES -->
       <div style="margin-bottom:14px;">
-        <label style="font-size:12px;font-weight:700;color:var(--muted);">🚗 قوالب السيارات الشائعة</label>
+        <label style="font-size:12px;font-weight:700;color:var(--muted);" data-i18n="lbl_car_templates">🚗 قوالب السيارات الشائعة</label>
         <div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:7px;">
           <button type="button" class="car-tpl-btn" onclick="setCarTemplate('Toyota','كامري','Camry')">كامري</button>
           <button type="button" class="car-tpl-btn" onclick="setCarTemplate('Toyota','لاندكروزر','Land Cruiser')">لاندكروزر</button>
@@ -973,11 +971,11 @@ label{font-size:14px;}
 
       <!-- MAIN FIELDS -->
       <div class="form-grid">
-        <div class="form-group"><label>رقم اللوحة *</label><input type="text" id="car-plate" placeholder="مثال: 12345 ع م"></div>
-        <div class="form-group"><label>اسم المالك *</label><input type="text" id="car-owner" placeholder="الاسم الكامل"></div>
-        <div class="form-group"><label>رقم الهاتف</label><input type="text" id="car-phone" placeholder="968XXXXXXXX+"></div>
-        <div class="form-group"><label>موديل السيارة</label><input type="text" id="car-model" placeholder="مثال: Toyota Camry 2022"></div>
-        <div class="form-group"><label>نوع الخدمة *</label>
+        <div class="form-group"><label data-i18n="lbl_plate_req">رقم اللوحة *</label><input type="text" id="car-plate" placeholder="مثال: 12345 ع م"></div>
+        <div class="form-group"><label data-i18n="lbl_owner_req">اسم المالك *</label><input type="text" id="car-owner" placeholder="الاسم الكامل"></div>
+        <div class="form-group"><label data-i18n="lbl_phone_opt">رقم الهاتف</label><input type="text" id="car-phone" placeholder="968XXXXXXXX+"></div>
+        <div class="form-group"><label data-i18n="lbl_car_model_opt">موديل السيارة</label><input type="text" id="car-model" placeholder="مثال: Toyota Camry 2022"></div>
+        <div class="form-group"><label data-i18n="lbl_service_type_req">نوع الخدمة *</label>
           <select id="car-service">
             <option value="صيانة ميكانيكية">🔧 صيانة ميكانيكية</option>
             <option value="سمكرة وهيكل">🔨 سمكرة وهيكل</option>
@@ -990,7 +988,7 @@ label{font-size:14px;}
           </select>
         </div>
         <div class="form-group">
-          <label>📅 التسليم المتوقع</label>
+          <label data-i18n="lbl_expected_delivery">📅 التسليم المتوقع</label>
           <div style="display:flex;gap:6px;align-items:center;">
             <input type="date" id="car-expected-date" style="flex:1;">
           </div>
@@ -1002,19 +1000,19 @@ label{font-size:14px;}
             <button type="button" class="day-btn" onclick="setDeliveryDays(7)">أسبوع</button>
           </div>
         </div>
-        <div class="form-group"><label>المبلغ التقديري (ر.ع)</label><input type="number" id="car-estimate" placeholder="0.000" step="0.001"></div>
-        <div class="form-group"><label>💰 الدفعة المقدمة (ر.ع)</label><input type="number" id="car-deposit" placeholder="0.000" step="0.001"></div>
+        <div class="form-group"><label data-i18n="lbl_estimate">المبلغ التقديري (ر.ع)</label><input type="number" id="car-estimate" placeholder="0.000" step="0.001"></div>
+        <div class="form-group"><label data-i18n="lbl_deposit_adv">💰 الدفعة المقدمة (ر.ع)</label><input type="number" id="car-deposit" placeholder="0.000" step="0.001"></div>
       </div>
 
       <!-- OPTIONAL FIELDS TOGGLE -->
       <div style="margin-top:10px;">
         <button type="button" onclick="toggleOptional()" style="background:none;border:none;color:var(--muted);font-family:var(--font-main);font-size:12px;cursor:pointer;padding:4px 0;display:flex;align-items:center;gap:5px;">
-          <span id="optional-arrow">▶</span> تفاصيل إضافية (اختياري)
+          <span id="optional-arrow">▶</span> <span data-i18n="lbl_extra_details">تفاصيل إضافية (اختياري)</span>
         </button>
         <div id="optional-fields" style="display:none;margin-top:10px;">
           <div class="form-grid">
-            <div class="form-group"><label>الكيلومترات</label><input type="number" id="car-km" placeholder="مثال: 85000"></div>
-            <div class="form-group full"><label>وصف العطل / المطلوب</label><textarea id="car-notes" placeholder="تفاصيل العطل أو الخدمة المطلوبة..."></textarea></div>
+            <div class="form-group"><label data-i18n="lbl_km">الكيلومترات</label><input type="number" id="car-km" placeholder="مثال: 85000"></div>
+            <div class="form-group full"><label data-i18n="lbl_fault_desc">وصف العطل / المطلوب</label><textarea id="car-notes" placeholder="تفاصيل العطل أو الخدمة المطلوبة..."></textarea></div>
           </div>
         </div>
         <!-- Hidden inputs so addCar() still works when optional is collapsed -->
@@ -1026,8 +1024,8 @@ label{font-size:14px;}
 
     </div>
     <div class="modal-footer">
-      <button class="btn btn-outline" onclick="closeModal('modal-add-car')">إلغاء</button>
-      <button class="btn btn-primary" onclick="addCar()">✓ حفظ السيارة</button>
+      <button class="btn btn-outline" onclick="closeModal('modal-add-car')" data-i18n="btn_cancel">إلغاء</button>
+      <button class="btn btn-primary" onclick="addCar()" data-i18n="btn_save_car">✓ حفظ السيارة</button>
     </div>
   </div>
 </div>
@@ -1035,52 +1033,52 @@ label{font-size:14px;}
 <!-- Update Car -->
 <div class="modal-overlay" id="modal-update-car">
   <div class="modal modal-lg">
-    <div class="modal-header"><div class="modal-title">✏️ تحديث السيارة</div><button class="modal-close" onclick="closeModal('modal-update-car')">✕</button></div>
+    <div class="modal-header"><div class="modal-title" data-i18n="modal_update_car">✏️ تحديث السيارة</div><button class="modal-close" onclick="closeModal('modal-update-car')">✕</button></div>
     <div class="modal-body">
       <!-- Stages -->
       <div style="margin-bottom:20px;">
-        <div style="font-size:13px;font-weight:700;color:var(--muted);margin-bottom:12px;">مراحل الإصلاح</div>
+        <div style="font-size:13px;font-weight:700;color:var(--muted);margin-bottom:12px;" data-i18n="lbl_repair_stages">مراحل الإصلاح</div>
         <div class="stages-track" id="stages-track">
-          <div class="stage-item" id="stage-0"><div class="stage-dot">📋</div><div class="stage-label">استلام</div></div>
-          <div class="stage-item" id="stage-1"><div class="stage-dot">🔍</div><div class="stage-label">تشخيص</div></div>
-          <div class="stage-item" id="stage-2"><div class="stage-dot">🔧</div><div class="stage-label">إصلاح</div></div>
-          <div class="stage-item" id="stage-3"><div class="stage-dot">🎨</div><div class="stage-label">دهان</div></div>
-          <div class="stage-item" id="stage-4"><div class="stage-dot">✅</div><div class="stage-label">جاهزة</div></div>
-          <div class="stage-item" id="stage-5"><div class="stage-dot">📦</div><div class="stage-label">تسليم</div></div>
+          <div class="stage-item" id="stage-0"><div class="stage-dot">📋</div><div class="stage-label" data-i18n="stage_receive">استلام</div></div>
+          <div class="stage-item" id="stage-1"><div class="stage-dot">🔍</div><div class="stage-label" data-i18n="stage_diagnose">تشخيص</div></div>
+          <div class="stage-item" id="stage-2"><div class="stage-dot">🔧</div><div class="stage-label" data-i18n="stage_repair">إصلاح</div></div>
+          <div class="stage-item" id="stage-3"><div class="stage-dot">🎨</div><div class="stage-label" data-i18n="stage_paint">دهان</div></div>
+          <div class="stage-item" id="stage-4"><div class="stage-dot">✅</div><div class="stage-label" data-i18n="stage_ready">جاهزة</div></div>
+          <div class="stage-item" id="stage-5"><div class="stage-dot">📦</div><div class="stage-label" data-i18n="stage_delivery">تسليم</div></div>
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;">
-          <button class="btn btn-outline btn-sm" onclick="setStage(0)">📋 استلام</button>
-          <button class="btn btn-outline btn-sm" onclick="setStage(1)">🔍 تشخيص</button>
-          <button class="btn btn-outline btn-sm" onclick="setStage(2)">🔧 إصلاح</button>
-          <button class="btn btn-outline btn-sm" onclick="setStage(3)">🎨 دهان</button>
-          <button class="btn btn-outline btn-sm" onclick="setStage(4)">✅ جاهزة</button>
-          <button class="btn btn-success btn-sm" onclick="setStage(5)">📦 تسليم</button>
+          <button class="btn btn-outline btn-sm" onclick="setStage(0)" data-i18n="stage_receive">📋 استلام</button>
+          <button class="btn btn-outline btn-sm" onclick="setStage(1)" data-i18n="stage_diagnose">🔍 تشخيص</button>
+          <button class="btn btn-outline btn-sm" onclick="setStage(2)" data-i18n="stage_repair">🔧 إصلاح</button>
+          <button class="btn btn-outline btn-sm" onclick="setStage(3)" data-i18n="stage_paint">🎨 دهان</button>
+          <button class="btn btn-outline btn-sm" onclick="setStage(4)" data-i18n="stage_ready">✅ جاهزة</button>
+          <button class="btn btn-success btn-sm" onclick="setStage(5)" data-i18n="stage_delivery">📦 تسليم</button>
         </div>
       </div>
       <div class="divider"></div>
       <!-- Payment — admin only -->
       <div id="update-payment-section">
-        <div style="font-size:13px;font-weight:700;color:var(--muted);margin-bottom:10px;">💰 الدفع</div>
+        <div style="font-size:13px;font-weight:700;color:var(--muted);margin-bottom:10px;" data-i18n="lbl_payment_section">💰 الدفع</div>
         <div class="form-grid">
-          <div class="form-group"><label>المبلغ الكلي (ر.ع)</label><input type="number" id="update-amount" placeholder="0.000" step="0.001" oninput="calcRemaining()"></div>
-          <div class="form-group"><label>المدفوع حتى الآن (ر.ع)</label><input type="number" id="update-paid" placeholder="0.000" step="0.001" oninput="calcRemaining()"></div>
+          <div class="form-group"><label data-i18n="lbl_total_amount_omr">المبلغ الكلي (ر.ع)</label><input type="number" id="update-amount" placeholder="0.000" step="0.001" oninput="calcRemaining()"></div>
+          <div class="form-group"><label data-i18n="lbl_paid_so_far">المدفوع حتى الآن (ر.ع)</label><input type="number" id="update-paid" placeholder="0.000" step="0.001" oninput="calcRemaining()"></div>
         </div>
         <div class="payment-box" id="payment-preview">
-          <div class="payment-row"><span>المبلغ الكلي</span><span id="pp-total">0.000 ر.ع</span></div>
-          <div class="payment-row paid"><span>✅ المدفوع</span><span id="pp-paid">0.000 ر.ع</span></div>
-          <div class="payment-row remaining"><span>⏳ المتبقي</span><span id="pp-remaining">0.000 ر.ع</span></div>
-          <div class="payment-row total"><span>💰 حالة الدفع</span><span id="pp-status">—</span></div>
+          <div class="payment-row"><span data-i18n="pay_total">المبلغ الكلي</span><span id="pp-total">0.000 ر.ع</span></div>
+          <div class="payment-row paid"><span data-i18n="pay_paid">✅ المدفوع</span><span id="pp-paid">0.000 ر.ع</span></div>
+          <div class="payment-row remaining"><span data-i18n="pay_remaining">⏳ المتبقي</span><span id="pp-remaining">0.000 ر.ع</span></div>
+          <div class="payment-row total"><span data-i18n="pay_status">💰 حالة الدفع</span><span id="pp-status">—</span></div>
         </div>
       </div>
       <div class="form-group" style="margin-top:14px;">
-        <label>📅 تاريخ التسليم المتوقع</label>
+        <label data-i18n="lbl_expected_del_date">📅 تاريخ التسليم المتوقع</label>
         <input type="date" id="update-expected-date">
       </div>
-      <div class="form-group"><label>ملاحظات الإصلاح</label><textarea id="update-notes" placeholder="تفاصيل الأعمال المنجزة..."></textarea></div>
+      <div class="form-group"><label data-i18n="lbl_repair_notes">ملاحظات الإصلاح</label><textarea id="update-notes" placeholder="تفاصيل الأعمال المنجزة..."></textarea></div>
     </div>
     <div class="modal-footer">
-      <button class="btn btn-outline" onclick="closeModal('modal-update-car')">إلغاء</button>
-      <button class="btn btn-success" onclick="updateCar()">✓ تحديث</button>
+      <button class="btn btn-outline" onclick="closeModal('modal-update-car')" data-i18n="btn_cancel">إلغاء</button>
+      <button class="btn btn-success" onclick="updateCar()" data-i18n="btn_update_car">✓ تحديث</button>
     </div>
   </div>
 </div>
@@ -1088,12 +1086,12 @@ label{font-size:14px;}
 <!-- Receipt -->
 <div class="modal-overlay" id="modal-receipt">
   <div class="modal modal-lg">
-    <div class="modal-header"><div class="modal-title">🧾 إيصال الدفع</div><button class="modal-close" onclick="closeModal('modal-receipt')">✕</button></div>
+    <div class="modal-header"><div class="modal-title" data-i18n="modal_receipt">🧾 إيصال الدفع</div><button class="modal-close" onclick="closeModal('modal-receipt')">✕</button></div>
     <div class="modal-body" id="receipt-content"></div>
     <div class="modal-footer">
-      <button class="btn btn-outline" onclick="closeModal('modal-receipt')">إغلاق</button>
-      <button class="btn btn-info" onclick="exportReceiptPDF()">📄 تصدير PDF</button>
-      <button class="btn btn-primary" onclick="printReceipt()">🖨️ طباعة</button>
+      <button class="btn btn-outline" onclick="closeModal('modal-receipt')" data-i18n="btn_close">إغلاق</button>
+      <button class="btn btn-info" onclick="exportReceiptPDF()" data-i18n="btn_export_pdf">📄 تصدير PDF</button>
+      <button class="btn btn-primary" onclick="printReceipt()" data-i18n="btn_print">🖨️ طباعة</button>
     </div>
   </div>
 </div>
@@ -1101,11 +1099,11 @@ label{font-size:14px;}
 <!-- Add Order -->
 <div class="modal-overlay" id="modal-add-order">
   <div class="modal">
-    <div class="modal-header"><div class="modal-title">⚙️ إضافة أمر صيانة</div><button class="modal-close" onclick="closeModal('modal-add-order')">✕</button></div>
+    <div class="modal-header"><div class="modal-title" data-i18n="modal_add_order">⚙️ إضافة أمر صيانة</div><button class="modal-close" onclick="closeModal('modal-add-order')">✕</button></div>
     <div class="modal-body">
       <div class="form-grid">
-        <div class="form-group"><label>السيارة</label><select id="order-car"></select></div>
-        <div class="form-group"><label>نوع العمل</label>
+        <div class="form-group"><label data-i18n="lbl_car_select">السيارة</label><select id="order-car"></select></div>
+        <div class="form-group"><label data-i18n="lbl_work_type_lbl">نوع العمل</label>
           <select id="order-type">
             <option value="صيانة ميكانيكية">صيانة ميكانيكية</option>
             <option value="سمكرة">سمكرة وهيكل</option>
@@ -1116,14 +1114,14 @@ label{font-size:14px;}
             <option value="زيت">تغيير زيت وفلاتر</option>
           </select>
         </div>
-        <div class="form-group"><label>الفني المسؤول</label><input type="text" id="order-tech" placeholder="اسم الفني"></div>
-        <div class="form-group"><label>التكلفة (ر.ع)</label><input type="number" id="order-cost" placeholder="0.000" step="0.001"></div>
-        <div class="form-group full"><label>وصف العمل</label><textarea id="order-desc" placeholder="تفاصيل العمل..."></textarea></div>
+        <div class="form-group"><label data-i18n="lbl_technician_lbl">الفني المسؤول</label><input type="text" id="order-tech" placeholder="اسم الفني"></div>
+        <div class="form-group"><label data-i18n="lbl_cost_omr">التكلفة (ر.ع)</label><input type="number" id="order-cost" placeholder="0.000" step="0.001"></div>
+        <div class="form-group full"><label data-i18n="lbl_work_desc">وصف العمل</label><textarea id="order-desc" placeholder="تفاصيل العمل..."></textarea></div>
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn btn-outline" onclick="closeModal('modal-add-order')">إلغاء</button>
-      <button class="btn btn-primary" onclick="addOrder()">✓ إضافة</button>
+      <button class="btn btn-outline" onclick="closeModal('modal-add-order')" data-i18n="btn_cancel">إلغاء</button>
+      <button class="btn btn-primary" onclick="addOrder()" data-i18n="btn_add_item">✓ إضافة</button>
     </div>
   </div>
 </div>
@@ -1131,11 +1129,11 @@ label{font-size:14px;}
 <!-- Add Service -->
 <div class="modal-overlay" id="modal-add-service">
   <div class="modal">
-    <div class="modal-header"><div class="modal-title">🛠️ إضافة خدمة</div><button class="modal-close" onclick="closeModal('modal-add-service')">✕</button></div>
+    <div class="modal-header"><div class="modal-title" data-i18n="modal_add_service">🛠️ إضافة خدمة</div><button class="modal-close" onclick="closeModal('modal-add-service')">✕</button></div>
     <div class="modal-body">
       <div class="form-grid">
-        <div class="form-group"><label>اسم الخدمة *</label><input type="text" id="svc-name" placeholder="مثال: تغيير زيت المحرك"></div>
-        <div class="form-group"><label>النوع</label>
+        <div class="form-group"><label data-i18n="lbl_service_name_req">اسم الخدمة *</label><input type="text" id="svc-name" placeholder="مثال: تغيير زيت المحرك"></div>
+        <div class="form-group"><label data-i18n="th_type">النوع</label>
           <select id="svc-type">
             <option value="صيانة">صيانة ميكانيكية</option>
             <option value="سمكرة">سمكرة وهيكل</option>
@@ -1144,13 +1142,13 @@ label{font-size:14px;}
             <option value="أخرى">أخرى</option>
           </select>
         </div>
-        <div class="form-group"><label>السعر الافتراضي (ر.ع)</label><input type="number" id="svc-price" placeholder="0.000" step="0.001"></div>
-        <div class="form-group full"><label>الوصف</label><textarea id="svc-desc" placeholder="وصف مختصر..."></textarea></div>
+        <div class="form-group"><label data-i18n="lbl_default_price">السعر الافتراضي (ر.ع)</label><input type="number" id="svc-price" placeholder="0.000" step="0.001"></div>
+        <div class="form-group full"><label data-i18n="th_description">الوصف</label><textarea id="svc-desc" placeholder="وصف مختصر..."></textarea></div>
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn btn-outline" onclick="closeModal('modal-add-service')">إلغاء</button>
-      <button class="btn btn-primary" onclick="addService()">✓ حفظ</button>
+      <button class="btn btn-outline" onclick="closeModal('modal-add-service')" data-i18n="btn_cancel">إلغاء</button>
+      <button class="btn btn-primary" onclick="addService()" data-i18n="btn_save">✓ حفظ</button>
     </div>
   </div>
 </div>
@@ -1158,11 +1156,11 @@ label{font-size:14px;}
 <!-- Add Expense -->
 <div class="modal-overlay" id="modal-add-expense">
   <div class="modal">
-    <div class="modal-header"><div class="modal-title">💸 إضافة مصروف</div><button class="modal-close" onclick="closeModal('modal-add-expense')">✕</button></div>
+    <div class="modal-header"><div class="modal-title" data-i18n="modal_add_expense">💸 إضافة مصروف</div><button class="modal-close" onclick="closeModal('modal-add-expense')">✕</button></div>
     <div class="modal-body">
       <div class="form-grid">
-        <div class="form-group"><label>البيان *</label><input type="text" id="exp-desc" placeholder="مثال: شراء زيت محرك"></div>
-        <div class="form-group"><label>النوع</label>
+        <div class="form-group"><label data-i18n="lbl_statement_req">البيان *</label><input type="text" id="exp-desc" placeholder="مثال: شراء زيت محرك"></div>
+        <div class="form-group"><label data-i18n="th_type">النوع</label>
           <select id="exp-type">
             <option value="قطع غيار">قطع الغيار</option>
             <option value="مرافق">مرافق وتشغيل</option>
@@ -1172,13 +1170,13 @@ label{font-size:14px;}
             <option value="أخرى">أخرى</option>
           </select>
         </div>
-        <div class="form-group"><label>المبلغ (ر.ع)</label><input type="number" id="exp-amount" placeholder="0.000" step="0.001"></div>
-        <div class="form-group"><label>التاريخ</label><input type="date" id="exp-date"></div>
+        <div class="form-group"><label data-i18n="lbl_amount_omr">المبلغ (ر.ع)</label><input type="number" id="exp-amount" placeholder="0.000" step="0.001"></div>
+        <div class="form-group"><label data-i18n="lbl_exp_date">التاريخ</label><input type="date" id="exp-date"></div>
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn btn-outline" onclick="closeModal('modal-add-expense')">إلغاء</button>
-      <button class="btn btn-primary" onclick="addExpense()">✓ حفظ</button>
+      <button class="btn btn-outline" onclick="closeModal('modal-add-expense')" data-i18n="btn_cancel">إلغاء</button>
+      <button class="btn btn-primary" onclick="addExpense()" data-i18n="btn_save">✓ حفظ</button>
     </div>
   </div>
 </div>
@@ -1878,7 +1876,7 @@ function exportPDF(){
 <div class="modal-overlay" id="modal-firebase">
   <div class="modal modal-lg">
     <div class="modal-header">
-      <div class="modal-title">☁️ إعداد المزامنة والإشعارات</div>
+      <div class="modal-title" data-i18n="card_firebase">☁️ إعداد المزامنة والإشعارات</div>
       <button class="modal-close" onclick="closeModal('modal-firebase')">✕</button>
     </div>
     <div class="modal-body">
@@ -2674,7 +2672,7 @@ window.addEventListener('load', () => {
 <div class="modal-overlay" id="modal-firebase">
   <div class="modal modal-lg">
     <div class="modal-header">
-      <div class="modal-title">☁️ إعداد المزامنة والإشعارات</div>
+      <div class="modal-title" data-i18n="card_firebase">☁️ إعداد المزامنة والإشعارات</div>
       <button class="modal-close" onclick="closeModal('modal-firebase')">✕</button>
     </div>
     <div class="modal-body">
