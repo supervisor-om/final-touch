@@ -646,7 +646,7 @@ label{font-size:14px;}
     </div>
     <div class="topbar-actions">
       <div id="sync-indicator" style="padding:6px 14px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:20px;">
-        <span style="color:#8892a4;font-size:12px;font-weight:700;" data-i18n="lbl_local_only">💾 محلي فقط</span>
+        <span style="color:#f5a623;font-size:12px;font-weight:700;">⏳ جاري الاتصال...</span>
       </div>
       <button id="lang-toggle-btn" onclick="setLang(currentLang==='ar'?'en':'ar')" style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);color:#fff;border-radius:20px;padding:5px 14px;font-family:var(--font-main);font-size:12px;font-weight:700;cursor:pointer;">🌐 EN</button>
       <button class="btn btn-primary" onclick="openModal('modal-add-car')" data-i18n="btn_add_car">➕ إضافة سيارة</button>
@@ -2540,26 +2540,27 @@ async function pollCloud() {
     const remoteTime = new Date(fld.stringValue || 0);
     const localTime  = state.updatedAt ? new Date(state.updatedAt) : new Date(0);
     if (remoteTime > localTime) {
-      await loadFromCloud(); // pull full data
+      await loadFromCloud();
     }
   } catch(e) { /* silent */ }
 }
 
-// ── Init — auto-connect & retry, then start polling ──────────────────────────
-window.addEventListener('load', async () => {
+// ── Init — called directly (not waiting for 'load') so CDN delays don't block
+(async function initFirebase() {
   const ok = await checkFirebase();
+  // Poll every 15s for live updates from other browsers/devices
+  setInterval(pollCloud, 15000);
   if (!ok) {
+    // Retry every 30s until connected (max 10 min)
     let retryCount = 0;
     const retryInterval = setInterval(async () => {
+      if (syncEnabled) { clearInterval(retryInterval); return; }
       retryCount++;
-      const connected = await checkFirebase();
-      if (connected) clearInterval(retryInterval);
+      await checkFirebase();
       if (retryCount >= 20) clearInterval(retryInterval);
     }, 30000);
   }
-  // Poll every 15 seconds for updates from other browsers/devices
-  setInterval(pollCloud, 15000);
-});
+})();
 
 </script>
 
