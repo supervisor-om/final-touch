@@ -665,7 +665,7 @@ label{font-size:14px;}
     </div>
     <div class="two-col-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:18px;">
       <div class="card">
-        <div class="card-header"><div class="card-title">📊 توزيع الخدمات</div></div>
+        <div class="card-header"><div class="card-title" data-i18n="card_service_dist">📊 توزيع الخدمات</div></div>
         <div class="card-body">
           <div style="display:flex;flex-direction:column;gap:14px;">
             <div><div style="display:flex;justify-content:space-between;margin-bottom:5px;"><span style="font-size:13px;">🔧 صيانة ميكانيكية</span><span style="font-size:13px;color:var(--info);" id="pct-maint">0%</span></div><div class="progress-bar"><div class="progress-fill" id="bar-maint" style="width:0%;background:linear-gradient(90deg,#4facfe,#00f2fe)"></div></div></div>
@@ -1249,8 +1249,8 @@ function showPage(id){
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   document.getElementById('page-'+id).classList.add('active');
   document.querySelectorAll('.nav-item').forEach(n=>{if(n.getAttribute('onclick')&&n.getAttribute('onclick').includes("'"+id+"'"))n.classList.add('active');});
-  const titles={dashboard:'لوحة التحكم',cars:'السيارات في الورشة',delivered:'السيارات المُسلَّمة',alerts:'التنبيهات',maintenance:'أوامر الصيانة',services:'قائمة الخدمات',invoices:'الفواتير والإيصالات',expenses:'المصروفات',reports:'التقارير المالية',customers:'العملاء'};
-  document.getElementById('page-title').textContent=titles[id]||'';
+  const titleKeys={dashboard:'nav_dashboard',cars:'nav_cars',delivered:'nav_delivered',alerts:'nav_alerts',maintenance:'nav_maintenance',services:'nav_services',invoices:'nav_invoices',expenses:'nav_expenses',reports:'nav_reports',customers:'nav_customers'};
+  document.getElementById('page-title').textContent=t(titleKeys[id]||'')||'';
   renderAll();
   if(document.getElementById('sidebar').classList.contains('open'))toggleSidebar();
 }
@@ -2770,6 +2770,53 @@ var LANG = {
     stat_cars_workshop:'سيارات في الورشة', stat_revenue:'إجمالي الإيرادات',
     stat_expenses:'إجمالي المصروفات', stat_profit:'صافي الربح', stat_pending:'مبالغ معلقة',
     lbl_local_only:'💾 محلي فقط',
+    card_service_dist:'📊 توزيع الخدمات', card_latest_cars:'🚗 أحدث السيارات',
+    lbl_maint_mech:'صيانة ميكانيكية', lbl_body_work:'سمكرة وهيكل', lbl_paint_polish:'دهان وتلميع',
+    card_cars_workshop:'🚗 السيارات في الورشة', card_delivered:'✅ السيارات المُسلَّمة',
+    card_alerts_exceeded:'🔔 سيارات تجاوزت المدة المحددة', card_alert_settings:'⚙️ إعداد حد التنبيه',
+    card_maintenance:'⚙️ أوامر الصيانة', card_services_list:'🛠️ قائمة الخدمات والأسعار',
+    card_invoices:'🧾 الفواتير والإيصالات', card_expenses_log:'💸 سجل المصروفات',
+    card_financial_summary:'📋 ملخص مالي', card_services_analysis:'🔧 تحليل الخدمات',
+    card_cars_stats:'🚗 إحصائيات السيارات', card_customers:'👤 العملاء',
+    card_tracking_wa:'📱 إرسال رابط التتبع عبر واتساب', card_active_links:'🔗 روابط التتبع النشطة',
+    card_tracking_stats:'📊 إحصائيات التتبع', card_users_mgmt:'👥 إدارة المستخدمين',
+    card_firebase:'☁️ إعداد المزامنة والإشعارات',
+    modal_add_car:'🚗 إضافة سيارة جديدة', modal_update_car:'✏️ تحديث السيارة',
+    modal_receipt:'🧾 إيصال الدفع', modal_add_order:'⚙️ إضافة أمر صيانة',
+    modal_add_service:'🛠️ إضافة خدمة', modal_add_expense:'💸 إضافة مصروف',
+    lbl_search_prev_cust:'👤 بحث عن عميل سابق', lbl_quick_service:'⚡ خدمة سريعة',
+    lbl_car_templates:'🚗 قوالب السيارات الشائعة',
+    lbl_plate_req:'رقم اللوحة *', lbl_owner_req:'اسم المالك *',
+    lbl_phone_opt:'رقم الهاتف', lbl_car_model_opt:'موديل السيارة',
+    lbl_service_type_req:'نوع الخدمة *', lbl_expected_delivery:'📅 التسليم المتوقع',
+    lbl_estimate:'المبلغ التقديري (ر.ع)', lbl_deposit_adv:'💰 الدفعة المقدمة (ر.ع)',
+    lbl_extra_details:'تفاصيل إضافية (اختياري)', lbl_km:'الكيلومترات',
+    lbl_fault_desc:'وصف العطل / المطلوب',
+    btn_save_car:'✓ حفظ السيارة', btn_update_car:'✓ تحديث', btn_add_item:'✓ إضافة',
+    lbl_alert_at:'تنبيه عند تجاوز:', lbl_days_unit:'أيام',
+    lbl_spare_parts:'قطع الغيار', lbl_utilities:'المرافق والتشغيل', lbl_labor_sal:'الرواتب والعمالة',
+    lbl_total_revenue:'إجمالي الإيرادات', lbl_total_expenses_rpt:'إجمالي المصروفات', lbl_net_profit_rpt:'صافي الربح',
+    tab_financial:'📊 المالي', tab_services_rpt:'🔧 الخدمات', tab_cars_rpt:'🚗 السيارات',
+    btn_export_pdf:'📄 تصدير PDF', btn_print:'🖨️ طباعة',
+    th_svc_name:'الخدمة', th_type:'النوع', th_price_omr:'السعر (ر.ع)',
+    th_invoice_no:'رقم الفاتورة', th_total_amount:'المبلغ الكلي', th_deposit_hdr:'المقدمة',
+    th_remaining:'المتبقي', th_date:'التاريخ', th_statement:'البيان',
+    th_cust_name:'الاسم', th_cars_count_hdr:'عدد السيارات', th_total_paid_hdr:'إجمالي المدفوع',
+    th_tracking_link:'رابط التتبع',
+    lbl_repair_stages:'مراحل الإصلاح', lbl_payment_section:'💰 الدفع',
+    lbl_total_amount_omr:'المبلغ الكلي (ر.ع)', lbl_paid_so_far:'المدفوع حتى الآن (ر.ع)',
+    lbl_expected_del_date:'📅 تاريخ التسليم المتوقع', lbl_repair_notes:'ملاحظات الإصلاح',
+    lbl_car_select:'السيارة', lbl_work_type_lbl:'نوع العمل', lbl_technician_lbl:'الفني المسؤول',
+    lbl_cost_omr:'التكلفة (ر.ع)', lbl_work_desc:'وصف العمل',
+    lbl_service_name_req:'اسم الخدمة *', lbl_default_price:'السعر الافتراضي (ر.ع)',
+    lbl_statement_req:'البيان *', lbl_amount_omr:'المبلغ (ر.ع)', lbl_exp_date:'التاريخ',
+    stage_receive:'استلام', stage_diagnose:'تشخيص', stage_repair:'إصلاح',
+    stage_paint:'دهان', stage_ready:'جاهزة', stage_delivery:'تسليم',
+    pay_total:'المبلغ الكلي', pay_paid:'✅ المدفوع', pay_remaining:'⏳ المتبقي', pay_status:'💰 حالة الدفع',
+    lbl_choose_car:'اختر السيارة', lbl_msg_preview_title:'📋 معاينة الرسالة',
+    btn_send_wa:'📱 فتح واتساب وإرسال الرابط',
+    trk_total_cars:'إجمالي السيارات', trk_waiting:'في الانتظار',
+    trk_in_progress:'تحت الإصلاح', trk_ready:'جاهزة للتسليم',
   },
   en: {
     nav_dashboard:'Dashboard', nav_cars:'Cars in Workshop', nav_delivered:'Delivered Cars',
@@ -2792,6 +2839,53 @@ var LANG = {
     stat_cars_workshop:'Cars in Workshop', stat_revenue:'Total Revenue',
     stat_expenses:'Total Expenses', stat_profit:'Net Profit', stat_pending:'Pending Amounts',
     lbl_local_only:'💾 Local Only',
+    card_service_dist:'📊 Service Distribution', card_latest_cars:'🚗 Latest Cars',
+    lbl_maint_mech:'Mechanical Maintenance', lbl_body_work:'Body Work', lbl_paint_polish:'Paint & Polish',
+    card_cars_workshop:'🚗 Cars in Workshop', card_delivered:'✅ Delivered Cars',
+    card_alerts_exceeded:'🔔 Cars Exceeded Deadline', card_alert_settings:'⚙️ Alert Threshold',
+    card_maintenance:'⚙️ Maintenance Orders', card_services_list:'🛠️ Services & Prices',
+    card_invoices:'🧾 Invoices & Receipts', card_expenses_log:'💸 Expenses Log',
+    card_financial_summary:'📋 Financial Summary', card_services_analysis:'🔧 Services Analysis',
+    card_cars_stats:'🚗 Cars Statistics', card_customers:'👤 Customers',
+    card_tracking_wa:'📱 Send Tracking Link via WhatsApp', card_active_links:'🔗 Active Tracking Links',
+    card_tracking_stats:'📊 Tracking Statistics', card_users_mgmt:'👥 User Management',
+    card_firebase:'☁️ Sync & Notifications Setup',
+    modal_add_car:'🚗 Add New Car', modal_update_car:'✏️ Update Car',
+    modal_receipt:'🧾 Payment Receipt', modal_add_order:'⚙️ Add Maintenance Order',
+    modal_add_service:'🛠️ Add Service', modal_add_expense:'💸 Add Expense',
+    lbl_search_prev_cust:'👤 Search Previous Customer', lbl_quick_service:'⚡ Quick Service',
+    lbl_car_templates:'🚗 Common Car Templates',
+    lbl_plate_req:'Plate Number *', lbl_owner_req:'Owner Name *',
+    lbl_phone_opt:'Phone Number', lbl_car_model_opt:'Car Model',
+    lbl_service_type_req:'Service Type *', lbl_expected_delivery:'📅 Expected Delivery',
+    lbl_estimate:'Estimated Amount (OMR)', lbl_deposit_adv:'💰 Advance Payment (OMR)',
+    lbl_extra_details:'Extra Details (optional)', lbl_km:'Kilometers',
+    lbl_fault_desc:'Fault Description / Required',
+    btn_save_car:'✓ Save Car', btn_update_car:'✓ Update', btn_add_item:'✓ Add',
+    lbl_alert_at:'Alert when exceeding:', lbl_days_unit:'days',
+    lbl_spare_parts:'Spare Parts', lbl_utilities:'Utilities', lbl_labor_sal:'Labor & Salaries',
+    lbl_total_revenue:'Total Revenue', lbl_total_expenses_rpt:'Total Expenses', lbl_net_profit_rpt:'Net Profit',
+    tab_financial:'📊 Financial', tab_services_rpt:'🔧 Services', tab_cars_rpt:'🚗 Cars',
+    btn_export_pdf:'📄 Export PDF', btn_print:'🖨️ Print',
+    th_svc_name:'Service', th_type:'Type', th_price_omr:'Price (OMR)',
+    th_invoice_no:'Invoice #', th_total_amount:'Total Amount', th_deposit_hdr:'Deposit',
+    th_remaining:'Remaining', th_date:'Date', th_statement:'Statement',
+    th_cust_name:'Name', th_cars_count_hdr:'Cars Count', th_total_paid_hdr:'Total Paid',
+    th_tracking_link:'Tracking Link',
+    lbl_repair_stages:'Repair Stages', lbl_payment_section:'💰 Payment',
+    lbl_total_amount_omr:'Total Amount (OMR)', lbl_paid_so_far:'Amount Paid (OMR)',
+    lbl_expected_del_date:'📅 Expected Delivery Date', lbl_repair_notes:'Repair Notes',
+    lbl_car_select:'Car', lbl_work_type_lbl:'Work Type', lbl_technician_lbl:'Responsible Technician',
+    lbl_cost_omr:'Cost (OMR)', lbl_work_desc:'Work Description',
+    lbl_service_name_req:'Service Name *', lbl_default_price:'Default Price (OMR)',
+    lbl_statement_req:'Statement *', lbl_amount_omr:'Amount (OMR)', lbl_exp_date:'Date',
+    stage_receive:'Receive', stage_diagnose:'Diagnose', stage_repair:'Repair',
+    stage_paint:'Paint', stage_ready:'Ready', stage_delivery:'Delivery',
+    pay_total:'Total Amount', pay_paid:'✅ Paid', pay_remaining:'⏳ Remaining', pay_status:'💰 Payment Status',
+    lbl_choose_car:'Select Car', lbl_msg_preview_title:'📋 Message Preview',
+    btn_send_wa:'📱 Open WhatsApp & Send',
+    trk_total_cars:'Total Cars', trk_waiting:'Waiting',
+    trk_in_progress:'In Progress', trk_ready:'Ready for Delivery',
   }
 };
 function t(key) {
