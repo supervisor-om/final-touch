@@ -631,7 +631,8 @@ label{font-size:14px;}
       </div>
       <button onclick="logout()" title="تسجيل الخروج" style="background:rgba(233,69,96,.15);border:1px solid rgba(233,69,96,.25);color:#e94560;border-radius:8px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;" data-i18n="btn_logout">خروج ↩</button>
     </div>
-    <div id="sync-indicator-side" style="margin-bottom:8px;"></div>
+    <div id="sync-indicator-side" style="margin-bottom:6px;"></div>
+    <button onclick="openFirebaseSetup()" id="cloud-btn" style="background:rgba(79,172,254,.1);border:1px solid rgba(79,172,254,.2);color:#4facfe;border-radius:8px;padding:6px 12px;font-family:var(--font-main);font-size:11px;font-weight:700;cursor:pointer;width:100%;margin-bottom:8px;">☁️ حالة السحابة</button>
     📅 <span id="today-date"></span>
   </div>
 </aside>
@@ -1925,39 +1926,55 @@ function switchTab(btn,targetId){
 
 
 
-function switchFbTab(tab, btn) {
-  document.getElementById('fb-tab-cloud').style.display = tab === 'cloud' ? '' : 'none';
-  document.getElementById('fb-tab-push').style.display  = tab === 'push'  ? '' : 'none';
-  btn.closest('.tabs').querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  btn.classList.add('active');
-}
-
 function openFirebaseSetup() {
-  const saved = localStorage.getItem('firebase_config');
-  if (saved) document.getElementById('firebase-config-input').value = saved;
-  const vapid = localStorage.getItem('fcm_vapid_key');
-  const srvKey = localStorage.getItem('fcm_server_key');
-  if (vapid)  document.getElementById('fcm-vapid-key').value  = vapid;
-  if (srvKey) document.getElementById('fcm-server-key').value = srvKey;
-  // reset to cloud tab
-  switchFbTab('cloud', document.getElementById('fb-tab-cloud-btn'));
+  // Show current status
+  const icon = document.getElementById('fb-status-icon');
+  const text = document.getElementById('fb-status-text');
+  const sub  = document.getElementById('fb-status-sub');
+  const card = document.getElementById('fb-status-card');
+  if (syncEnabled) {
+    icon.textContent = '✅';
+    text.textContent = 'متصل بالسحابة';
+    sub.textContent  = 'بياناتك تُحفظ تلقائياً عند كل تغيير';
+    card.style.background = 'rgba(0,212,170,.08)';
+    card.style.borderColor = 'rgba(0,212,170,.3)';
+  } else {
+    icon.textContent = '⚠️';
+    text.textContent = 'غير متصل';
+    sub.textContent  = 'اضغط "إعادة الاتصال" للمحاولة';
+    card.style.background = 'rgba(245,166,35,.08)';
+    card.style.borderColor = 'rgba(245,166,35,.3)';
+  }
+  document.getElementById('firebase-status').innerHTML = '';
   openModal('modal-firebase');
 }
 
-async function applyFirebaseConfig() {
+async function reconnectFirebase() {
   const statusEl = document.getElementById('firebase-status');
-
-  // Save FCM push keys if filled
-  // (WhatsApp keys stored per car, not globally)
-
-  // Try Firebase connection
-  statusEl.innerHTML = '<span style="color:#f5a623;">⏳ جاري الاتصال بالسحابة...</span>';
+  const icon = document.getElementById('fb-status-icon');
+  const text = document.getElementById('fb-status-text');
+  const sub  = document.getElementById('fb-status-sub');
+  const card = document.getElementById('fb-status-card');
+  icon.textContent = '⏳';
+  text.textContent = 'جاري الاتصال...';
+  sub.textContent  = '';
+  card.style.background = 'rgba(79,172,254,.08)';
+  card.style.borderColor = 'rgba(79,172,254,.2)';
   const ok = await checkFirebase();
   if (ok) {
-    statusEl.innerHTML = '<span style="color:#00d4aa;">✅ تم الاتصال! البيانات تُحفظ على السحابة الآن.</span>';
-    setTimeout(() => closeModal('modal-firebase'), 2000);
+    icon.textContent = '✅';
+    text.textContent = 'تم الاتصال!';
+    sub.textContent  = 'بياناتك تُحفظ تلقائياً الآن';
+    card.style.background = 'rgba(0,212,170,.08)';
+    card.style.borderColor = 'rgba(0,212,170,.3)';
+    statusEl.innerHTML = '';
+    setTimeout(() => closeModal('modal-firebase'), 1500);
   } else {
-    statusEl.innerHTML = '<span style="color:#e94560;">⚠️ تعذّر الاتصال بـ Firestore. تحقق من الإعدادات.</span>';
+    icon.textContent = '❌';
+    text.textContent = 'فشل الاتصال';
+    sub.textContent  = 'تحقق من الإنترنت وحاول مجدداً';
+    card.style.background = 'rgba(233,69,96,.08)';
+    card.style.borderColor = 'rgba(233,69,96,.3)';
   }
 }
 
@@ -2492,6 +2509,15 @@ function showSyncStatus(status) {
   const el2 = document.getElementById('sync-indicator-side');
   if (el1) el1.innerHTML = html;
   if (el2) el2.innerHTML = html;
+  // Update cloud button color
+  const btn = document.getElementById('cloud-btn');
+  if (btn) {
+    const connected = (status === 'online' || status === 'saved' || status === 'synced');
+    btn.style.color       = connected ? '#00d4aa' : '#4facfe';
+    btn.style.borderColor = connected ? 'rgba(0,212,170,.3)' : 'rgba(79,172,254,.2)';
+    btn.style.background  = connected ? 'rgba(0,212,170,.08)' : 'rgba(79,172,254,.1)';
+    btn.textContent = connected ? '✅ السحابة متصلة' : '☁️ حالة السحابة';
+  }
 }
 
 // ── Override saveState ───────────────────────────────────────────────────────
@@ -3053,5 +3079,45 @@ function saveWaBotKey() {
   }, 3000);
 }
 </script>
+
+<!-- ═══ Firebase Status Modal ═══ -->
+<div class="modal-overlay" id="modal-firebase" style="display:none;opacity:0;">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">☁️ السحابة والمزامنة</div>
+      <button class="modal-close" onclick="closeModal('modal-firebase')">✕</button>
+    </div>
+    <div class="modal-body">
+
+      <!-- Connection status card -->
+      <div id="fb-status-card" style="border-radius:14px;padding:18px;margin-bottom:16px;text-align:center;background:rgba(79,172,254,.08);border:1px solid rgba(79,172,254,.2);">
+        <div style="font-size:36px;margin-bottom:8px;" id="fb-status-icon">⏳</div>
+        <div style="font-size:15px;font-weight:700;color:#fff;" id="fb-status-text">جاري التحقق...</div>
+        <div style="font-size:11px;color:#8892a4;margin-top:4px;" id="fb-status-sub"></div>
+      </div>
+
+      <!-- Project info -->
+      <div style="background:rgba(255,255,255,.04);border-radius:10px;padding:12px;font-size:12px;color:#8892a4;direction:ltr;margin-bottom:16px;">
+        <div>🔗 Project: <strong style="color:#4facfe;">i-hope-1-2-3-4-5-6-7</strong></div>
+        <div style="margin-top:4px;">📄 Document: <strong style="color:#4facfe;">workshop/data</strong></div>
+      </div>
+
+      <!-- WhatsApp section -->
+      <div style="background:rgba(37,211,102,.06);border:1px solid rgba(37,211,102,.2);border-radius:12px;padding:14px;font-size:12px;line-height:1.8;">
+        <div style="font-weight:700;color:#25d366;margin-bottom:6px;">📱 تفعيل إشعارات WhatsApp للعميل:</div>
+        <div>1. اطلب من العميل إرسال هذه الرسالة لـ <strong dir="ltr">+34 644 597 364</strong></div>
+        <div style="background:rgba(255,255,255,.06);border-radius:8px;padding:6px 10px;margin:6px 0;font-family:monospace;direction:ltr;">I allow callmebot to send me messages</div>
+        <div>2. سيصله مفتاح API — أدخله في تعديل السيارة ← حقل "مفتاح WhatsApp"</div>
+      </div>
+
+      <div id="firebase-status" style="margin-top:10px;font-size:12px;text-align:center;"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-firebase')">إغلاق</button>
+      <button class="btn btn-info" onclick="reconnectFirebase()">🔄 إعادة الاتصال</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
