@@ -3233,13 +3233,10 @@ function doLogin() {
     return;
   }
 
-  // Hide overlay first, then apply role
-  document.getElementById('auth-overlay').style.display = 'none';
+  // Save session, hide overlay, then render
   try { setSession(user); } catch(e) {}
-  try { applyRole(user); } catch(e) {
-    // fallback: reload page to apply session
-    location.reload();
-  }
+  document.getElementById('auth-overlay').style.display = 'none';
+  try { applyRole(user); } catch(e) {}
 }
 
 // ── Logout ───────────────────────────────────────────────────────────
@@ -3296,8 +3293,8 @@ function initAuth() {
 
   var session = getSession();
   if (session) {
-    applyRole(session);
     document.getElementById('auth-overlay').style.display = 'none';
+    try { applyRole(session); } catch(e) {}
   }
   // overlay stays visible if no session
 }
