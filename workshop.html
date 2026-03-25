@@ -2322,11 +2322,6 @@ showPage = function(id) {
 // Check URL on load
 window.addEventListener('load', initCustomerTracking);
 
-document.getElementById('today-date').textContent=new Date().toLocaleDateString('ar-SA',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
-document.getElementById('exp-date').value=today();
-renderAll();
-
-
 // ══════════════════════════════════════════
 // ☁️ FIREBASE REST API SYNC (No SDK needed)
 // ══════════════════════════════════════════
@@ -2339,6 +2334,10 @@ const FB_DOC_PATH = "workshop/data";
 let syncEnabled  = false;
 let saveTimeout  = null;
 let lastSaveHash = '';
+
+document.getElementById('today-date').textContent=new Date().toLocaleDateString('ar-SA',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+document.getElementById('exp-date').value=today();
+renderAll();
 
 // ── Firestore value converters ──────────────────────────────────────────────
 function toFirestore(val) {
