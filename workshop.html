@@ -2758,7 +2758,7 @@ window.addEventListener('load', initCustomerTracking);
 
 document.getElementById('today-date').textContent=new Date().toLocaleDateString(currentLang==='ar'?'ar-SA':'en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
 document.getElementById('exp-date').value=today();
-// renderAll() is called by initAuth() after auth state is confirmed
+try { renderAll(); } catch(e) { console.error('renderAll init error:', e); }
 
 
 // ══════════════════════════════════════════
@@ -3302,11 +3302,9 @@ function initAuth() {
   var session = getSession();
   if (session) {
     document.getElementById('auth-overlay').style.display = 'none';
-    try { applyRole(session); } catch(e) { renderAll(); }
-  } else {
-    // No session — show login, but still render background data
-    renderAll();
+    try { applyRole(session); } catch(e) { console.error('applyRole error:', e); }
   }
+  // overlay stays visible if no session
 }
 
 // ── User Management ──────────────────────────────────────────────────
@@ -3361,9 +3359,17 @@ function deleteUser(idx) {
   renderUsersList();
 }
 
-// Apply language first, then run auth check (initAuth calls renderAll internally)
-setLang(currentLang);
+// Run auth check after all scripts are parsed
 initAuth();
+// Apply initial language direction
+(function() {
+  var isRtl = currentLang === 'ar';
+  document.documentElement.lang = currentLang;
+  document.documentElement.dir = isRtl ? 'rtl' : 'ltr';
+  document.body.style.direction = isRtl ? 'rtl' : 'ltr';
+  var btn = document.getElementById('lang-toggle-btn');
+  if (btn) btn.textContent = currentLang === 'ar' ? '🌐 EN' : '🌐 عربي';
+})();
 </script>
 
 <!-- ═══════════════════════════════════════════════════
