@@ -3074,9 +3074,26 @@ function sendPushNotification(car) {
   let actionHtml;
   if (car.phone) {
     const nl  = '\n';
-    const msg = 'مرحباً ' + car.owner + ' 👋' + nl + nl +
+    const trackUrl = getTrackingURL(car);
+
+    // Build message
+    let msg = 'مرحباً ' + car.owner + ' 👋' + nl + nl +
       'سيارتك ' + car.plate + (car.model ? ' (' + car.model + ')' : '') + nl +
-      'وصلت إلى مرحلة: ' + label + nl + nl +
+      'وصلت إلى مرحلة: ' + label + nl;
+
+    // If ready for delivery (stage 4), add remaining amount
+    if (idx === 4) {
+      const total     = parseFloat(car.estimate) || 0;
+      const paid      = parseFloat(car.paidTotal) || 0;
+      const remaining = total - paid;
+      if (remaining > 0) {
+        msg += nl + '💰 المبلغ المتبقي: ' + remaining.toLocaleString('ar-OM') + ' ر.ع' + nl;
+      } else if (total > 0) {
+        msg += nl + '✅ تم سداد المبلغ كاملاً' + nl;
+      }
+    }
+
+    msg += nl + '🔍 تتبع سيارتك: ' + trackUrl + nl + nl +
       'ورشة اللمسة الأخيرة 🔧';
 
     let phone = car.phone.replace(/[^0-9+]/g, '').replace(/^\+/, '');
