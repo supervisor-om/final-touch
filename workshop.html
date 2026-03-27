@@ -1542,11 +1542,22 @@ function renderStagesManageList(){
   const el=document.getElementById('stages-manage-list');
   if(!el)return;
   el.innerHTML=state.stages.map((s,i)=>`
-    <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:rgba(255,255,255,.04);border-radius:10px;margin-bottom:6px;">
-      <span style="font-size:20px;width:30px;text-align:center;">${s.icon}</span>
-      <span style="flex:1;font-size:14px;font-weight:600;">${s.label}</span>
-      ${state.stages.length>2?`<button class="btn btn-danger btn-sm" onclick="deleteStage(${i})" ${i===0||i===state.stages.length-1?'title="لا يمكن حذف أول أو آخر حالة" style="opacity:.4;cursor:not-allowed;" disabled':''}>🗑️</button>`:''}
+    <div id="stage-row-${i}" style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:rgba(255,255,255,.04);border-radius:10px;margin-bottom:6px;">
+      <input type="text" value="${s.icon}" id="edit-icon-${i}" style="width:48px;text-align:center;font-size:18px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:8px;color:#fff;padding:4px;">
+      <input type="text" value="${s.label}" id="edit-label-${i}" style="flex:1;font-size:13px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:8px;color:#fff;padding:6px 10px;" onkeydown="if(event.key==='Enter')saveStage(${i})">
+      <button class="btn btn-primary btn-sm" onclick="saveStage(${i})">💾</button>
+      <button class="btn btn-danger btn-sm" onclick="deleteStage(${i})" ${i===0||i===state.stages.length-1?'disabled style="opacity:.4;cursor:not-allowed;"':''}>🗑️</button>
     </div>`).join('');
+}
+function saveStage(i){
+  const icon=document.getElementById('edit-icon-'+i).value.trim()||state.stages[i].icon;
+  const label=document.getElementById('edit-label-'+i).value.trim();
+  if(!label){alert('أدخل اسم الحالة');return;}
+  state.stages[i]={icon,label};
+  syncStageArrays();
+  saveState();
+  renderStagesManageList();
+  renderAll();
 }
 function addStage(){
   const icon=document.getElementById('new-stage-icon').value.trim()||'🔹';
