@@ -2,7 +2,7 @@
   "name": "اللمسة الأخيرة - The Final Touch",
   "short_name": "اللمسة الأخيرة",
   "description": "نظام إدارة ورشة السيارات",
-  "start_url": "/workshop.html",
+  "start_url": "workshop.html",
   "display": "standalone",
   "background_color": "#1a1a2e",
   "theme_color": "#0f3460",
@@ -27,7 +27,7 @@
     {
       "name": "تتبع السيارة",
       "short_name": "تتبع",
-      "url": "/track.html",
+      "url": "track.html",
       "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
     }
   ],
