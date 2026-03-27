@@ -1052,27 +1052,8 @@ label{font-size:14px;}
         <div class="stages-track" id="stages-track"></div>
         <div id="stage-buttons-row" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;"></div>
       </div>
-      <div class="divider"></div>
-      <!-- Payment — admin only -->
-      <div id="update-payment-section">
-        <div style="font-size:13px;font-weight:700;color:var(--muted);margin-bottom:10px;" data-i18n="lbl_payment_section">💰 الدفع</div>
-        <div class="form-grid">
-          <div class="form-group"><label data-i18n="lbl_total_amount_omr">المبلغ الكلي (ر.ع)</label><input type="number" id="update-amount" placeholder="0.000" step="0.001" oninput="calcRemaining()"></div>
-          <div class="form-group"><label data-i18n="lbl_paid_so_far">المدفوع حتى الآن (ر.ع)</label><input type="number" id="update-paid" placeholder="0.000" step="0.001" oninput="calcRemaining()"></div>
-        </div>
-        <div class="payment-box" id="payment-preview">
-          <div class="payment-row"><span data-i18n="pay_total">المبلغ الكلي</span><span id="pp-total">0.000 ر.ع</span></div>
-          <div class="payment-row paid"><span data-i18n="pay_paid">✅ المدفوع</span><span id="pp-paid">0.000 ر.ع</span></div>
-          <div class="payment-row remaining"><span data-i18n="pay_remaining">⏳ المتبقي</span><span id="pp-remaining">0.000 ر.ع</span></div>
-          <div class="payment-row total"><span data-i18n="pay_status">💰 حالة الدفع</span><span id="pp-status">—</span></div>
-        </div>
-      </div>
-      <div class="form-group" style="margin-top:14px;">
-        <label data-i18n="lbl_expected_del_date">📅 تاريخ التسليم المتوقع</label>
-        <input type="date" id="update-expected-date">
-      </div>
       <!-- صور السيارة -->
-      <div style="margin:14px 0;">
+      <div style="margin:14px 0 6px;">
         <div style="font-size:13px;font-weight:700;color:var(--muted);margin-bottom:10px;">📷 صور السيارة</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
           <div>
@@ -1092,6 +1073,25 @@ label{font-size:14px;}
             </label>
           </div>
         </div>
+      </div>
+      <div class="divider"></div>
+      <!-- Payment — admin only -->
+      <div id="update-payment-section">
+        <div style="font-size:13px;font-weight:700;color:var(--muted);margin-bottom:10px;" data-i18n="lbl_payment_section">💰 الدفع</div>
+        <div class="form-grid">
+          <div class="form-group"><label data-i18n="lbl_total_amount_omr">المبلغ الكلي (ر.ع)</label><input type="number" id="update-amount" placeholder="0.000" step="0.001" oninput="calcRemaining()"></div>
+          <div class="form-group"><label data-i18n="lbl_paid_so_far">المدفوع حتى الآن (ر.ع)</label><input type="number" id="update-paid" placeholder="0.000" step="0.001" oninput="calcRemaining()"></div>
+        </div>
+        <div class="payment-box" id="payment-preview">
+          <div class="payment-row"><span data-i18n="pay_total">المبلغ الكلي</span><span id="pp-total">0.000 ر.ع</span></div>
+          <div class="payment-row paid"><span data-i18n="pay_paid">✅ المدفوع</span><span id="pp-paid">0.000 ر.ع</span></div>
+          <div class="payment-row remaining"><span data-i18n="pay_remaining">⏳ المتبقي</span><span id="pp-remaining">0.000 ر.ع</span></div>
+          <div class="payment-row total"><span data-i18n="pay_status">💰 حالة الدفع</span><span id="pp-status">—</span></div>
+        </div>
+      </div>
+      <div class="form-group" style="margin-top:14px;">
+        <label data-i18n="lbl_expected_del_date">📅 تاريخ التسليم المتوقع</label>
+        <input type="date" id="update-expected-date">
       </div>
       <div class="form-group"><label data-i18n="lbl_repair_notes">ملاحظات الإصلاح</label><textarea id="update-notes" placeholder="تفاصيل الأعمال المنجزة..."></textarea></div>
       <div class="form-group"><label>📞 رقم هاتف العميل</label><input type="text" id="update-phone" placeholder="مثال: 96812345678 أو 91234567"><div style="font-size:11px;color:#8892a4;margin-top:3px;">أدخل الرقم كاملاً مع كود الدولة (عُمان: 968XXXXXXXX)</div></div>
