@@ -3063,12 +3063,10 @@ async function sendPushNotification(car) {
   const STAGE_EMOJIS = ['📋','🔍','🔧','🎨','✅','📦'];
   const idx   = car.stage || 0;
   const label = STAGE_EMOJIS[idx] + ' ' + STAGES_AR[idx];
-  const trackUrl = getTrackingURL(car);
   const nl = '\n';
   const msg = 'مرحباً ' + car.owner + ' 👋' + nl + nl +
     'سيارتك ' + car.plate + (car.model ? ' (' + car.model + ')' : '') + nl +
     'وصلت إلى مرحلة: ' + label + nl + nl +
-    '📱 تابع سيارتك لحظة بلحظة:' + nl + trackUrl + nl + nl +
     'ورشة اللمسة الأخيرة 🔧';
 
   // Normalize phone: strip non-digits, ensure country code
