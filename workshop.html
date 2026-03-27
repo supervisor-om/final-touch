@@ -1046,7 +1046,7 @@ label{font-size:14px;}
           <div class="stage-item" id="stage-4"><div class="stage-dot">✅</div><div class="stage-label" data-i18n="stage_ready">جاهزة</div></div>
           <div class="stage-item" id="stage-5"><div class="stage-dot">📦</div><div class="stage-label" data-i18n="stage_delivery">تسليم</div></div>
         </div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;">
+        <div id="stage-buttons-row" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;">
           <button class="btn btn-outline btn-sm" onclick="setStage(0)" data-i18n="stage_receive">📋 استلام</button>
           <button class="btn btn-outline btn-sm" onclick="setStage(1)" data-i18n="stage_diagnose">🔍 تشخيص</button>
           <button class="btn btn-outline btn-sm" onclick="setStage(2)" data-i18n="stage_repair">🔧 إصلاح</button>
@@ -1302,11 +1302,13 @@ function editCar(id){
   document.getElementById('update-phone').value=car.phone||'';
   document.getElementById('update-wakey').value=car.waBotKey||'';
   document.getElementById('update-expected-date').value=car.expectedDate||'';
-  // Show/hide payment section based on role
+  // Show/hide sections based on role
   const session=getSession();
   const isAdmin=session&&session.role==='admin';
   const paySection=document.getElementById('update-payment-section');
   if(paySection)paySection.style.display=isAdmin?'':'none';
+  const stageBtns=document.getElementById('stage-buttons-row');
+  if(stageBtns)stageBtns.style.display=isAdmin?'flex':'none';
   updateStageUI();calcRemaining();
   openModal('modal-update-car');
 }
@@ -1321,6 +1323,14 @@ const QS_STAGES=[
 ];
 function quickStatus(carId,e){
   e.stopPropagation();
+  const _qs=getSession();
+  if(!_qs||_qs.role!=='admin'){
+    const b=document.createElement('div');
+    b.style.cssText='position:fixed;top:80px;left:50%;transform:translateX(-50%);background:rgba(233,69,96,.92);color:#fff;padding:12px 24px;border-radius:12px;font-weight:700;font-size:13px;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,.4);';
+    b.textContent='🔒 تغيير الحالة للمسؤول فقط';
+    document.body.appendChild(b);setTimeout(()=>b.remove(),2500);
+    return;
+  }
   document.getElementById('qs-popup')?.remove();
   const car=state.cars.find(c=>c.id===carId);
   if(!car)return;
