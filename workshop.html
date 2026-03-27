@@ -2082,9 +2082,8 @@ const STAGE_DESCS  = ['تم استلام سيارتك في الورشة','يتم
 const STAGE_COLORS = ['#8892a4','#4facfe','#f5a623','#9b59b6','#00d4aa','#00d4aa'];
 
 function getTrackingURL(car) {
-  // track.html must be in the same folder as workshop.html
-  const base = window.location.href.replace(/[^/]*$/, '');
-  return base + 'track.html';
+  const base = window.location.origin + window.location.pathname;
+  return base + '?track=' + encodeURIComponent(car.plate);
 }
 
 function renderTrackingPage() {
@@ -3068,7 +3067,10 @@ async function sendPushNotification(car) {
     '📱 تابع سيارتك لحظة بلحظة:' + nl + trackUrl + nl + nl +
     'ورشة اللمسة الأخيرة 🔧';
 
-  const phone = car.phone.replace(/[^0-9]/g, '');
+  // Normalize phone: strip non-digits, handle leading 0 → add 968 (Oman)
+  let phone = car.phone.replace(/[^0-9]/g, '');
+  if (phone.startsWith('0')) phone = '968' + phone.slice(1);
+  else if (phone.length <= 8)  phone = '968' + phone; // local number without country code
   const waKey = car.waBotKey || '';
 
   if (waKey && phone) {
