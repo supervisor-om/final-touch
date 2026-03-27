@@ -1308,7 +1308,7 @@ function editCar(id){
   const paySection=document.getElementById('update-payment-section');
   if(paySection)paySection.style.display=isAdmin?'':'none';
   const stageBtns=document.getElementById('stage-buttons-row');
-  if(stageBtns)stageBtns.style.display=isAdmin?'flex':'none';
+  if(stageBtns)stageBtns.style.display='flex';
   updateStageUI();calcRemaining();
   openModal('modal-update-car');
 }
@@ -1323,14 +1323,6 @@ const QS_STAGES=[
 ];
 function quickStatus(carId,e){
   e.stopPropagation();
-  const _qs=getSession();
-  if(!_qs||_qs.role!=='admin'){
-    const b=document.createElement('div');
-    b.style.cssText='position:fixed;top:80px;left:50%;transform:translateX(-50%);background:rgba(233,69,96,.92);color:#fff;padding:12px 24px;border-radius:12px;font-weight:700;font-size:13px;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,.4);';
-    b.textContent='🔒 تغيير الحالة للمسؤول فقط';
-    document.body.appendChild(b);setTimeout(()=>b.remove(),2500);
-    return;
-  }
   document.getElementById('qs-popup')?.remove();
   const car=state.cars.find(c=>c.id===carId);
   if(!car)return;
