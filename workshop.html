@@ -633,6 +633,7 @@ label{font-size:14px;}
     </div>
     <div id="sync-indicator-side" style="margin-bottom:6px;"></div>
     <button onclick="openFirebaseSetup()" id="cloud-btn" style="background:rgba(79,172,254,.1);border:1px solid rgba(79,172,254,.2);color:#4facfe;border-radius:8px;padding:6px 12px;font-family:var(--font-main);font-size:11px;font-weight:700;cursor:pointer;width:100%;margin-bottom:8px;">☁️ حالة السحابة</button>
+    <button onclick="openManageStages()" class="admin-only" style="background:rgba(245,166,35,.1);border:1px solid rgba(245,166,35,.25);color:#f5a623;border-radius:8px;padding:6px 12px;font-family:var(--font-main);font-size:11px;font-weight:700;cursor:pointer;width:100%;margin-bottom:8px;">⚙️ إدارة الحالات</button>
     📅 <span id="today-date"></span>
   </div>
 </aside>
@@ -1038,22 +1039,8 @@ label{font-size:14px;}
       <!-- Stages -->
       <div style="margin-bottom:20px;">
         <div style="font-size:13px;font-weight:700;color:var(--muted);margin-bottom:12px;" data-i18n="lbl_repair_stages">مراحل الإصلاح</div>
-        <div class="stages-track" id="stages-track">
-          <div class="stage-item" id="stage-0"><div class="stage-dot">📋</div><div class="stage-label" data-i18n="stage_receive">استلام</div></div>
-          <div class="stage-item" id="stage-1"><div class="stage-dot">🔍</div><div class="stage-label" data-i18n="stage_diagnose">تشخيص</div></div>
-          <div class="stage-item" id="stage-2"><div class="stage-dot">🔧</div><div class="stage-label" data-i18n="stage_repair">إصلاح</div></div>
-          <div class="stage-item" id="stage-3"><div class="stage-dot">🎨</div><div class="stage-label" data-i18n="stage_paint">دهان</div></div>
-          <div class="stage-item" id="stage-4"><div class="stage-dot">✅</div><div class="stage-label" data-i18n="stage_ready">جاهزة</div></div>
-          <div class="stage-item" id="stage-5"><div class="stage-dot">📦</div><div class="stage-label" data-i18n="stage_delivery">تسليم</div></div>
-        </div>
-        <div id="stage-buttons-row" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;">
-          <button class="btn btn-outline btn-sm" onclick="setStage(0)" data-i18n="stage_receive">📋 استلام</button>
-          <button class="btn btn-outline btn-sm" onclick="setStage(1)" data-i18n="stage_diagnose">🔍 تشخيص</button>
-          <button class="btn btn-outline btn-sm" onclick="setStage(2)" data-i18n="stage_repair">🔧 إصلاح</button>
-          <button class="btn btn-outline btn-sm" onclick="setStage(3)" data-i18n="stage_paint">🎨 دهان</button>
-          <button class="btn btn-outline btn-sm" onclick="setStage(4)" data-i18n="stage_ready">✅ جاهزة</button>
-          <button class="btn btn-success btn-sm" onclick="setStage(5)" data-i18n="stage_delivery">📦 تسليم</button>
-        </div>
+        <div class="stages-track" id="stages-track"></div>
+        <div id="stage-buttons-row" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;"></div>
       </div>
       <div class="divider"></div>
       <!-- Payment — admin only -->
@@ -1165,6 +1152,30 @@ label{font-size:14px;}
   </div>
 </div>
 
+<!-- Manage Stages (Admin) -->
+<div class="modal-overlay" id="modal-manage-stages">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">⚙️ إدارة حالات السيارة</div>
+      <button class="modal-close" onclick="closeModal('modal-manage-stages')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="stages-manage-list" style="margin-bottom:18px;"></div>
+      <div style="border-top:1px solid var(--border);padding-top:16px;">
+        <div style="font-size:13px;font-weight:700;color:var(--muted);margin-bottom:10px;">➕ إضافة حالة جديدة</div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <input type="text" id="new-stage-icon" placeholder="رمز 📌" style="width:70px;text-align:center;font-size:18px;">
+          <input type="text" id="new-stage-label" placeholder="اسم الحالة" style="flex:1;">
+          <button class="btn btn-primary btn-sm" onclick="addStage()">➕ إضافة</button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-manage-stages')">إغلاق</button>
+    </div>
+  </div>
+</div>
+
 <!-- Add Expense -->
 <div class="modal-overlay" id="modal-add-expense">
   <div class="modal">
@@ -1212,16 +1223,29 @@ let state = {
   currentEditCar:null,
   invoiceCounter:1000,
   alertDays:3,
+  stages:[
+    {icon:'📋',label:'استلام'},
+    {icon:'🔍',label:'تشخيص'},
+    {icon:'🔧',label:'إصلاح'},
+    {icon:'🎨',label:'دهان'},
+    {icon:'✅',label:'جاهزة للتسليم'},
+    {icon:'📦',label:'تسليم'},
+  ],
 };
 
-const STAGES = ['استلام','تشخيص','إصلاح','دهان','جاهزة','تسليم'];
-const STAGE_ICONS = ['📋','🔍','🔧','🎨','✅','📦'];
+let STAGES = [];
+let STAGE_ICONS = [];
+function syncStageArrays(){
+  STAGES = state.stages.map(s=>s.label);
+  STAGE_ICONS = state.stages.map(s=>s.icon);
+}
 
 function loadState(){
-  try{const s=localStorage.getItem('finaltouchv2');if(s)state={...state,...JSON.parse(s)};}catch(e){}
+  try{const s=localStorage.getItem('finaltouchv2');if(s){const p=JSON.parse(s);state={...state,...p};if(!state.stages||!state.stages.length)state.stages=[{icon:'📋',label:'استلام'},{icon:'🔍',label:'تشخيص'},{icon:'🔧',label:'إصلاح'},{icon:'🎨',label:'دهان'},{icon:'✅',label:'جاهزة للتسليم'},{icon:'📦',label:'تسليم'}];}}catch(e){}
 }
 function saveState(){localStorage.setItem('finaltouchv2',JSON.stringify(state));}
 loadState();
+syncStageArrays();
 
 const fmt=(n)=>parseFloat(n||0).toFixed(3)+' ر.ع';
 const today=()=>new Date().toISOString().split('T')[0];
@@ -1238,8 +1262,8 @@ function serviceBadge(s){
   if(s.includes('سمكرة'))return`<span class="badge badge-body">🔨 ${s}</span>`;
   return`<span class="badge badge-maint">🔧 ${s}</span>`;
 }
-function stageFromStatus(s){return{waiting:0,progress:2,done:4,delivered:5}[s]||0;}
-function statusFromStage(i){return i>=5?'delivered':i>=4?'done':i>=1?'progress':'waiting';}
+function stageFromStatus(s){const last=state.stages.length-1;return{waiting:0,progress:Math.min(2,last),done:Math.max(0,last-1),delivered:last}[s]||0;}
+function statusFromStage(i){const last=state.stages.length-1;return i>=last?'delivered':i>=(last-1)?'done':i>=1?'progress':'waiting';}
 
 // NAVIGATION
 const ADMIN_PAGES_SET = ['dashboard','invoices','expenses','reports'];
@@ -1313,14 +1337,6 @@ function editCar(id){
   openModal('modal-update-car');
 }
 // QUICK STATUS CHANGE (click badge in table)
-const QS_STAGES=[
-  {icon:'📋',label:'استلام',    stage:0},
-  {icon:'🔍',label:'تشخيص',    stage:1},
-  {icon:'🔧',label:'إصلاح',    stage:2},
-  {icon:'🎨',label:'دهان',     stage:3},
-  {icon:'✅',label:'جاهزة',    stage:4},
-  {icon:'📦',label:'تسليم',    stage:5},
-];
 function quickStatus(carId,e){
   e.stopPropagation();
   document.getElementById('qs-popup')?.remove();
@@ -1331,8 +1347,8 @@ function quickStatus(carId,e){
   const rect=e.currentTarget.getBoundingClientRect();
   popup.style.top=(rect.bottom+6)+'px';
   popup.style.right=(window.innerWidth-rect.right)+'px';
-  popup.innerHTML=QS_STAGES.map(s=>`
-    <div class="qs-item${car.stage===s.stage?' qs-active':''}" onclick="applyQuickStatus('${carId}',${s.stage})">
+  popup.innerHTML=state.stages.map((s,i)=>`
+    <div class="qs-item${car.stage===i?' qs-active':''}" onclick="applyQuickStatus('${carId}',${i})">
       ${s.icon} ${s.label}
     </div>`).join('');
   document.body.appendChild(popup);
@@ -1357,14 +1373,22 @@ function applyQuickStatus(carId,stage){
 
 function setStage(i){currentStage=i;updateStageUI();}
 function updateStageUI(){
-  for(let i=0;i<6;i++){
+  const track=document.getElementById('stages-track');
+  const btnsRow=document.getElementById('stage-buttons-row');
+  if(!track||!btnsRow)return;
+  const last=state.stages.length-1;
+  // Rebuild track
+  track.innerHTML=state.stages.map((s,i)=>`<div class="stage-item" id="stage-${i}"><div class="stage-dot">${s.icon}</div><div class="stage-label">${s.label}</div></div>`).join('');
+  // Update active/done classes
+  state.stages.forEach((_,i)=>{
     const item=document.getElementById('stage-'+i);
     const dot=item.querySelector('.stage-dot');
     item.className='stage-item';dot.className='stage-dot';
     if(i<currentStage){item.classList.add('done');dot.classList.add('done');dot.textContent='✓';}
     else if(i===currentStage){item.classList.add('active');dot.classList.add('active');dot.textContent=STAGE_ICONS[i];}
-    else{dot.textContent=STAGE_ICONS[i];}
-  }
+  });
+  // Rebuild buttons
+  btnsRow.innerHTML=state.stages.map((s,i)=>`<button class="btn ${i===last?'btn-success':'btn-outline'} btn-sm" onclick="setStage(${i})">${s.icon} ${s.label}</button>`).join('');
 }
 function calcRemaining(){
   const total=parseFloat(document.getElementById('update-amount').value)||0;
@@ -1508,6 +1532,50 @@ function deleteService(id){if(!confirm('حذف الخدمة؟'))return;state.ser
 function deleteOrder(id){if(!confirm('حذف الأمر؟'))return;state.orders=state.orders.filter(o=>o.id!==id);saveState();renderAll();}
 
 function saveAlertDays(){state.alertDays=parseInt(document.getElementById('alert-days').value)||3;saveState();renderAll();}
+
+// ── إدارة الحالات ─────────────────────────────────────────────
+function openManageStages(){
+  renderStagesManageList();
+  openModal('modal-manage-stages');
+}
+function renderStagesManageList(){
+  const el=document.getElementById('stages-manage-list');
+  if(!el)return;
+  el.innerHTML=state.stages.map((s,i)=>`
+    <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:rgba(255,255,255,.04);border-radius:10px;margin-bottom:6px;">
+      <span style="font-size:20px;width:30px;text-align:center;">${s.icon}</span>
+      <span style="flex:1;font-size:14px;font-weight:600;">${s.label}</span>
+      ${state.stages.length>2?`<button class="btn btn-danger btn-sm" onclick="deleteStage(${i})" ${i===0||i===state.stages.length-1?'title="لا يمكن حذف أول أو آخر حالة" style="opacity:.4;cursor:not-allowed;" disabled':''}>🗑️</button>`:''}
+    </div>`).join('');
+}
+function addStage(){
+  const icon=document.getElementById('new-stage-icon').value.trim()||'🔹';
+  const label=document.getElementById('new-stage-label').value.trim();
+  if(!label){alert('أدخل اسم الحالة');return;}
+  // Insert before last stage (تسليم)
+  state.stages.splice(state.stages.length-1,0,{icon,label});
+  syncStageArrays();
+  saveState();
+  document.getElementById('new-stage-icon').value='';
+  document.getElementById('new-stage-label').value='';
+  renderStagesManageList();
+  renderAll();
+}
+function deleteStage(i){
+  if(i===0||i===state.stages.length-1){alert('لا يمكن حذف الحالة الأولى أو الأخيرة');return;}
+  if(!confirm('حذف هذه الحالة؟ السيارات في هذه الحالة ستنتقل للحالة السابقة.'))return;
+  // Shift cars that were at this stage or beyond
+  state.cars.forEach(c=>{
+    if(c.stage===i) c.stage=Math.max(0,i-1);
+    else if(c.stage>i) c.stage--;
+    c.status=statusFromStage(c.stage);
+  });
+  state.stages.splice(i,1);
+  syncStageArrays();
+  saveState();
+  renderStagesManageList();
+  renderAll();
+}
 
 // ALERTS
 function getAlertedCars(){return state.cars.filter(c=>c.status!=='delivered'&&daysSince(c.dateIn)>=state.alertDays);}
@@ -2457,12 +2525,14 @@ async function loadFromCloud() {
         cars:           data.cars           || state.cars,
         orders:         data.orders         || state.orders,
         services:       data.services       || state.services,
+        stages:         data.stages         || state.stages,
         expenses:       data.expenses       || state.expenses,
         invoices:       data.invoices       || state.invoices,
         invoiceCounter: data.invoiceCounter || state.invoiceCounter,
         alertDays:      data.alertDays      || state.alertDays,
         updatedAt:      data.updatedAt,
       });
+      syncStageArrays();
       _origSaveState(); // save locally only — don't re-upload to cloud
       renderAll();
       showSyncStatus('synced');
