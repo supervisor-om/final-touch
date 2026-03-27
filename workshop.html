@@ -973,7 +973,7 @@ label{font-size:14px;}
       <div class="form-grid">
         <div class="form-group"><label data-i18n="lbl_plate_req">رقم اللوحة *</label><input type="text" id="car-plate" placeholder="مثال: 12345 ع م"></div>
         <div class="form-group"><label data-i18n="lbl_owner_req">اسم المالك *</label><input type="text" id="car-owner" placeholder="الاسم الكامل"></div>
-        <div class="form-group"><label data-i18n="lbl_phone_opt">رقم الهاتف</label><input type="text" id="car-phone" placeholder="968XXXXXXXX+"></div>
+        <div class="form-group"><label data-i18n="lbl_phone_opt">رقم الهاتف</label><input type="text" id="car-phone" placeholder="مثال: 96812345678 أو 91234567"><div style="font-size:11px;color:#8892a4;margin-top:3px;">أدخل الرقم كاملاً مع كود الدولة للإشعارات (عُمان: 968XXXXXXXX)</div></div>
         <div class="form-group"><label data-i18n="lbl_car_model_opt">موديل السيارة</label><input type="text" id="car-model" placeholder="مثال: Toyota Camry 2022"></div>
         <div class="form-group"><label data-i18n="lbl_service_type_req">نوع الخدمة *</label>
           <select id="car-service">
@@ -1075,6 +1075,7 @@ label{font-size:14px;}
         <input type="date" id="update-expected-date">
       </div>
       <div class="form-group"><label data-i18n="lbl_repair_notes">ملاحظات الإصلاح</label><textarea id="update-notes" placeholder="تفاصيل الأعمال المنجزة..."></textarea></div>
+      <div class="form-group"><label>📞 رقم هاتف العميل</label><input type="text" id="update-phone" placeholder="مثال: 96812345678 أو 91234567"><div style="font-size:11px;color:#8892a4;margin-top:3px;">أدخل الرقم كاملاً مع كود الدولة (عُمان: 968XXXXXXXX)</div></div>
       <div class="form-group"><label style="color:#25d366;">📱 مفتاح WhatsApp (CallMeBot)</label><input type="text" id="update-wakey" placeholder="أدخل API Key من CallMeBot لإرسال إشعارات تلقائية" style="direction:ltr;font-family:monospace;font-size:12px;"><div style="font-size:11px;color:var(--muted);margin-top:4px;">اطلب من العميل إرسال "I allow callmebot to send me messages" لـ +34 644 597 364 على واتساب</div></div>
     </div>
     <div class="modal-footer">
@@ -1289,6 +1290,7 @@ function editCar(id){
   document.getElementById('update-amount').value=car.estimate||0;
   document.getElementById('update-paid').value=car.paidTotal||0;
   document.getElementById('update-notes').value=car.notes||'';
+  document.getElementById('update-phone').value=car.phone||'';
   document.getElementById('update-wakey').value=car.waBotKey||'';
   document.getElementById('update-expected-date').value=car.expectedDate||'';
   // Show/hide payment section based on role
@@ -1372,6 +1374,8 @@ function updateCar(){
   car.estimate=parseFloat(document.getElementById('update-amount').value)||0;
   car.paidTotal=parseFloat(document.getElementById('update-paid').value)||0;
   car.notes=document.getElementById('update-notes').value;
+  const newPhone=document.getElementById('update-phone').value.trim();
+  if(newPhone) car.phone=newPhone;
   car.waBotKey=document.getElementById('update-wakey').value.trim();
   car.expectedDate=document.getElementById('update-expected-date').value||car.expectedDate||'';
   if(car.status==='delivered'&&!car.dateOut){
@@ -3067,10 +3071,13 @@ async function sendPushNotification(car) {
     '📱 تابع سيارتك لحظة بلحظة:' + nl + trackUrl + nl + nl +
     'ورشة اللمسة الأخيرة 🔧';
 
-  // Normalize phone: strip non-digits, handle leading 0 → add 968 (Oman)
-  let phone = car.phone.replace(/[^0-9]/g, '');
-  if (phone.startsWith('0')) phone = '968' + phone.slice(1);
-  else if (phone.length <= 8)  phone = '968' + phone; // local number without country code
+  // Normalize phone: strip non-digits, ensure country code
+  let phone = car.phone.replace(/[^0-9+]/g, '').replace(/^\+/, '');
+  if (phone.startsWith('00')) phone = phone.slice(2);       // 00968... → 968...
+  else if (phone.startsWith('0')) phone = '968' + phone.slice(1); // 0912... → 968912...
+  // If 8 digits starting with 7/9 → local Omani number
+  else if (/^[79]\d{7}$/.test(phone)) phone = '968' + phone;
+  // Otherwise use as-is (already has country code)
   const waKey = car.waBotKey || '';
 
   if (waKey && phone) {
