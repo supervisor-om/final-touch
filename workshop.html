@@ -649,7 +649,7 @@ label{font-size:14px;}
         <span style="color:#f5a623;font-size:12px;font-weight:700;">⏳ جاري الاتصال...</span>
       </div>
       <button id="lang-toggle-btn" onclick="setLang(currentLang==='ar'?'en':'ar')" style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);color:#fff;border-radius:20px;padding:5px 14px;font-family:var(--font-main);font-size:12px;font-weight:700;cursor:pointer;">🌐 EN</button>
-      <button id="topbar-add-car-btn" class="btn btn-primary admin-only" onclick="openModal('modal-add-car')" data-i18n="btn_add_car">➕ إضافة سيارة</button>
+      <button id="topbar-add-car-btn" class="btn btn-primary" onclick="openModal('modal-add-car')" data-i18n="btn_add_car">➕ إضافة سيارة</button>
     </div>
   </div>
 
@@ -700,7 +700,7 @@ label{font-size:14px;}
         <option value="سمكرة">سمكرة</option>
         <option value="دهان">دهان</option>
       </select>
-      <button id="page-add-car-btn" class="btn btn-primary admin-only" onclick="openModal('modal-add-car')" data-i18n="btn_add_car">➕ إضافة سيارة</button>
+      <button id="page-add-car-btn" class="btn btn-primary" onclick="openModal('modal-add-car')" data-i18n="btn_add_car">➕ إضافة سيارة</button>
     </div>
     <div class="card">
       <div class="card-header"><div class="card-title"><span data-i18n="card_cars_workshop">🚗 السيارات في الورشة</span> (<span id="cars-count">0</span>)</div></div>
@@ -1277,7 +1277,6 @@ document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click
 
 // ADD CAR
 function addCar(){
-  const _ac=getSession();if(!_ac||_ac.role!=='admin'){alert('🔒 إضافة السيارات للمسؤول فقط');return;}
   const plate=document.getElementById('car-plate').value.trim();
   const owner=document.getElementById('car-owner').value.trim();
   if(!plate||!owner){alert('يرجى إدخال رقم اللوحة واسم المالك');return;}
@@ -1293,7 +1292,6 @@ function addCar(){
 // UPDATE CAR
 let currentStage=0;
 function editCar(id){
-  const _ec=getSession();if(!_ec||_ec.role!=='admin'){alert('🔒 تعديل السيارات للمسؤول فقط');return;}
   state.currentEditCar=id;
   const car=state.cars.find(c=>c.id===id);
   if(!car)return;
@@ -1603,9 +1601,8 @@ function renderCarsTable(){
       <td>${c.expectedDate?`<span style="font-size:12px;color:${new Date(c.expectedDate)<new Date()?'var(--danger)':'var(--success)'};">${formatDate(c.expectedDate)}</span>`:'<span style="color:var(--muted);font-size:12px;">—</span>'}</td>
       <td><span class="qs-badge" onclick="quickStatus('${c.id}',event)" title="انقر لتغيير الحالة">${statusBadge(c.status)}</span></td>
       <td><div style="display:flex;gap:5px;">
-        ${isAdmin?`<button class="btn btn-primary btn-sm" onclick="editCar('${c.id}')">✏️</button>`:''}
+        <button class="btn btn-primary btn-sm" onclick="editCar('${c.id}')">✏️</button>
         ${isAdmin?`<button class="btn btn-danger btn-sm" onclick="deleteCar('${c.id}')">🗑️</button>`:''}
-        ${!isAdmin?`<span style="color:var(--muted);font-size:12px;">🔒</span>`:''}
       </div></td>
     </tr>`;
   }).join('');
@@ -1644,7 +1641,7 @@ function renderAlertsTable(){
       <td>${serviceBadge(c.service)}</td>
       <td><span class="badge badge-alert">⚠️ ${days} يوم</span></td>
       <td>${statusBadge(c.status)}</td>
-      <td>${_aAdmin?`<button class="btn btn-primary btn-sm" onclick="editCar('${c.id}')">✏️ تحديث</button>`:'<span style="color:var(--muted);font-size:12px;">🔒</span>'}</td>
+      <td><button class="btn btn-primary btn-sm" onclick="editCar('${c.id}')">✏️ تحديث</button></td>
     </tr>`;
   }).join('');
 }
