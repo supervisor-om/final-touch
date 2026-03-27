@@ -3058,51 +3058,58 @@ initAuth();
 <script>
 // ── إشعار WhatsApp — يعرض زر قابل للضغط لتجاوز popup blocker ──
 function sendPushNotification(car) {
-  if (!car.phone) return;
   const STAGES_AR    = ['استلام','تشخيص','إصلاح','دهان','جاهزة للتسليم','تم التسليم'];
   const STAGE_EMOJIS = ['📋','🔍','🔧','🎨','✅','📦'];
-  const idx  = car.stage || 0;
+  const idx   = car.stage || 0;
   const label = STAGE_EMOJIS[idx] + ' ' + STAGES_AR[idx];
-  const nl   = '\n';
-  const msg  = 'مرحباً ' + car.owner + ' 👋' + nl + nl +
-    'سيارتك ' + car.plate + (car.model ? ' (' + car.model + ')' : '') + nl +
-    'وصلت إلى مرحلة: ' + label + nl + nl +
-    'ورشة اللمسة الأخيرة 🔧';
-
-  let phone = car.phone.replace(/[^0-9+]/g, '').replace(/^\+/, '');
-  if (phone.startsWith('00'))          phone = phone.slice(2);
-  else if (phone.startsWith('0'))      phone = '968' + phone.slice(1);
-  else if (/^[79]\d{7}$/.test(phone)) phone = '968' + phone;
-  if (!phone) return;
-
-  const waUrl = 'https://wa.me/' + phone + '?text=' + encodeURIComponent(msg);
 
   // Remove old banner if exists
   const old = document.getElementById('wa-notify-banner');
   if (old) old.remove();
 
-  // Show clickable WhatsApp button (avoids popup blocker)
   const banner = document.createElement('div');
   banner.id = 'wa-notify-banner';
-  banner.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:9999;background:#25d366;border-radius:16px;padding:14px 24px;display:flex;align-items:center;gap:14px;box-shadow:0 6px 30px rgba(0,0,0,.35);font-family:var(--font-main);direction:rtl;';
+  banner.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:9999;background:#25d366;border-radius:16px;padding:14px 24px;display:flex;align-items:center;gap:14px;box-shadow:0 6px 30px rgba(0,0,0,.35);font-family:var(--font-main);direction:rtl;max-width:90vw;';
+
+  let actionHtml;
+  if (car.phone) {
+    const nl  = '\n';
+    const msg = 'مرحباً ' + car.owner + ' 👋' + nl + nl +
+      'سيارتك ' + car.plate + (car.model ? ' (' + car.model + ')' : '') + nl +
+      'وصلت إلى مرحلة: ' + label + nl + nl +
+      'ورشة اللمسة الأخيرة 🔧';
+
+    let phone = car.phone.replace(/[^0-9+]/g, '').replace(/^\+/, '');
+    if (phone.startsWith('00'))          phone = phone.slice(2);
+    else if (phone.startsWith('0'))      phone = '968' + phone.slice(1);
+    else if (/^[79]\d{7}$/.test(phone)) phone = '968' + phone;
+
+    if (phone) {
+      const waUrl = 'https://wa.me/' + phone + '?text=' + encodeURIComponent(msg);
+      actionHtml = `<a href="${waUrl}" target="_blank" rel="noopener"
+         style="background:#fff;color:#25d366;border-radius:10px;padding:8px 18px;font-size:13px;font-weight:900;text-decoration:none;white-space:nowrap;"
+         onclick="setTimeout(()=>document.getElementById('wa-notify-banner')?.remove(),500)">
+        إرسال ▶
+      </a>`;
+    } else {
+      actionHtml = `<span style="background:rgba(0,0,0,.2);color:#fff;border-radius:10px;padding:8px 14px;font-size:12px;">رقم غير صحيح</span>`;
+    }
+  } else {
+    actionHtml = `<span style="background:rgba(0,0,0,.2);color:#fff;border-radius:10px;padding:8px 14px;font-size:12px;">أضف رقم هاتف العميل</span>`;
+  }
+
   banner.innerHTML = `
     <span style="font-size:22px;">💬</span>
     <div>
-      <div style="color:#fff;font-size:13px;font-weight:700;">أرسل إشعار واتساب للعميل</div>
-      <div style="color:rgba(255,255,255,.8);font-size:11px;">${car.owner} — ${label}</div>
+      <div style="color:#fff;font-size:13px;font-weight:700;">إشعار واتساب — ${car.owner}</div>
+      <div style="color:rgba(255,255,255,.85);font-size:11px;">${label}</div>
     </div>
-    <a href="${waUrl}" target="_blank" rel="noopener"
-       style="background:#fff;color:#25d366;border-radius:10px;padding:8px 18px;font-size:13px;font-weight:900;text-decoration:none;white-space:nowrap;"
-       onclick="setTimeout(()=>document.getElementById('wa-notify-banner')?.remove(),500)">
-      إرسال ▶
-    </a>
+    ${actionHtml}
     <button onclick="document.getElementById('wa-notify-banner').remove()"
-      style="background:rgba(0,0,0,.15);border:none;color:#fff;border-radius:8px;width:28px;height:28px;cursor:pointer;font-size:16px;line-height:1;">✕</button>
+      style="background:rgba(0,0,0,.15);border:none;color:#fff;border-radius:8px;width:28px;height:28px;cursor:pointer;font-size:16px;line-height:1;flex-shrink:0;">✕</button>
   `;
   document.body.appendChild(banner);
-  // Auto-remove after 30s
-  setTimeout(() => banner.remove(), 30000);
-}
+  setTimeout(() => banner?.remove(), 30000);
 }
 
 // ── تفعيل إشعارات WhatsApp من صفحة التتبع ──────────────────
