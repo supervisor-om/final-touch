@@ -1458,7 +1458,8 @@ function applyQuickStatus(carId,stage){
     state.invoices.push(inv);
   }
   saveState();renderAll();
-  if(car.stage!==prevStage)sendPushNotification(car);
+  if(car.stage!==prevStage) sendPushNotification(car);
+  else if(car.stage===0) sendWelcomeMessage(car);
 }
 
 function setStage(i){currentStage=i;updateStageUI();}
@@ -1508,8 +1509,8 @@ function updateCar(){
     state.invoices.push(inv);
   }
   saveState();closeModal('modal-update-car');renderAll();
-  // Send push notification if stage changed
   if(car.stage!==prevStage) sendPushNotification(car);
+  else if(car.stage===0) sendWelcomeMessage(car);
 }
 
 // RECEIPT
