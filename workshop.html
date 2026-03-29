@@ -534,6 +534,51 @@ label{font-size:14px;}
   #job-card-overlay{display:block!important;position:static!important;background:#fff!important;overflow:visible!important;}
   #job-card-overlay .jc-no-print{display:none!important;}
 }
+/* Job Card Styles */
+.jc *{box-sizing:border-box;}
+.jc{border:2px solid #1a3a6e;max-width:800px;margin:0 auto;font-family:Arial,sans-serif;font-size:10.5px;color:#000;}
+.jc-head{display:flex;align-items:stretch;border-bottom:2px solid #1a3a6e;}
+.jc-head-left{padding:7px 10px;font-size:9.5px;line-height:1.75;min-width:160px;border-left:1px solid #1a3a6e;direction:ltr;}
+.jc-head-center{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:6px 8px;text-align:center;border-left:1px solid #1a3a6e;}
+.jc-head-right{padding:7px 10px;font-size:9.5px;line-height:1.75;min-width:160px;text-align:right;direction:rtl;}
+.jc-co-name-ar{font-size:15px;font-weight:900;color:#1a3a6e;}
+.jc-co-name-en{font-size:13px;font-weight:900;color:#1a3a6e;letter-spacing:.5px;}
+.jc-badge{display:inline-block;background:#1a3a6e;color:#fff;border-radius:30px;padding:3px 12px;font-size:8.5px;font-weight:700;margin:3px 0;}
+.jc-card-title{font-size:13px;font-weight:900;color:#1a3a6e;margin-top:3px;}
+.jc-no-row{display:flex;align-items:center;border-bottom:1px solid #1a3a6e;padding:5px 10px;gap:14px;direction:ltr;}
+.jc-no-label{font-weight:700;font-size:11px;}
+.jc-no-val{color:#c0392b;font-size:22px;font-weight:900;letter-spacing:2px;min-width:70px;}
+.jc-date-pair{display:flex;align-items:baseline;gap:4px;font-size:10px;}
+.jc-date-pair label{font-weight:700;white-space:nowrap;}
+.jc-dotline{border-bottom:1px dotted #555;min-width:90px;display:inline-block;vertical-align:bottom;padding-bottom:1px;}
+.jc-cust{border-bottom:1px solid #1a3a6e;padding:4px 10px;direction:rtl;}
+.jc-cust-row{display:flex;align-items:baseline;gap:6px;margin-bottom:4px;}
+.jc-cust-row label{font-weight:700;white-space:nowrap;font-size:10px;}
+.jc-dotfill{flex:1;border-bottom:1px dotted #555;min-height:14px;}
+.jc-veh{border-bottom:1px solid #1a3a6e;}
+.jc-veh table{width:100%;border-collapse:collapse;}
+.jc-veh td{border:1px solid #1a3a6e;padding:3px 7px;font-size:10px;}
+.jc-veh td.lbl{font-weight:700;background:#f0f4ff;width:130px;}
+.jc-svc{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid #1a3a6e;}
+.jc-svc-cell{padding:5px 8px;border-left:1px solid #1a3a6e;font-size:10.5px;font-weight:700;display:flex;align-items:center;gap:5px;}
+.jc-svc-cell:last-child{border-left:none;}
+.jc-body{display:flex;border-bottom:1px solid #1a3a6e;min-height:220px;}
+.jc-jobs{flex:1;padding:6px 10px;border-left:1px solid #1a3a6e;}
+.jc-jobs-hdr{font-size:12px;font-weight:900;text-align:center;margin-bottom:5px;color:#1a3a6e;direction:ltr;}
+.jc-jline{border-bottom:1px solid #d0d0d0;height:22px;}
+.jc-diagram{width:180px;padding:5px;display:flex;align-items:center;justify-content:center;}
+.jc-amt{border-bottom:1px solid #1a3a6e;padding:5px 10px;font-size:11px;font-weight:700;direction:ltr;}
+.jc-terms-hdr{background:#1a3a6e;color:#fff;text-align:center;font-weight:700;font-size:10px;padding:3px;}
+.jc-terms-body{display:flex;direction:ltr;border-bottom:1px solid #1a3a6e;}
+.jc-terms-en{flex:1;padding:5px 8px;font-size:8px;line-height:1.55;border-left:1px solid #1a3a6e;}
+.jc-terms-ar{flex:1;padding:5px 8px;font-size:8px;line-height:1.55;text-align:right;direction:rtl;}
+.jc-auth-body{display:flex;direction:ltr;border-bottom:1px solid #1a3a6e;}
+.jc-auth-en{flex:1;padding:6px 8px;font-size:8.5px;line-height:1.5;border-left:1px solid #1a3a6e;}
+.jc-auth-ar{flex:1;padding:6px 8px;font-size:8.5px;line-height:1.5;text-align:right;direction:rtl;}
+.jc-sigs{display:flex;direction:ltr;}
+.jc-sig{flex:1;padding:8px 12px;border-left:1px solid #1a3a6e;font-size:10px;}
+.jc-sig:last-child{border-left:none;}
+.jc-sigline{border-bottom:1px solid #000;margin-top:22px;}
 </style>
 </head>
 <body>
@@ -1049,7 +1094,7 @@ label{font-size:14px;}
 <!-- Update Car -->
 <div class="modal-overlay" id="modal-update-car">
   <div class="modal modal-lg">
-    <div class="modal-header"><div class="modal-title" data-i18n="modal_update_car">✏️ تحديث السيارة</div><button class="modal-close" onclick="closeModal('modal-update-car')">✕</button></div>
+    <div class="modal-header"><div class="modal-title" data-i18n="modal_update_car">✏️ تحديث السيارة</div><div style="display:flex;gap:8px;align-items:center;"><button onclick="openJobCard(state.cars.find(c=>c.id===state.currentEditCar))" style="background:#1a3a6e;color:#fff;border:none;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;">📋 بطاقة العمل</button><button class="modal-close" onclick="closeModal('modal-update-car')">✕</button></div></div>
     <div class="modal-body">
       <!-- Stages -->
       <div style="margin-bottom:20px;">
@@ -3492,68 +3537,7 @@ function openJobCard(car){
   const overlay = document.getElementById('job-card-overlay');
   const content = document.getElementById('job-card-content');
   overlay.style.display = 'block';
-  content.innerHTML = `<style>
-.jc *{box-sizing:border-box;}
-.jc{border:2px solid #1a3a6e;max-width:800px;margin:0 auto;font-family:Arial,sans-serif;font-size:10.5px;color:#000;}
-/* HEADER */
-.jc-head{display:flex;align-items:stretch;border-bottom:2px solid #1a3a6e;}
-.jc-head-left{padding:7px 10px;font-size:9.5px;line-height:1.75;min-width:185px;border-left:1px solid #1a3a6e;direction:ltr;}
-.jc-head-center{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:6px 8px;text-align:center;border-left:1px solid #1a3a6e;}
-.jc-head-right{padding:7px 10px;font-size:9.5px;line-height:1.75;min-width:175px;text-align:right;direction:rtl;}
-.jc-co-name-ar{font-size:15px;font-weight:900;color:#1a3a6e;}
-.jc-co-name-en{font-size:13px;font-weight:900;color:#1a3a6e;letter-spacing:.5px;}
-.jc-badge{display:inline-block;background:#1a3a6e;color:#fff;border-radius:30px;padding:3px 14px;font-size:9px;font-weight:700;margin:4px 0;}
-.jc-card-title{font-size:14px;font-weight:900;color:#1a3a6e;margin-top:4px;letter-spacing:.5px;}
-/* NO + DATES ROW */
-.jc-no-row{display:flex;align-items:center;border-bottom:1px solid #1a3a6e;padding:5px 10px;gap:16px;direction:ltr;}
-.jc-no-label{font-weight:700;font-size:11px;}
-.jc-no-val{color:#c0392b;font-size:22px;font-weight:900;letter-spacing:2px;min-width:70px;}
-.jc-date-pair{display:flex;align-items:baseline;gap:5px;font-size:10px;}
-.jc-date-pair label{font-weight:700;white-space:nowrap;}
-.jc-dotline{flex:1;border-bottom:1px dotted #555;min-width:90px;height:13px;display:inline-block;vertical-align:bottom;}
-/* CUSTOMER FIELDS */
-.jc-cust{border-bottom:1px solid #1a3a6e;padding:4px 10px;direction:rtl;}
-.jc-cust-row{display:flex;align-items:baseline;gap:6px;margin-bottom:3px;}
-.jc-cust-row label{font-weight:700;white-space:nowrap;font-size:10px;}
-.jc-cust-row .en{direction:ltr;font-size:9px;color:#444;}
-.jc-dotfill{flex:1;border-bottom:1px dotted #555;height:13px;}
-/* VEHICLE TABLE */
-.jc-veh{border-bottom:1px solid #1a3a6e;}
-.jc-veh table{width:100%;border-collapse:collapse;}
-.jc-veh td{border:1px solid #1a3a6e;padding:3px 7px;font-size:10px;}
-.jc-veh td.lbl{font-weight:700;background:#f0f4ff;width:140px;}
-/* SERVICE CHECKBOXES */
-.jc-svc{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid #1a3a6e;}
-.jc-svc-cell{padding:5px 8px;border-left:1px solid #1a3a6e;font-size:11px;font-weight:700;display:flex;align-items:center;gap:5px;}
-.jc-svc-cell:last-child{border-left:none;}
-.jc-svc-cell .ar{font-size:11px;}
-.jc-svc-cell .en{font-size:9px;color:#333;}
-/* JOBS + DIAGRAM */
-.jc-body{display:flex;border-bottom:1px solid #1a3a6e;min-height:230px;}
-.jc-jobs{flex:1;padding:6px 10px;border-left:1px solid #1a3a6e;}
-.jc-jobs-hdr{font-size:12px;font-weight:900;text-align:center;margin-bottom:5px;color:#1a3a6e;direction:ltr;}
-.jc-jline{border-bottom:1px solid #ccc;height:22px;margin-bottom:1px;}
-.jc-diagram{width:185px;padding:5px;display:flex;align-items:center;justify-content:center;}
-/* AMOUNT */
-.jc-amt{border-bottom:1px solid #1a3a6e;padding:5px 10px;font-size:11px;font-weight:700;direction:ltr;}
-/* TERMS */
-.jc-terms{border-bottom:1px solid #1a3a6e;}
-.jc-terms-hdr{background:#1a3a6e;color:#fff;text-align:center;font-weight:700;font-size:10px;padding:3px;}
-.jc-terms-body{display:flex;direction:ltr;}
-.jc-terms-en{flex:1;padding:5px 8px;font-size:8px;line-height:1.55;border-left:1px solid #1a3a6e;}
-.jc-terms-ar{flex:1;padding:5px 8px;font-size:8px;line-height:1.55;text-align:right;direction:rtl;}
-/* AUTH */
-.jc-auth{border-bottom:1px solid #1a3a6e;}
-.jc-auth-body{display:flex;direction:ltr;}
-.jc-auth-en{flex:1;padding:6px 8px;font-size:8.5px;line-height:1.5;border-left:1px solid #1a3a6e;}
-.jc-auth-ar{flex:1;padding:6px 8px;font-size:8.5px;line-height:1.5;text-align:right;direction:rtl;}
-/* SIGNATURES */
-.jc-sigs{display:flex;direction:ltr;}
-.jc-sig{flex:1;padding:8px 12px;border-left:1px solid #1a3a6e;font-size:10px;}
-.jc-sig:last-child{border-left:none;}
-.jc-sigline{border-bottom:1px solid #000;margin-top:22px;}
-</style>
-<div class="jc" style="max-width:800px;margin:0 auto;">
+  content.innerHTML = `<div class="jc">
 
   <!-- HEADER -->
   <div class="jc-head">
