@@ -1279,6 +1279,7 @@ let state = {
   invoices:[],
   currentEditCar:null,
   invoiceCounter:1000,
+  jobCardCounter:75,
   alertDays:3,
   stages:[
     {icon:'📋',label:'استلام'},
@@ -1395,6 +1396,7 @@ function addCar(){
   saveState();closeModal('modal-add-car');
   ['car-plate','car-owner','car-phone','car-model','car-notes','car-estimate','car-deposit','car-km','car-expected-date'].forEach(id=>{document.getElementById(id).value='';});
   renderAll();
+  openJobCard(car);
   // إرسال رسالة ترحيبية للعميل عبر واتساب
   sendWelcomeMessage(car);
 }
@@ -1952,6 +1954,7 @@ function renderCarsTable(){
       <td><span class="qs-badge" onclick="quickStatus('${c.id}',event)" title="انقر لتغيير الحالة">${statusBadge(c.status)}</span></td>
       <td><div style="display:flex;gap:5px;">
         <button class="btn btn-primary btn-sm" onclick="editCar('${c.id}')">✏️</button>
+        <button class="btn btn-outline btn-sm" onclick="openJobCard(state.cars.find(x=>x.id==='${c.id}'))" title="طباعة بطاقة العمل">📋</button>
         ${(()=>{const p=getCarPhotos(c.id);return(p.reception.length||p.delivery.length)?`<button class="btn btn-outline btn-sm" onclick="editCar('${c.id}')" title="توجد صور">📷${p.reception.length+p.delivery.length}</button>`:''})()}
         ${isAdmin?`<button class="btn btn-danger btn-sm" onclick="deleteCar('${c.id}')">🗑️</button>`:''}
       </div></td>
@@ -3431,6 +3434,223 @@ initAuth();
      ═══════════════════════════════════════════════════ -->
 <script>
 // ── رسالة ترحيبية عند تسجيل السيارة ─────────────────────────
+// ── بطاقة العمل JOB CARD ──
+function openJobCard(car){
+  if(!state.jobCardCounter) state.jobCardCounter=75;
+  const num = String(state.jobCardCounter++).padStart(4,'0');
+  car.jobCardNo = num;
+  saveState();
+  const svc = car.service||'';
+  const chk = v => svc.includes(v)?'☑':'☐';
+  const w = window.open('','_blank','width=900,height=1100');
+  if(!w){alert('يرجى السماح بالنوافذ المنبثقة لطباعة بطاقة العمل');return;}
+  w.document.write(`<!DOCTYPE html><html dir="rtl" lang="ar"><head>
+<meta charset="UTF-8"><title>Job Card #${num}</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Arial',sans-serif;font-size:11px;color:#000;background:#fff;padding:10px;}
+  .jc-outer{border:3px double #000;max-width:820px;margin:0 auto;padding:0;}
+  /* header */
+  .jc-header{display:grid;grid-template-columns:1fr auto 1fr;border-bottom:2px solid #000;}
+  .jc-header-left{padding:8px;font-size:10px;line-height:1.7;border-left:1px solid #000;}
+  .jc-header-center{padding:8px 16px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+  .jc-header-right{padding:8px;font-size:10px;line-height:1.7;text-align:right;}
+  .jc-logo-text{font-size:22px;font-weight:900;color:#c0392b;letter-spacing:1px;}
+  .jc-logo-sub{font-size:10px;color:#555;margin-top:2px;}
+  .jc-logo-ar{font-size:15px;font-weight:700;color:#1a1a2e;margin-top:4px;}
+  /* red job number row */
+  .jc-jobno{background:#c0392b;color:#fff;text-align:center;padding:5px 0;font-size:14px;font-weight:900;letter-spacing:2px;border-bottom:2px solid #000;}
+  /* dates row */
+  .jc-dates{display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1px solid #000;}
+  .jc-date-cell{padding:5px 8px;border-left:1px solid #000;font-size:10px;}
+  .jc-date-cell:last-child{border-left:none;}
+  .jc-date-label{font-weight:700;color:#555;font-size:9px;}
+  .jc-date-val{font-size:12px;font-weight:700;margin-top:2px;}
+  /* fields section */
+  .jc-fields{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid #000;}
+  .jc-field-row{display:flex;align-items:center;padding:4px 8px;border-bottom:1px dotted #ccc;gap:6px;}
+  .jc-field-label{font-weight:700;white-space:nowrap;color:#333;min-width:75px;font-size:10px;}
+  .jc-field-val{flex:1;border-bottom:1px solid #999;min-height:16px;font-size:11px;padding:0 4px;}
+  .jc-fields-col{border-left:1px solid #000;}
+  /* service checkboxes */
+  .jc-services{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid #000;}
+  .jc-svc-cell{padding:6px 8px;text-align:center;border-left:1px solid #000;font-size:12px;}
+  .jc-svc-cell:last-child{border-left:none;}
+  .jc-svc-title{background:#1a1a2e;color:#fff;text-align:center;padding:4px;font-weight:700;font-size:10px;border-bottom:1px solid #000;}
+  /* jobs area */
+  .jc-body{display:grid;grid-template-columns:1fr 200px;border-bottom:1px solid #000;}
+  .jc-jobs{padding:6px 8px;border-left:1px solid #000;}
+  .jc-jobs-title{font-weight:900;font-size:11px;margin-bottom:4px;color:#c0392b;}
+  .jc-job-line{border-bottom:1px dotted #bbb;min-height:20px;margin-bottom:2px;}
+  .jc-car-diagram{padding:6px;display:flex;flex-direction:column;align-items:center;gap:4px;}
+  .jc-car-diagram svg{width:180px;height:auto;}
+  /* amount row */
+  .jc-amount{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid #000;}
+  .jc-amount-cell{padding:6px 8px;border-left:1px solid #000;font-size:11px;}
+  .jc-amount-cell:last-child{border-left:none;}
+  /* terms */
+  .jc-terms{padding:6px 8px;font-size:8.5px;line-height:1.5;border-bottom:1px solid #000;color:#444;}
+  /* signatures */
+  .jc-sigs{display:grid;grid-template-columns:1fr 1fr;border-bottom:none;}
+  .jc-sig-cell{padding:10px 8px;border-left:1px solid #000;font-size:10px;}
+  .jc-sig-cell:last-child{border-left:none;}
+  .jc-sig-line{border-bottom:1px solid #000;margin-top:20px;}
+  @media print{
+    body{padding:0;}
+    .no-print{display:none!important;}
+  }
+</style>
+</head><body>
+<div class="no-print" style="text-align:center;margin-bottom:10px;display:flex;gap:10px;justify-content:center;">
+  <button onclick="window.print()" style="background:#c0392b;color:#fff;border:none;border-radius:8px;padding:8px 24px;font-size:14px;cursor:pointer;font-weight:700;">🖨️ طباعة</button>
+  <button onclick="window.close()" style="background:#333;color:#fff;border:none;border-radius:8px;padding:8px 24px;font-size:14px;cursor:pointer;">✕ إغلاق</button>
+</div>
+<div class="jc-outer">
+
+  <!-- HEADER -->
+  <div class="jc-header">
+    <div class="jc-header-left">
+      <div style="font-weight:700;">FINAL TOUCH AUTO CENTER</div>
+      <div>Tel: +968 XXXX XXXX</div>
+      <div>P.O.Box: ---- Muscat, Oman</div>
+      <div>VAT#: OM-XXXXXXXXXX</div>
+    </div>
+    <div class="jc-header-center">
+      <div class="jc-logo-text">FINAL TOUCH</div>
+      <div class="jc-logo-sub">AUTO SERVICES CENTER</div>
+      <div class="jc-logo-ar">اللمسة الأخيرة</div>
+      <div style="font-size:9px;color:#777;">لخدمات السيارات</div>
+    </div>
+    <div class="jc-header-right">
+      <div style="font-weight:700;">مركز اللمسة الأخيرة</div>
+      <div>هاتف: XXXX XXXX 968+</div>
+      <div>صندوق بريد: ---- مسقط، عُمان</div>
+      <div>الرقم الضريبي: OM-XXXXXXXXXX</div>
+    </div>
+  </div>
+
+  <!-- JOB NUMBER -->
+  <div class="jc-jobno">JOB CARD No. ${num} &nbsp;|&nbsp; بطاقة عمل رقم ${num}</div>
+
+  <!-- DATES -->
+  <div class="jc-dates">
+    <div class="jc-date-cell">
+      <div class="jc-date-label">DATE IN / تاريخ الاستلام</div>
+      <div class="jc-date-val">${car.dateIn||''}</div>
+    </div>
+    <div class="jc-date-cell" style="text-align:center;">
+      <div class="jc-date-label">EXPECTED DATE / التسليم المتوقع</div>
+      <div class="jc-date-val">${car.expectedDate||'&nbsp;'}</div>
+    </div>
+    <div class="jc-date-cell" style="text-align:left;direction:ltr;">
+      <div class="jc-date-label">DATE OUT / تاريخ التسليم</div>
+      <div class="jc-date-val">&nbsp;</div>
+    </div>
+  </div>
+
+  <!-- CUSTOMER & VEHICLE FIELDS -->
+  <div class="jc-fields">
+    <div>
+      <div style="background:#eee;padding:3px 8px;font-weight:700;font-size:10px;border-bottom:1px solid #ccc;">معلومات العميل — CUSTOMER INFO</div>
+      <div class="jc-field-row"><span class="jc-field-label">اسم العميل / Name</span><span class="jc-field-val">${car.owner}</span></div>
+      <div class="jc-field-row"><span class="jc-field-label">رقم الهاتف / Phone</span><span class="jc-field-val">${car.phone||''}</span></div>
+      <div class="jc-field-row"><span class="jc-field-label">نوع الخدمة / Service</span><span class="jc-field-val">${car.service||''}</span></div>
+      <div class="jc-field-row"><span class="jc-field-label">ملاحظات / Notes</span><span class="jc-field-val">${car.notes||''}</span></div>
+    </div>
+    <div class="jc-fields-col">
+      <div style="background:#eee;padding:3px 8px;font-weight:700;font-size:10px;border-bottom:1px solid #ccc;">معلومات السيارة — VEHICLE INFO</div>
+      <div class="jc-field-row"><span class="jc-field-label">رقم اللوحة / Plate</span><span class="jc-field-val">${car.plate}</span></div>
+      <div class="jc-field-row"><span class="jc-field-label">الموديل / Model</span><span class="jc-field-val">${car.model||''}</span></div>
+      <div class="jc-field-row"><span class="jc-field-label">الكيلومتر / KM</span><span class="jc-field-val">${car.km||''}</span></div>
+      <div class="jc-field-row"><span class="jc-field-label">التقدير / Estimate</span><span class="jc-field-val">${car.estimate?car.estimate+' ر.ع':''}</span></div>
+    </div>
+  </div>
+
+  <!-- SERVICES -->
+  <div class="jc-svc-title">نوع العمل المطلوب — TYPE OF WORK REQUIRED</div>
+  <div class="jc-services">
+    <div class="jc-svc-cell">${chk('ميكانيك')} Mechanical / ميكانيك</div>
+    <div class="jc-svc-cell">${chk('سمكرة')} Body Work / سمكرة</div>
+    <div class="jc-svc-cell">${chk('دهان')} Painting / دهان</div>
+    <div class="jc-svc-cell">${chk('كهربائي')} Electrical / كهربائي</div>
+  </div>
+
+  <!-- JOBS + DIAGRAM -->
+  <div class="jc-body">
+    <div class="jc-jobs">
+      <div class="jc-jobs-title">الأعمال المطلوبة — REQUESTED WORK</div>
+      ${Array(10).fill(0).map(()=>'<div class="jc-job-line"></div>').join('')}
+    </div>
+    <div class="jc-car-diagram">
+      <div style="font-size:9px;font-weight:700;color:#555;text-align:center;">مخطط السيارة — Car Diagram</div>
+      <svg viewBox="0 0 120 240" xmlns="http://www.w3.org/2000/svg" style="width:160px;">
+        <!-- Body -->
+        <rect x="20" y="20" width="80" height="200" rx="14" ry="14" fill="none" stroke="#000" stroke-width="2"/>
+        <!-- Windshield front -->
+        <path d="M30,55 Q60,35 90,55" fill="none" stroke="#000" stroke-width="1.5"/>
+        <!-- Windshield rear -->
+        <path d="M30,185 Q60,205 90,185" fill="none" stroke="#000" stroke-width="1.5"/>
+        <!-- Hood line -->
+        <line x1="20" y1="65" x2="100" y2="65" stroke="#000" stroke-width="1"/>
+        <!-- Trunk line -->
+        <line x1="20" y1="175" x2="100" y2="175" stroke="#000" stroke-width="1"/>
+        <!-- Front wheels -->
+        <rect x="5" y="55" width="12" height="30" rx="3" fill="none" stroke="#000" stroke-width="1.5"/>
+        <rect x="103" y="55" width="12" height="30" rx="3" fill="none" stroke="#000" stroke-width="1.5"/>
+        <!-- Rear wheels -->
+        <rect x="5" y="155" width="12" height="30" rx="3" fill="none" stroke="#000" stroke-width="1.5"/>
+        <rect x="103" y="155" width="12" height="30" rx="3" fill="none" stroke="#000" stroke-width="1.5"/>
+        <!-- Doors -->
+        <line x1="20" y1="115" x2="100" y2="115" stroke="#000" stroke-width="0.8" stroke-dasharray="3,2"/>
+        <!-- Center console -->
+        <line x1="60" y1="70" x2="60" y2="175" stroke="#bbb" stroke-width="0.5"/>
+        <!-- front label -->
+        <text x="60" y="14" text-anchor="middle" font-size="9" fill="#c0392b" font-weight="bold">FRONT / الأمام</text>
+        <!-- rear label -->
+        <text x="60" y="232" text-anchor="middle" font-size="9" fill="#c0392b" font-weight="bold">REAR / الخلف</text>
+      </svg>
+      <div style="font-size:8px;color:#777;text-align:center;margin-top:2px;">حدد مناطق التلف بعلامة ✗</div>
+    </div>
+  </div>
+
+  <!-- AMOUNT -->
+  <div class="jc-amount">
+    <div class="jc-amount-cell">
+      <strong>التقدير المبدئي / Initial Estimate: </strong>${car.estimate?car.estimate+' ر.ع / OMR':'_____________'}
+    </div>
+    <div class="jc-amount-cell" style="text-align:left;direction:ltr;">
+      <strong>Deposit Paid / العربون: </strong>${car.deposit?car.deposit+' OMR / ر.ع':'_____________'}
+    </div>
+  </div>
+
+  <!-- TERMS -->
+  <div class="jc-terms">
+    <strong>الشروط والأحكام / Terms & Conditions:</strong><br>
+    ١- المركز غير مسؤول عن المقتنيات الشخصية المتروكة داخل المركبة. &nbsp;|&nbsp; 1. The center is not responsible for personal belongings left in the vehicle.<br>
+    ٢- يُطلب استلام السيارة خلال ٣ أيام من إشعار الانتهاء وإلا تُفرض رسوم تخزين. &nbsp;|&nbsp; 2. Vehicle must be collected within 3 days of completion notice, otherwise storage fees apply.<br>
+    ٣- التقدير المبدئي قد يتغير بعد الفحص الكامل. &nbsp;|&nbsp; 3. Estimate may change after full inspection.<br>
+    ٤- يُلزم العميل بدفع تكاليف المواد المستخدمة حتى وإن قرر التوقف عن الإصلاح. &nbsp;|&nbsp; 4. Customer is liable for materials used even if repair is stopped.
+  </div>
+
+  <!-- SIGNATURES -->
+  <div class="jc-sigs">
+    <div class="jc-sig-cell">
+      <div>توقيع العميل / Customer Signature</div>
+      <div style="font-size:9px;color:#888;">بتوقيعه يقر العميل بالشروط أعلاه / By signing, customer agrees to the above terms</div>
+      <div class="jc-sig-line"></div>
+    </div>
+    <div class="jc-sig-cell" style="text-align:left;direction:ltr;">
+      <div>Received by / استلمه</div>
+      <div style="font-size:9px;color:#888;">Workshop Representative / ممثل الورشة</div>
+      <div class="jc-sig-line"></div>
+    </div>
+  </div>
+
+</div>
+</body></html>`);
+  w.document.close();
+}
+
 function sendWelcomeMessage(car) {
   const nl = '\n';
   const trackUrl = getTrackingURL(car);
