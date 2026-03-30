@@ -993,7 +993,7 @@ label{font-size:14px;}
       <div style="margin-bottom:14px;">
         <label style="font-size:12px;font-weight:700;color:var(--muted);" data-i18n="lbl_search_prev_cust">👤 بحث عن عميل سابق</label>
         <div style="position:relative;margin-top:5px;">
-          <input type="text" id="customer-search" placeholder="اكتب اسم العميل أو رقم الهاتف..."
+          <input type="text" id="customer-search" data-i18n-placeholder="ph_search_cust" placeholder="اكتب اسم العميل أو رقم الهاتف..."
             oninput="searchCustomers(this.value)"
             style="width:100%;padding:9px 12px;border-radius:10px;border:1px solid var(--border);background:rgba(79,172,254,0.08);color:var(--text);font-family:var(--font-main);font-size:13px;">
           <div id="customer-suggestions" style="display:none;position:absolute;top:100%;right:0;left:0;background:#1a2a4a;border:1px solid var(--border);border-radius:10px;z-index:999;max-height:160px;overflow-y:auto;margin-top:4px;box-shadow:0 8px 24px rgba(0,0,0,0.4);"></div>
@@ -1004,14 +1004,14 @@ label{font-size:14px;}
       <div style="margin-bottom:14px;">
         <label style="font-size:12px;font-weight:700;color:var(--muted);" data-i18n="lbl_quick_service">⚡ خدمة سريعة</label>
         <div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:7px;">
-          <button type="button" class="quick-svc-btn" onclick="setQuickService('صيانة ميكانيكية')">🔧 صيانة</button>
-          <button type="button" class="quick-svc-btn" onclick="setQuickService('سمكرة وهيكل')">🔨 سمكرة</button>
-          <button type="button" class="quick-svc-btn" onclick="setQuickService('دهان وتلميع')">🎨 دهان</button>
-          <button type="button" class="quick-svc-btn" onclick="setQuickService('خدمة شاملة')">⭐ شاملة</button>
-          <button type="button" class="quick-svc-btn" onclick="setQuickService('تغيير زيت')">🛢️ زيت</button>
-          <button type="button" class="quick-svc-btn" onclick="setQuickService('فرامل')">🛑 فرامل</button>
-          <button type="button" class="quick-svc-btn" onclick="setQuickService('مكيف')">❄️ مكيف</button>
-          <button type="button" class="quick-svc-btn" onclick="setQuickService('كهرباء')">⚡ كهرباء</button>
+          <button type="button" class="quick-svc-btn" onclick="setQuickService(t('svc_mech_full'))">🔧 <span data-i18n="svc_maintenance">صيانة</span></button>
+          <button type="button" class="quick-svc-btn" onclick="setQuickService(t('svc_body_full'))">🔨 <span data-i18n="svc_body">سمكرة</span></button>
+          <button type="button" class="quick-svc-btn" onclick="setQuickService(t('svc_paint_full'))">🎨 <span data-i18n="svc_paint">دهان</span></button>
+          <button type="button" class="quick-svc-btn" onclick="setQuickService(t('svc_full_full'))">⭐ <span data-i18n="svc_full">شاملة</span></button>
+          <button type="button" class="quick-svc-btn" onclick="setQuickService(t('svc_oil_full'))">🛢️ <span data-i18n="svc_oil">زيت</span></button>
+          <button type="button" class="quick-svc-btn" onclick="setQuickService(t('svc_brakes_full'))">🛑 <span data-i18n="svc_brakes">فرامل</span></button>
+          <button type="button" class="quick-svc-btn" onclick="setQuickService(t('svc_ac_full'))">❄️ <span data-i18n="svc_ac">مكيف</span></button>
+          <button type="button" class="quick-svc-btn" onclick="setQuickService(t('svc_elec_full'))">⚡ <span data-i18n="svc_elec">كهرباء</span></button>
         </div>
       </div>
 
@@ -1036,20 +1036,20 @@ label{font-size:14px;}
 
       <!-- MAIN FIELDS -->
       <div class="form-grid">
-        <div class="form-group"><label data-i18n="lbl_plate_req">رقم اللوحة *</label><input type="text" id="car-plate" placeholder="مثال: 12345 ع م"></div>
-        <div class="form-group"><label data-i18n="lbl_owner_req">اسم المالك *</label><input type="text" id="car-owner" placeholder="الاسم الكامل"></div>
-        <div class="form-group"><label data-i18n="lbl_phone_opt">رقم الهاتف</label><input type="text" id="car-phone" placeholder="مثال: 96812345678 أو 91234567"><div style="font-size:11px;color:#8892a4;margin-top:3px;">أدخل الرقم كاملاً مع كود الدولة للإشعارات (عُمان: 968XXXXXXXX)</div></div>
-        <div class="form-group"><label data-i18n="lbl_car_model_opt">موديل السيارة</label><input type="text" id="car-model" placeholder="مثال: Toyota Camry 2022"></div>
+        <div class="form-group"><label data-i18n="lbl_plate_req">رقم اللوحة *</label><input type="text" id="car-plate" data-i18n-placeholder="ph_plate" placeholder="مثال: 12345"></div>
+        <div class="form-group"><label data-i18n="lbl_owner_req">اسم المالك *</label><input type="text" id="car-owner" data-i18n-placeholder="ph_owner" placeholder="الاسم الكامل"></div>
+        <div class="form-group"><label data-i18n="lbl_phone_opt">رقم الهاتف</label><input type="text" id="car-phone" data-i18n-placeholder="ph_phone" placeholder="مثال: 96812345678"><div style="font-size:11px;color:#8892a4;margin-top:3px;" data-i18n="hint_phone_intl">أدخل الرقم كاملاً مع كود الدولة للإشعارات (عُمان: 968XXXXXXXX)</div></div>
+        <div class="form-group"><label data-i18n="lbl_car_model_opt">موديل السيارة</label><input type="text" id="car-model" data-i18n-placeholder="ph_model" placeholder="مثال: Toyota Camry 2022"></div>
         <div class="form-group"><label data-i18n="lbl_service_type_req">نوع الخدمة *</label>
           <select id="car-service">
-            <option value="صيانة ميكانيكية">🔧 صيانة ميكانيكية</option>
-            <option value="سمكرة وهيكل">🔨 سمكرة وهيكل</option>
-            <option value="دهان وتلميع">🎨 دهان وتلميع</option>
-            <option value="خدمة شاملة">⭐ خدمة شاملة</option>
-            <option value="تغيير زيت">🛢️ تغيير زيت</option>
-            <option value="فرامل">🛑 فرامل</option>
-            <option value="مكيف">❄️ مكيف</option>
-            <option value="كهرباء">⚡ كهرباء</option>
+            <option value="صيانة ميكانيكية" data-i18n="svc_mech_full">🔧 صيانة ميكانيكية</option>
+            <option value="سمكرة وهيكل" data-i18n="svc_body_full">🔨 سمكرة وهيكل</option>
+            <option value="دهان وتلميع" data-i18n="svc_paint_full">🎨 دهان وتلميع</option>
+            <option value="خدمة شاملة" data-i18n="svc_full_full">⭐ خدمة شاملة</option>
+            <option value="تغيير زيت" data-i18n="svc_oil_full">🛢️ تغيير زيت</option>
+            <option value="فرامل" data-i18n="svc_brakes_full">🛑 فرامل</option>
+            <option value="مكيف" data-i18n="svc_ac_full">❄️ مكيف</option>
+            <option value="كهرباء" data-i18n="svc_elec_full">⚡ كهرباء</option>
           </select>
         </div>
         <div class="form-group">
@@ -1062,7 +1062,7 @@ label{font-size:14px;}
             <button type="button" class="day-btn" onclick="setDeliveryDays(2)">+2</button>
             <button type="button" class="day-btn" onclick="setDeliveryDays(3)">+3</button>
             <button type="button" class="day-btn" onclick="setDeliveryDays(5)">+5</button>
-            <button type="button" class="day-btn" onclick="setDeliveryDays(7)">أسبوع</button>
+            <button type="button" class="day-btn" onclick="setDeliveryDays(7)" data-i18n="day_week">أسبوع</button>
           </div>
         </div>
         <div class="form-group"><label data-i18n="lbl_estimate">المبلغ التقديري (ر.ع)</label><input type="number" id="car-estimate" placeholder="0.000" step="0.001"></div>
@@ -3248,6 +3248,17 @@ var LANG = {
     lbl_plate_req:'رقم اللوحة *', lbl_owner_req:'اسم المالك *',
     lbl_phone_opt:'رقم الهاتف', lbl_car_model_opt:'موديل السيارة',
     lbl_service_type_req:'نوع الخدمة *', lbl_expected_delivery:'📅 التسليم المتوقع',
+    svc_maintenance:'صيانة', svc_body:'سمكرة', svc_paint:'دهان', svc_full:'شاملة',
+    svc_oil:'زيت', svc_brakes:'فرامل', svc_ac:'مكيف', svc_elec:'كهرباء',
+    svc_mech_full:'صيانة ميكانيكية', svc_body_full:'سمكرة وهيكل', svc_paint_full:'دهان وتلميع', svc_full_full:'خدمة شاملة',
+    svc_oil_full:'تغيير زيت', svc_brakes_full:'فرامل', svc_ac_full:'مكيف', svc_elec_full:'كهرباء',
+    ph_search_cust:'اكتب اسم العميل أو رقم الهاتف...',
+    day_1:'+1', day_2:'+2', day_3:'+3', day_5:'+5', day_week:'أسبوع',
+    ph_plate:'مثال: 12345',
+    ph_owner:'الاسم الكامل',
+    ph_phone:'مثال: 96812345678',
+    ph_model:'مثال: Toyota Camry 2022',
+    hint_phone_intl:'أدخل الرقم كاملاً مع كود الدولة للإشعارات (عُمان: 968XXXXXXXX)',
     lbl_estimate:'المبلغ التقديري (ر.ع)', lbl_deposit_adv:'💰 الدفعة المقدمة (ر.ع)',
     lbl_extra_details:'تفاصيل إضافية (اختياري)', lbl_km:'الكيلومترات',
     lbl_fault_desc:'وصف العطل / المطلوب',
@@ -3367,6 +3378,17 @@ var LANG = {
     lbl_plate_req:'Plate Number *', lbl_owner_req:'Owner Name *',
     lbl_phone_opt:'Phone Number', lbl_car_model_opt:'Car Model',
     lbl_service_type_req:'Service Type *', lbl_expected_delivery:'📅 Expected Delivery',
+    svc_maintenance:'Maintenance', svc_body:'Body Work', svc_paint:'Paint', svc_full:'Full Service',
+    svc_oil:'Oil', svc_brakes:'Brakes', svc_ac:'AC', svc_elec:'Electrical',
+    svc_mech_full:'Mechanical Maintenance', svc_body_full:'Body Work', svc_paint_full:'Paint & Polish', svc_full_full:'Full Service',
+    svc_oil_full:'Oil Change', svc_brakes_full:'Brakes', svc_ac_full:'AC', svc_elec_full:'Electrical',
+    ph_search_cust:'Type customer name or phone...',
+    day_1:'+1', day_2:'+2', day_3:'+3', day_5:'+5', day_week:'Week',
+    ph_plate:'e.g., 12345',
+    ph_owner:'Full name',
+    ph_phone:'e.g., 96812345678',
+    ph_model:'e.g., Toyota Camry 2022',
+    hint_phone_intl:'Enter full number with country code for notifications (Oman: 968XXXXXXXX)',
     lbl_estimate:'Estimated Amount (OMR)', lbl_deposit_adv:'💰 Advance Payment (OMR)',
     lbl_extra_details:'Extra Details (optional)', lbl_km:'Kilometers',
     lbl_fault_desc:'Fault Description / Required',
@@ -3460,7 +3482,13 @@ function setLang(lang) {
   document.querySelectorAll('[data-i18n]').forEach(function(el) {
     var key = el.getAttribute('data-i18n');
     var val = t(key);
-    if (val) el.textContent = val;
+    if (val) {
+      if (el.tagName === 'OPTION') {
+        el.textContent = val;
+      } else {
+        el.textContent = val;
+      }
+    }
   });
   document.querySelectorAll('[data-i18n-placeholder]').forEach(function(el) {
     var key = el.getAttribute('data-i18n-placeholder');
