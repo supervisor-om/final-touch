@@ -668,12 +668,12 @@ label{font-size:14px;}
     <div class="nav-item admin-only" onclick="showPage('invoices')"><span class="nav-icon">🧾</span> <span data-i18n="nav_invoices">الفواتير والإيصالات</span></div>
     <div class="nav-item admin-only" onclick="showPage('expenses')"><span class="nav-icon">💸</span> <span data-i18n="nav_expenses">المصروفات</span></div>
     <div class="nav-item admin-only" onclick="showPage('reports')"><span class="nav-icon">📈</span> <span data-i18n="nav_reports">التقارير المالية</span></div>
-    <div class="nav-item admin-only" onclick="showPage('closing')"><span class="nav-icon">📅</span> الإغلاق الشهري</div>
+    <div class="nav-item admin-only" onclick="showPage('closing')"><span class="nav-icon">📅</span> <span data-i18n="nav_closing">الإغلاق الشهري</span></div>
     <div class="nav-section"><span data-i18n="sec_system">النظام</span></div>
     <div class="nav-item" onclick="showPage('customers')"><span class="nav-icon">👤</span> <span data-i18n="nav_customers">العملاء</span></div>
     <div class="nav-item" onclick="showPage('tracking')"><span class="nav-icon">🔍</span> <span data-i18n="nav_tracking">تتبع العملاء</span></div>
     <div class="nav-item admin-only" onclick="openModal('modal-users')"><span class="nav-icon">👥</span> <span data-i18n="nav_users">إدارة المستخدمين</span></div>
-    <div class="nav-item admin-only" onclick="openManageStages()"><span class="nav-icon">⚙️</span> إدارة الحالات</div>
+    <div class="nav-item admin-only" onclick="openManageStages()"><span class="nav-icon">⚙️</span> <span data-i18n="nav_manage_stages">إدارة الحالات</span></div>
   </nav>
   <div class="sidebar-footer">
     <div id="auth-user-info" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:8px 12px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;">
@@ -712,7 +712,7 @@ label{font-size:14px;}
       <div class="stat-card blue"><span class="stat-icon">🚗</span><div class="stat-value" id="stat-cars">0</div><div class="stat-label" data-i18n="stat_cars_workshop">سيارات في الورشة</div></div>
       <div class="stat-card green"><span class="stat-icon">💰</span><div class="stat-value" id="stat-revenue">0 ر.ع</div><div class="stat-label" data-i18n="stat_revenue">إجمالي الإيرادات</div></div>
       <div class="stat-card red"><span class="stat-icon">💸</span><div class="stat-value" id="stat-expenses">0 ر.ع</div><div class="stat-label" data-i18n="stat_expenses">إجمالي المصروفات</div></div>
-      <div class="stat-card gold"><span class="stat-icon">📦</span><div class="stat-value" id="stat-profit">0 ر.ع</div><div class="stat-label" data-i18n="stat_profit">صافي الربح</div></div>
+      <div class="stat-card gold"><span class="stat-icon">📦</span><div class="stat-value" id="stat-profit">0 ر.ع</div><div class="stat-label" data-i18n="stat_profit">${t('closing_net_profit_lbl')}</div></div>
       <div class="stat-card purple"><span class="stat-icon">⏳</span><div class="stat-value" id="stat-pending">0 ر.ع</div><div class="stat-label" data-i18n="stat_pending">مبالغ معلقة (غير مقبوضة)</div></div>
     </div>
     <div class="two-col-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:18px;">
@@ -897,10 +897,10 @@ label{font-size:14px;}
   <div class="page" id="page-closing">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:10px;">
       <div>
-        <div style="font-size:18px;font-weight:900;">📅 الإغلاق الشهري</div>
-        <div style="font-size:12px;color:var(--muted);margin-top:2px;">تتبع إيرادات ومصاريف وأرباح كل شهر</div>
+        <div style="font-size:18px;font-weight:900;" data-i18n="closing_page_title">📅 الإغلاق الشهري</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:2px;" data-i18n="closing_page_subtitle">تتبع إيرادات ومصاريف وأرباح كل شهر</div>
       </div>
-      <button onclick="openClosingModal()" class="btn btn-primary">🔒 إغلاق شهر جديد</button>
+      <button onclick="openClosingModal()" class="btn btn-primary" data-i18n="btn_new_closing">🔒 إغلاق شهر جديد</button>
     </div>
     <div id="closing-current-card"></div>
     <div id="closing-list"></div>
@@ -1089,10 +1089,10 @@ label{font-size:14px;}
 
       <!-- صور الاستلام -->
       <div style="margin-top:14px;">
-        <div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:8px;">📷 صور الاستلام (اختياري)</div>
+        <div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:8px;" data-i18n="lbl_reception_photos">📷 صور الاستلام (اختياري)</div>
         <div id="add-car-photo-grid" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px;"></div>
         <label style="display:inline-flex;align-items:center;gap:6px;background:rgba(79,172,254,.1);border:1px dashed rgba(79,172,254,.4);color:#4facfe;border-radius:10px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;">
-          📷 إضافة صورة
+          <span data-i18n="lbl_add_photo_btn">📷 إضافة صورة</span>
           <input type="file" accept="image/*" multiple style="display:none;" onchange="handleAddCarPhotos(this)">
         </label>
       </div>
@@ -1108,7 +1108,7 @@ label{font-size:14px;}
 <!-- Update Car -->
 <div class="modal-overlay" id="modal-update-car">
   <div class="modal modal-lg">
-    <div class="modal-header"><div class="modal-title" data-i18n="modal_update_car">✏️ تحديث السيارة</div><div style="display:flex;gap:8px;align-items:center;"><button onclick="openJobCard(state.cars.find(c=>c.id===state.currentEditCar))" style="background:#1a3a6e;color:#fff;border:none;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;">📋 بطاقة العمل</button><button class="modal-close" onclick="closeModal('modal-update-car')">✕</button></div></div>
+    <div class="modal-header"><div class="modal-title" data-i18n="modal_update_car">✏️ تحديث السيارة</div><div style="display:flex;gap:8px;align-items:center;"><button onclick="openJobCard(state.cars.find(c=>c.id===state.currentEditCar))" style="background:#1a3a6e;color:#fff;border:none;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;" data-i18n="btn_job_card">📋 بطاقة العمل</button><button class="modal-close" onclick="closeModal('modal-update-car')">✕</button></div></div>
     <div class="modal-body">
       <!-- Stages -->
       <div style="margin-bottom:20px;">
@@ -1118,10 +1118,10 @@ label{font-size:14px;}
       </div>
       <!-- صور السيارة -->
       <div style="margin:14px 0 6px;">
-        <div style="font-size:13px;font-weight:700;color:var(--muted);margin-bottom:10px;">📷 صور السيارة</div>
+        <div style="font-size:13px;font-weight:700;color:var(--muted);margin-bottom:10px;" data-i18n="lbl_car_photos">📷 صور السيارة</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
           <div>
-            <div style="font-size:11px;font-weight:700;color:#4facfe;margin-bottom:6px;">🔵 عند الاستلام</div>
+            <div style="font-size:11px;font-weight:700;color:#4facfe;margin-bottom:6px;" data-i18n="lbl_photo_reception">🔵 عند الاستلام</div>
             <div id="photo-grid-reception" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px;"></div>
             <label style="display:inline-flex;align-items:center;gap:5px;background:rgba(79,172,254,.1);border:1px dashed rgba(79,172,254,.4);color:#4facfe;border-radius:8px;padding:6px 12px;font-size:11px;font-weight:700;cursor:pointer;">
               ➕ صورة
@@ -1129,7 +1129,7 @@ label{font-size:14px;}
             </label>
           </div>
           <div>
-            <div style="font-size:11px;font-weight:700;color:#00d4aa;margin-bottom:6px;">🟢 عند التسليم</div>
+            <div style="font-size:11px;font-weight:700;color:#00d4aa;margin-bottom:6px;" data-i18n="lbl_photo_delivery">🟢 عند التسليم</div>
             <div id="photo-grid-delivery" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px;"></div>
             <label style="display:inline-flex;align-items:center;gap:5px;background:rgba(0,212,170,.1);border:1px dashed rgba(0,212,170,.4);color:#00d4aa;border-radius:8px;padding:6px 12px;font-size:11px;font-weight:700;cursor:pointer;">
               ➕ صورة
@@ -1258,30 +1258,30 @@ label{font-size:14px;}
 <div class="modal-overlay" id="modal-manage-stages">
   <div class="modal modal-lg">
     <div class="modal-header">
-      <div class="modal-title">⚙️ إدارة حالات السيارة</div>
+      <div class="modal-title" data-i18n="modal_manage_stages">⚙️ إدارة حالات السيارة</div>
       <button class="modal-close" onclick="closeModal('modal-manage-stages')">✕</button>
     </div>
     <div class="modal-body">
       <!-- Tabs -->
       <div class="tabs" style="margin-bottom:16px;">
-        <button class="tab active" id="tab-default-stages" onclick="switchStagesTab('default')">🔧 الحالات الافتراضية</button>
-        <button class="tab" id="tab-templates" onclick="switchStagesTab('templates')">📋 قوالب الخدمات</button>
+        <button class="tab active" id="tab-default-stages" onclick="switchStagesTab('default')" data-i18n="tab_default_stages">🔧 الحالات الافتراضية</button>
+        <button class="tab" id="tab-templates" onclick="switchStagesTab('templates')" data-i18n="tab_templates">📋 قوالب الخدمات</button>
       </div>
       <!-- Default stages panel -->
       <div id="panel-default-stages">
         <div id="stages-manage-list" style="margin-bottom:18px;"></div>
         <div style="border-top:1px solid var(--border);padding-top:16px;">
-          <div style="font-size:13px;font-weight:700;color:var(--muted);margin-bottom:10px;">➕ إضافة حالة جديدة</div>
+          <div style="font-size:13px;font-weight:700;color:var(--muted);margin-bottom:10px;" data-i18n="lbl_add_stage">➕ إضافة حالة جديدة</div>
           <div style="display:flex;gap:8px;align-items:center;">
-            <input type="text" id="new-stage-icon" placeholder="رمز 📌" style="width:70px;text-align:center;font-size:18px;">
-            <input type="text" id="new-stage-label" placeholder="اسم الحالة" style="flex:1;">
-            <button class="btn btn-primary btn-sm" onclick="addStage()">➕ إضافة</button>
+            <input type="text" id="new-stage-icon" data-i18n-placeholder="ph_stage_icon" placeholder="رمز 📌" style="width:70px;text-align:center;font-size:18px;">
+            <input type="text" id="new-stage-label" data-i18n-placeholder="ph_stage_label" placeholder="اسم الحالة" style="flex:1;">
+            <button class="btn btn-primary btn-sm" onclick="addStage()" data-i18n="btn_add_item">➕ إضافة</button>
           </div>
         </div>
       </div>
       <!-- Templates panel -->
       <div id="panel-templates" style="display:none;">
-        <div style="font-size:12px;color:var(--muted);margin-bottom:12px;">اختر خدمة لتعديل مراحلها — تُطبَّق تلقائياً على السيارات الجديدة</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:12px;" data-i18n="tpl_hint">اختر خدمة لتعديل مراحلها — تُطبَّق تلقائياً على السيارات الجديدة</div>
         <div id="tpl-service-tabs" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;"></div>
         <div id="tpl-stage-list" style="margin-bottom:12px;"></div>
         <div style="border-top:1px solid var(--border);padding-top:12px;display:flex;gap:8px;align-items:center;">
@@ -1292,7 +1292,7 @@ label{font-size:14px;}
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn btn-outline" onclick="closeModal('modal-manage-stages')">إغلاق</button>
+      <button class="btn btn-outline" onclick="closeModal('modal-manage-stages')" data-i18n="btn_close">إغلاق</button>
     </div>
   </div>
 </div>
@@ -2021,8 +2021,8 @@ function renderDashboard(){
   tbody.innerHTML=recent.length?recent.map(c=>{
     const days=daysSince(c.dateIn);
     const over=days>=state.alertDays;
-    return`<tr><td><strong>${c.plate}</strong></td><td>${c.owner}</td><td>${statusBadge(c.status)}</td><td style="color:${over?'var(--danger)':'var(--success)'};">${days} يوم${over?' ⚠️':''}</td></tr>`;
-  }).join(''):'<tr><td colspan="4"><div class="empty-state"><div class="empty-icon">🚗</div><p>لا توجد سيارات</p></div></td></tr>';
+    return`<tr><td><strong>${c.plate}</strong></td><td>${c.owner}</td><td>${statusBadge(c.status)}</td><td style="color:${over?'var(--danger)':'var(--success)'};">${days} ${t('lbl_days_unit')}${over?' ⚠️':''}</td></tr>`;
+  }).join(''):`<tr><td colspan="4"><div class="empty-state"><div class="empty-icon">🚗</div><p>${t('empty_cars')}</p></div></td></tr>`;
 }
 
 function renderCarsTable(){
@@ -2040,7 +2040,7 @@ function renderCarsTable(){
   const payTh=document.querySelector('#page-cars th:nth-child(8)');
   if(payTh)payTh.style.display=isAdmin?'':'none';
   const tbody=document.getElementById('cars-table-body');
-  if(!cars.length){tbody.innerHTML=`<tr><td colspan="${isAdmin?12:11}"><div class="empty-state"><div class="empty-icon">🚗</div><p>لا توجد سيارات</p></div></td></tr>`;return;}
+  if(!cars.length){tbody.innerHTML=`<tr><td colspan="${isAdmin?12:11}"><div class="empty-state"><div class="empty-icon">🚗</div><p>${t('empty_cars')}</p></div></td></tr>`;return;}
   tbody.innerHTML=cars.map((c,i)=>{
     const days=daysSince(c.dateIn);const over=days>=state.alertDays;
     const rem=Math.max(0,(c.estimate||0)-(c.paidTotal||0));
@@ -2055,10 +2055,10 @@ function renderCarsTable(){
       </td>`:''}
       <td style="color:${over?'var(--danger)':'var(--success)'};">${days}${over?' ⚠️':''}</td>
       <td>${c.expectedDate?`<span style="font-size:12px;color:${new Date(c.expectedDate)<new Date()?'var(--danger)':'var(--success)'};">${formatDate(c.expectedDate)}</span>`:'<span style="color:var(--muted);font-size:12px;">—</span>'}</td>
-      <td><span class="qs-badge" onclick="quickStatus('${c.id}',event)" title="انقر لتغيير الحالة">${statusBadge(c.status)}</span></td>
+      <td><span class="qs-badge" onclick="quickStatus('${c.id}',event)" title="${t('status_click_change')}">${statusBadge(c.status)}</span></td>
       <td><div style="display:flex;gap:5px;">
         <button class="btn btn-primary btn-sm" onclick="editCar('${c.id}')">✏️</button>
-        <button class="btn btn-outline btn-sm" onclick="openJobCard(state.cars.find(x=>x.id==='${c.id}'))" title="طباعة بطاقة العمل">📋</button>
+        <button class="btn btn-outline btn-sm" onclick="openJobCard(state.cars.find(x=>x.id==='${c.id}'))" title="${t('lbl_print_job_card')}">📋</button>
         ${(()=>{const p=getCarPhotos(c.id);return(p.reception.length||p.delivery.length)?`<button class="btn btn-outline btn-sm" onclick="editCar('${c.id}')" title="توجد صور">📷${p.reception.length+p.delivery.length}</button>`:''})()}
         ${isAdmin?`<button class="btn btn-danger btn-sm" onclick="deleteCar('${c.id}')">🗑️</button>`:''}
       </div></td>
@@ -2070,7 +2070,7 @@ function renderDeliveredTable(){
   const delivered=state.cars.filter(c=>c.status==='delivered');
   document.getElementById('delivered-count').textContent=delivered.length;
   const tbody=document.getElementById('delivered-table-body');
-  if(!delivered.length){tbody.innerHTML='<tr><td colspan="10"><div class="empty-state"><div class="empty-icon">✅</div><p>لا توجد سيارات مسلَّمة</p></div></td></tr>';return;}
+  if(!delivered.length){tbody.innerHTML=`<tr><td colspan="10"><div class="empty-state"><div class="empty-icon">✅</div><p>${t('empty_delivered')}</p></div></td></tr>`;return;}
   tbody.innerHTML=delivered.map(c=>{
     const inv=state.invoices.find(i=>i.carId===c.id);
     const days=c.dateOut&&c.dateIn?Math.floor((new Date(c.dateOut)-new Date(c.dateIn))/(1000*60*60*24)):0;
@@ -2080,8 +2080,8 @@ function renderDeliveredTable(){
       <td><strong style="color:var(--gold);">${(c.estimate||0).toFixed(3)} ر.ع</strong></td>
       <td style="color:var(--success);">${(c.paidTotal||0).toFixed(3)} ر.ع</td>
       <td>${formatDate(c.dateIn)}</td><td>${formatDate(c.dateOut)}</td>
-      <td>${days} يوم</td>
-      <td>${inv?`<button class="btn btn-outline btn-sm" onclick="generateReceipt(${inv.id})">🧾 إيصال</button>`:'—'}</td>
+      <td>${days} ${t('lbl_days_unit')}</td>
+      <td>${inv?`<button class="btn btn-outline btn-sm" onclick="generateReceipt(${inv.id})">🧾 ${t('status_receipt')}</button>`:'—'}</td>
     </tr>`;
   }).join('');
 }
@@ -2091,33 +2091,33 @@ function renderAlertsTable(){
   if(document.getElementById('alert-days'))document.getElementById('alert-days').value=state.alertDays;
   const tbody=document.getElementById('alerts-table-body');
   const _as=getSession();const _aAdmin=_as&&_as.role==='admin';
-  if(!alerted.length){tbody.innerHTML='<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">✅</div><p>لا توجد سيارات متأخرة</p></div></td></tr>';return;}
+  if(!alerted.length){tbody.innerHTML=`<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">✅</div><p>${t('empty_alerts')}</p></div></td></tr>`;return;}
   tbody.innerHTML=alerted.map(c=>{
     const days=daysSince(c.dateIn);
     return`<tr>
       <td><strong>${c.plate}</strong></td><td>${c.owner}</td><td>${c.model||'—'}</td>
       <td>${serviceBadge(c.service)}</td>
-      <td><span class="badge badge-alert">⚠️ ${days} يوم</span></td>
+      <td><span class="badge badge-alert">⚠️ ${days} ${t('lbl_days_unit')}</span></td>
       <td>${statusBadge(c.status)}</td>
-      <td><button class="btn btn-primary btn-sm" onclick="editCar('${c.id}')">✏️ تحديث</button></td>
+      <td><button class="btn btn-primary btn-sm" onclick="editCar('${c.id}')">✏️ ${t('lbl_update')}</button></td>
     </tr>`;
   }).join('');
 }
 
 function renderOrdersTable(){
   const tbody=document.getElementById('orders-table-body');
-  if(!state.orders.length){tbody.innerHTML='<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">⚙️</div><p>لا توجد أوامر</p></div></td></tr>';return;}
+  if(!state.orders.length){tbody.innerHTML=`<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">⚙️</div><p>${t('empty_orders')}</p></div></td></tr>`;return;}
   tbody.innerHTML=state.orders.map((o,i)=>`<tr>
     <td><strong>#${i+1}</strong></td><td>${o.carLabel}</td><td>${serviceBadge(o.type)}</td>
     <td style="max-width:180px;font-size:12px;">${o.desc||'—'}</td><td>${fmt(o.cost)}</td>
-    <td>${o.tech||'—'}</td><td><span class="badge badge-progress">🔧 جاري</span></td>
+    <td>${o.tech||'—'}</td><td><span class="badge badge-progress">🔧 ${t('status_in_progress')}</span></td>
     <td><button class="btn btn-danger btn-sm" onclick="deleteOrder('${o.id}')">🗑️</button></td>
   </tr>`).join('');
 }
 
 function renderServicesTable(){
   const tbody=document.getElementById('services-table-body');
-  if(!state.services.length){tbody.innerHTML='<tr><td colspan="5"><div class="empty-state"><div class="empty-icon">🛠️</div><p>لا توجد خدمات</p></div></td></tr>';return;}
+  if(!state.services.length){tbody.innerHTML=`<tr><td colspan="5"><div class="empty-state"><div class="empty-icon">🛠️</div><p>${t('empty_services_tbl')}</p></div></td></tr>`;return;}
   tbody.innerHTML=state.services.map(s=>`<tr>
     <td><strong>${s.name}</strong></td><td>${serviceBadge(s.type)}</td>
     <td><strong style="color:var(--gold);">${parseFloat(s.price).toFixed(3)}</strong></td>
@@ -2128,7 +2128,7 @@ function renderServicesTable(){
 
 function renderInvoicesTable(){
   const tbody=document.getElementById('invoices-table-body');
-  if(!state.invoices.length){tbody.innerHTML='<tr><td colspan="10"><div class="empty-state"><div class="empty-icon">🧾</div><p>لا توجد فواتير</p></div></td></tr>';return;}
+  if(!state.invoices.length){tbody.innerHTML=`<tr><td colspan="10"><div class="empty-state"><div class="empty-icon">🧾</div><p>${t('empty_invoices')}</p></div></td></tr>`;return;}
   tbody.innerHTML=state.invoices.map(inv=>{
     const rem=Math.max(0,(inv.amount||0)-(inv.paid||0));
     return`<tr>
@@ -2137,9 +2137,9 @@ function renderInvoicesTable(){
       <td><strong>${(inv.amount||0).toFixed(3)} ر.ع</strong></td>
       <td style="color:var(--info);">${(inv.deposit||0).toFixed(3)} ر.ع</td>
       <td style="color:var(--success);">${(inv.paid||0).toFixed(3)} ر.ع</td>
-      <td style="color:${rem>0?'var(--danger)':'var(--success)'};">${rem>0?rem.toFixed(3)+' ر.ع':'✅ مكتمل'}</td>
+      <td style="color:${rem>0?'var(--danger)':'var(--success)'};">${rem>0?rem.toFixed(3)+' ر.ع':`✅ ${t('status_done')}`}</td>
       <td>${formatDate(inv.date)}</td>
-      <td><button class="btn btn-outline btn-sm" onclick="generateReceipt(${inv.id})">🧾 إيصال</button></td>
+      <td><button class="btn btn-outline btn-sm" onclick="generateReceipt(${inv.id})">🧾 ${t('status_receipt')}</button></td>
     </tr>`;
   }).join('');
 }
@@ -2151,7 +2151,7 @@ function renderExpensesTable(){
     <td><span class="badge badge-maint">${e.type}</span></td>
     <td><strong style="color:var(--danger);">${fmt(e.amount)}</strong></td>
     <td><button class="btn btn-danger btn-sm" onclick="deleteExpense('${e.id}')">🗑️</button></td>
-  </tr>`).join(''):'<tr><td colspan="5"><div class="empty-state"><div class="empty-icon">💸</div><p>لا توجد مصروفات</p></div></td></tr>';
+  </tr>`).join(''):`<tr><td colspan="5"><div class="empty-state"><div class="empty-icon">💸</div><p>${t('empty_expenses_tbl')}</p></div></td></tr>`;
   const parts=state.expenses.filter(e=>e.type==='قطع غيار').reduce((s,e)=>s+e.amount,0);
   const util=state.expenses.filter(e=>['مرافق','إيجار','أدوات'].includes(e.type)).reduce((s,e)=>s+e.amount,0);
   const labor=state.expenses.filter(e=>e.type==='رواتب').reduce((s,e)=>s+e.amount,0);
@@ -2174,22 +2174,22 @@ function renderReports(){
   if(fs)fs.innerHTML=`
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
       <div>
-        <div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:10px;">الإيرادات</div>
-        <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px;"><span>عدد الفواتير</span><span>${state.invoices.length}</span></div>
-        <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px;"><span>إجمالي الإيرادات</span><span style="color:var(--success);">${fmt(revenue)}</span></div>
-        <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:13px;"><span>متوسط الفاتورة</span><span>${state.invoices.length?fmt(revenue/state.invoices.length):'0 ر.ع'}</span></div>
+        <div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:10px;">${t('closing_revenue_lbl')}</div>
+        <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px;"><span>${t('rpt_invoices_count')}</span><span>${state.invoices.length}</span></div>
+        <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px;"><span>${t('lbl_total_revenue')}</span><span style="color:var(--success);">${fmt(revenue)}</span></div>
+        <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:13px;"><span>${t('rpt_avg_invoice')}</span><span>${state.invoices.length?fmt(revenue/state.invoices.length):'0 ر.ع'}</span></div>
       </div>
       <div>
-        <div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:10px;">المصروفات</div>
-        <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px;"><span>عدد البنود</span><span>${state.expenses.length}</span></div>
-        <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px;"><span>إجمالي المصروفات</span><span style="color:var(--danger);">${fmt(expenses)}</span></div>
-        <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:13px;"><span>متوسط المصروف</span><span>${state.expenses.length?fmt(expenses/state.expenses.length):'0 ر.ع'}</span></div>
+        <div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:10px;">${t('stat_expenses')}</div>
+        <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px;"><span>${t('rpt_items_count')}</span><span>${state.expenses.length}</span></div>
+        <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px;"><span>${t('lbl_total_expenses_rpt')}</span><span style="color:var(--danger);">${fmt(expenses)}</span></div>
+        <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:13px;"><span>${t('rpt_avg_expense')}</span><span>${state.expenses.length?fmt(expenses/state.expenses.length):'0 ر.ع'}</span></div>
       </div>
     </div>
     <div style="margin-top:16px;text-align:center;padding:20px;background:rgba(255,255,255,.05);border-radius:12px;">
-      <div style="font-size:12px;color:var(--muted);">صافي الربح</div>
+      <div style="font-size:12px;color:var(--muted);">${t('lbl_net_profit_rpt')}</div>
       <div style="font-size:30px;font-weight:900;color:${profit>=0?'var(--success)':'var(--danger)'};">${fmt(profit)}</div>
-      <div style="font-size:12px;color:var(--muted);margin-top:4px;">${profit>=0?'✅ ربح':'❌ خسارة'}</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:4px;">${profit>=0?`✅ ${t('rpt_profit_lbl')}`:`❌ ${t('rpt_loss_lbl')}`}</div>
     </div>`;
 
   const sr=document.getElementById('services-report');
@@ -2197,9 +2197,9 @@ function renderReports(){
     const g={};state.invoices.forEach(inv=>{if(!g[inv.service])g[inv.service]={count:0,total:0};g[inv.service].count++;g[inv.service].total+=inv.amount;});
     sr.innerHTML=Object.keys(g).length?Object.entries(g).map(([k,v])=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:12px;background:rgba(255,255,255,.05);border-radius:10px;margin-bottom:10px;">
       <div>${serviceBadge(k)}</div>
-      <div style="text-align:center;"><div style="font-size:18px;font-weight:800;">${v.count}</div><div style="font-size:11px;color:var(--muted);">طلب</div></div>
+      <div style="text-align:center;"><div style="font-size:18px;font-weight:800;">${v.count}</div><div style="font-size:11px;color:var(--muted);">${t('rpt_requests')}</div></div>
       <div style="color:var(--success);font-weight:700;">${fmt(v.total)}</div>
-    </div>`).join(''):'<div class="empty-state"><div class="empty-icon">📊</div><p>لا توجد بيانات</p></div>';
+    </div>`).join(''):`<div class="empty-state"><div class="empty-icon">📊</div><p>${t('rpt_no_data')}</p></div>`;
   }
 
   const cr=document.getElementById('cars-report');
@@ -2207,15 +2207,15 @@ function renderReports(){
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px;">
       <div style="background:rgba(255,255,255,.05);border-radius:10px;padding:16px;text-align:center;">
         <div style="font-size:24px;font-weight:900;color:var(--info);">${state.cars.length}</div>
-        <div style="font-size:12px;color:var(--muted);">إجمالي السيارات</div>
+        <div style="font-size:12px;color:var(--muted);">${t('rpt_total_cars')}</div>
       </div>
       <div style="background:rgba(255,255,255,.05);border-radius:10px;padding:16px;text-align:center;">
         <div style="font-size:24px;font-weight:900;color:var(--success);">${state.cars.filter(c=>c.status==='delivered').length}</div>
-        <div style="font-size:12px;color:var(--muted);">تم تسليمها</div>
+        <div style="font-size:12px;color:var(--muted);">${t('rpt_delivered')}</div>
       </div>
       <div style="background:rgba(255,255,255,.05);border-radius:10px;padding:16px;text-align:center;">
         <div style="font-size:24px;font-weight:900;color:var(--gold);">${state.cars.filter(c=>c.status!=='delivered').length}</div>
-        <div style="font-size:12px;color:var(--muted);">في الورشة</div>
+        <div style="font-size:12px;color:var(--muted);">${t('rpt_in_workshop')}</div>
       </div>
     </div>`;
 }
@@ -3276,6 +3276,56 @@ var LANG = {
     btn_send_wa:'📱 فتح واتساب وإرسال الرابط',
     trk_total_cars:'إجمالي السيارات', trk_waiting:'في الانتظار',
     trk_in_progress:'تحت الإصلاح', trk_ready:'جاهزة للتسليم',
+    // Nav
+    nav_closing:'الإغلاق الشهري', nav_manage_stages:'إدارة الحالات',
+    // Monthly closing page
+    closing_page_title:'📅 الإغلاق الشهري', closing_page_subtitle:'تتبع إيرادات ومصاريف وأرباح كل شهر',
+    btn_new_closing:'🔒 إغلاق شهر جديد', closing_current_month:'الشهر الحالي',
+    closing_live_data:'أرقام حية غير مُقفَلة', closing_prev_pending:'⚠️ إغلاق {m} لم يُنجز بعد',
+    closing_cars_received:'سيارة واردة', closing_revenue_lbl:'إيرادات',
+    closing_expenses_lbl:'مصاريف', closing_net_profit_lbl:'صافي الربح',
+    closing_collected:'إيرادات محصلة', closing_no_data:'لا توجد إغلاقات شهرية حتى الآن',
+    closing_no_data_hint:'اضغط "إغلاق شهر جديد" لبدء التتبع الشهري',
+    closing_closed_on:'أُغلق:', closing_by:'بواسطة:', closing_update_btn:'🔄 تحديث',
+    closing_details_btn:'التفاصيل', closing_update_title:'تحديث الأرقام',
+    closing_profit_pct:'% ربح', closing_carry_note:'كانت في الورشة عند الإغلاق — محسوبة ضمن هذا الشهر',
+    modal_closing:'🔒 إغلاق الشهر', closing_select_month:'اختر الشهر المراد إغلاقه',
+    closing_summary_lbl:'ملخص', closing_confirm_btn:'✅ تأكيد الإغلاق',
+    closing_cars_delivered:'سيارة مُسلَّمة',
+    closing_carry_warning:'{n} سيارة لم تُسلَّم — ستُحوَّل للمتابعة وتُحسب ضمن هذا الشهر',
+    closing_profit_margin:'هامش الربح', closing_details_title:'تفاصيل الإغلاق',
+    closing_delivered_section:'السيارات المُسلَّمة', closing_carryover_section:'سيارات محولة للمتابعة',
+    closing_carryover_note:'إيراداتها محسوبة ضمن هذا الشهر',
+    closing_expenses_section:'مصاريف الشهر', closing_total_lbl:'الإجمالي',
+    closing_paid_so_far:'المدفوع حتى الآن', closing_remaining_lbl:'متبقي:',
+    closing_no_delivered:'لا توجد سيارات مُسلَّمة', closing_no_expenses:'لا توجد مصاريف',
+    closing_closed_info:'أُغلق في:', closing_update_link:'تحديث الأرقام',
+    // Photos
+    lbl_reception_photos:'📷 صور الاستلام (اختياري)', lbl_add_photo_btn:'📷 إضافة صورة',
+    lbl_car_photos:'📷 صور السيارة', lbl_photo_reception:'🔵 عند الاستلام',
+    lbl_photo_delivery:'🟢 عند التسليم', lbl_add_photo_sm:'➕ صورة',
+    // Job card button
+    btn_job_card:'📋 بطاقة العمل',
+    // Table empty states
+    empty_cars:'لا توجد سيارات', empty_delivered:'لا توجد سيارات مسلَّمة',
+    empty_alerts:'لا توجد سيارات متأخرة', empty_orders:'لا توجد أوامر',
+    empty_services_tbl:'لا توجد خدمات', empty_invoices:'لا توجد فواتير',
+    empty_expenses_tbl:'لا توجد مصروفات',
+    // Status labels
+    status_in_progress:'جاري', status_done:'مكتمل', status_receipt:'إيصال',
+    status_click_change:'انقر لتغيير الحالة', lbl_print_job_card:'طباعة بطاقة العمل',
+    lbl_update:'تحديث',
+    // Stage management modal
+    modal_manage_stages:'⚙️ إدارة حالات السيارة', tab_default_stages:'🔧 الحالات الافتراضية',
+    tab_templates:'📋 قوالب الخدمات', lbl_add_stage:'➕ إضافة حالة جديدة',
+    ph_stage_icon:'رمز 📌', ph_stage_label:'اسم الحالة',
+    tpl_hint:'اختر خدمة لتعديل مراحلها — تُطبَّق تلقائياً على السيارات الجديدة',
+    // Reports extra
+    rpt_invoices_count:'عدد الفواتير', rpt_avg_invoice:'متوسط الفاتورة',
+    rpt_items_count:'عدد البنود', rpt_avg_expense:'متوسط المصروف',
+    rpt_profit_lbl:'ربح', rpt_loss_lbl:'خسارة', rpt_requests:'طلب',
+    rpt_no_data:'لا توجد بيانات', rpt_total_cars:'إجمالي السيارات',
+    rpt_delivered:'تم تسليمها', rpt_in_workshop:'في الورشة',
   },
   en: {
     nav_dashboard:'Dashboard', nav_cars:'Cars in Workshop', nav_delivered:'Delivered Cars',
@@ -3345,6 +3395,56 @@ var LANG = {
     btn_send_wa:'📱 Open WhatsApp & Send',
     trk_total_cars:'Total Cars', trk_waiting:'Waiting',
     trk_in_progress:'In Progress', trk_ready:'Ready for Delivery',
+    // Nav
+    nav_closing:'Monthly Closing', nav_manage_stages:'Manage Stages',
+    // Monthly closing page
+    closing_page_title:'📅 Monthly Closing', closing_page_subtitle:'Track monthly revenue, expenses & profit',
+    btn_new_closing:'🔒 Close New Month', closing_current_month:'Current Month',
+    closing_live_data:'Live unarchived figures', closing_prev_pending:'⚠️ {m} closing not done yet',
+    closing_cars_received:'Cars Received', closing_revenue_lbl:'Revenue',
+    closing_expenses_lbl:'Expenses', closing_net_profit_lbl:'Net Profit',
+    closing_collected:'Collected Revenue', closing_no_data:'No monthly closings yet',
+    closing_no_data_hint:'Click "Close New Month" to start monthly tracking',
+    closing_closed_on:'Closed:', closing_by:'By:', closing_update_btn:'🔄 Update',
+    closing_details_btn:'Details', closing_update_title:'Update Figures',
+    closing_profit_pct:'% profit', closing_carry_note:'Were in workshop at closing — counted in this month',
+    modal_closing:'🔒 Close Month', closing_select_month:'Select month to close',
+    closing_summary_lbl:'Summary', closing_confirm_btn:'✅ Confirm Closing',
+    closing_cars_delivered:'Cars Delivered',
+    closing_carry_warning:'{n} cars not delivered — carried over & counted in this month',
+    closing_profit_margin:'Profit Margin', closing_details_title:'Closing Details',
+    closing_delivered_section:'Delivered Cars', closing_carryover_section:'Carry-over Cars',
+    closing_carryover_note:'Revenue counted in this month',
+    closing_expenses_section:'Monthly Expenses', closing_total_lbl:'Total',
+    closing_paid_so_far:'Paid So Far', closing_remaining_lbl:'Remaining:',
+    closing_no_delivered:'No delivered cars', closing_no_expenses:'No expenses',
+    closing_closed_info:'Closed on:', closing_update_link:'Update Figures',
+    // Photos
+    lbl_reception_photos:'📷 Reception Photos (optional)', lbl_add_photo_btn:'📷 Add Photo',
+    lbl_car_photos:'📷 Car Photos', lbl_photo_reception:'🔵 On Reception',
+    lbl_photo_delivery:'🟢 On Delivery', lbl_add_photo_sm:'➕ Photo',
+    // Job card button
+    btn_job_card:'📋 Job Card',
+    // Table empty states
+    empty_cars:'No cars found', empty_delivered:'No delivered cars',
+    empty_alerts:'No overdue cars', empty_orders:'No orders',
+    empty_services_tbl:'No services', empty_invoices:'No invoices',
+    empty_expenses_tbl:'No expenses',
+    // Status labels
+    status_in_progress:'In Progress', status_done:'Completed', status_receipt:'Receipt',
+    status_click_change:'Click to change stage', lbl_print_job_card:'Print Job Card',
+    lbl_update:'Update',
+    // Stage management modal
+    modal_manage_stages:'⚙️ Manage Car Stages', tab_default_stages:'🔧 Default Stages',
+    tab_templates:'📋 Service Templates', lbl_add_stage:'➕ Add New Stage',
+    ph_stage_icon:'Icon 📌', ph_stage_label:'Stage Name',
+    tpl_hint:'Select a service to edit its stages — applied automatically to new cars',
+    // Reports extra
+    rpt_invoices_count:'Invoices Count', rpt_avg_invoice:'Avg. Invoice',
+    rpt_items_count:'Items Count', rpt_avg_expense:'Avg. Expense',
+    rpt_profit_lbl:'Profit', rpt_loss_lbl:'Loss', rpt_requests:'Request',
+    rpt_no_data:'No data', rpt_total_cars:'Total Cars',
+    rpt_delivered:'Delivered', rpt_in_workshop:'In Workshop',
   }
 };
 function t(key) {
@@ -3361,6 +3461,11 @@ function setLang(lang) {
     var key = el.getAttribute('data-i18n');
     var val = t(key);
     if (val) el.textContent = val;
+  });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(function(el) {
+    var key = el.getAttribute('data-i18n-placeholder');
+    var val = t(key);
+    if (val) el.placeholder = val;
   });
   var btn = document.getElementById('lang-toggle-btn');
   if (btn) btn.textContent = lang === 'ar' ? '🌐 EN' : '🌐 عربي';
@@ -3625,33 +3730,33 @@ function previewClosingMonth(monthStr){
   const d = getMonthlyData(monthStr);
   const profColor = d.grossProfit>=0?'var(--success)':'var(--danger)';
   document.getElementById('closing-preview').innerHTML = `
-    <div style="font-weight:700;font-size:13px;margin-bottom:12px;color:var(--accent);">📊 ملخص ${monthLabel(monthStr)}</div>
+    <div style="font-weight:700;font-size:13px;margin-bottom:12px;color:var(--accent);">📊 ${t('closing_summary_lbl')} ${monthLabel(monthStr)}</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
       <div style="text-align:center;padding:10px;background:rgba(79,172,254,.08);border-radius:10px;">
         <div style="font-size:20px;font-weight:900;color:#4facfe;">${d.carsReceived}</div>
-        <div style="font-size:11px;color:var(--muted);">سيارة واردة</div>
+        <div style="font-size:11px;color:var(--muted);">${t('closing_cars_received')}</div>
       </div>
       <div style="text-align:center;padding:10px;background:rgba(0,212,170,.08);border-radius:10px;">
         <div style="font-size:20px;font-weight:900;color:var(--success);">${d.carsDelivered}</div>
-        <div style="font-size:11px;color:var(--muted);">سيارة مُسلَّمة</div>
+        <div style="font-size:11px;color:var(--muted);">${t('closing_cars_delivered')}</div>
       </div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px;">
       <div style="text-align:center;padding:8px;background:rgba(0,212,170,.06);border-radius:10px;">
         <div style="font-size:14px;font-weight:900;color:var(--success);">${fmt(d.totalPaid)}</div>
-        <div style="font-size:10px;color:var(--muted);">إيرادات محصلة</div>
+        <div style="font-size:10px;color:var(--muted);">${t('closing_collected')}</div>
       </div>
       <div style="text-align:center;padding:8px;background:rgba(233,69,96,.06);border-radius:10px;">
         <div style="font-size:14px;font-weight:900;color:var(--danger);">${fmt(d.totalExpenses)}</div>
-        <div style="font-size:10px;color:var(--muted);">مصاريف</div>
+        <div style="font-size:10px;color:var(--muted);">${t('closing_expenses_lbl')}</div>
       </div>
       <div style="text-align:center;padding:8px;background:rgba(0,0,0,.04);border-radius:10px;">
         <div style="font-size:14px;font-weight:900;color:${profColor};">${fmt(d.grossProfit)}</div>
-        <div style="font-size:10px;color:var(--muted);">صافي الربح</div>
+        <div style="font-size:10px;color:var(--muted);">${t('closing_net_profit_lbl')}</div>
       </div>
     </div>
     ${d.carsCarryOver>0?`<div style="padding:8px 12px;background:rgba(245,166,35,.1);border-radius:10px;font-size:12px;color:#f5a623;">
-      ⚠️ <strong>${d.carsCarryOver} سيارة</strong> لم تُسلَّم — ستُحوَّل للمتابعة وتُحسب ضمن هذا الشهر
+      ⚠️ ${t('closing_carry_warning').replace('{n}',d.carsCarryOver)}
     </div>`:''}`;
 }
 
@@ -3725,33 +3830,33 @@ function viewClosingDetails(id){
   const liveExpenses  = (mc.expenseIds||[]).map(eid=>state.expenses.find(e=>e.id===eid)).filter(Boolean);
   const profColor = mc.grossProfit>=0?'var(--success)':'var(--danger)';
 
-  document.getElementById('closing-details-title').textContent = `📅 تفاصيل — ${mc.monthLabel}`;
+  document.getElementById('closing-details-title').textContent = `📅 ${t('closing_details_title')} — ${mc.monthLabel}`;
   document.getElementById('closing-details-body').innerHTML = `
     <!-- Summary Cards -->
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px;">
       <div style="text-align:center;padding:12px;background:rgba(79,172,254,.08);border-radius:12px;">
         <div style="font-size:22px;font-weight:900;color:#4facfe;">${mc.carsReceived}</div>
-        <div style="font-size:11px;color:var(--muted);">سيارة واردة</div>
+        <div style="font-size:11px;color:var(--muted);">${t('closing_cars_received')}</div>
       </div>
       <div style="text-align:center;padding:12px;background:rgba(0,212,170,.08);border-radius:12px;">
         <div style="font-size:22px;font-weight:900;color:var(--success);">${fmt(mc.totalPaid)}</div>
-        <div style="font-size:11px;color:var(--muted);">إيرادات محصلة</div>
+        <div style="font-size:11px;color:var(--muted);">${t('closing_collected')}</div>
       </div>
       <div style="text-align:center;padding:12px;background:rgba(233,69,96,.08);border-radius:12px;">
         <div style="font-size:22px;font-weight:900;color:var(--danger);">${fmt(mc.totalExpenses)}</div>
-        <div style="font-size:11px;color:var(--muted);">مصاريف الشهر</div>
+        <div style="font-size:11px;color:var(--muted);">${t('closing_expenses_section')}</div>
       </div>
       <div style="text-align:center;padding:12px;background:rgba(0,0,0,.06);border-radius:12px;">
         <div style="font-size:22px;font-weight:900;color:${profColor};">${fmt(mc.grossProfit)}</div>
-        <div style="font-size:10px;color:${profColor};font-weight:700;">نسبة ${mc.profitMargin}%</div>
-        <div style="font-size:11px;color:var(--muted);">صافي الربح</div>
+        <div style="font-size:10px;color:${profColor};font-weight:700;">${mc.profitMargin}${t('closing_profit_pct')}</div>
+        <div style="font-size:11px;color:var(--muted);">${t('closing_net_profit_lbl')}</div>
       </div>
     </div>
 
     <!-- Profit Bar -->
     ${mc.totalPaid>0?`<div style="margin-bottom:20px;">
       <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:4px;">
-        <span>هامش الربح</span><span>${mc.profitMargin}%</span>
+        <span>${t('closing_profit_margin')}</span><span>${mc.profitMargin}%</span>
       </div>
       <div style="height:10px;background:rgba(233,69,96,.2);border-radius:6px;overflow:hidden;">
         <div style="height:100%;width:${Math.max(0,Math.min(100,mc.profitMargin))}%;background:${profColor};border-radius:6px;transition:width .5s;"></div>
@@ -3760,15 +3865,15 @@ function viewClosingDetails(id){
 
     <!-- Delivered Cars -->
     <div style="margin-bottom:16px;">
-      <div style="font-weight:700;font-size:13px;margin-bottom:8px;color:var(--success);">✅ السيارات المُسلَّمة (${liveDelivered.length})</div>
+      <div style="font-weight:700;font-size:13px;margin-bottom:8px;color:var(--success);">✅ ${t('closing_delivered_section')} (${liveDelivered.length})</div>
       ${liveDelivered.length?`<table style="width:100%;border-collapse:collapse;font-size:12px;">
         <thead><tr style="background:var(--bg);">
-          <th style="padding:6px 8px;text-align:right;">اللوحة</th>
-          <th style="padding:6px 8px;text-align:right;">المالك</th>
-          <th style="padding:6px 8px;text-align:right;">الخدمة</th>
-          <th style="padding:6px 8px;text-align:right;">التقدير</th>
-          <th style="padding:6px 8px;text-align:right;">المدفوع</th>
-          <th style="padding:6px 8px;text-align:right;">التسليم</th>
+          <th style="padding:6px 8px;text-align:right;">${t('th_plate')}</th>
+          <th style="padding:6px 8px;text-align:right;">${t('th_owner')}</th>
+          <th style="padding:6px 8px;text-align:right;">${t('th_service')}</th>
+          <th style="padding:6px 8px;text-align:right;">${t('lbl_estimate')}</th>
+          <th style="padding:6px 8px;text-align:right;">${t('th_paid')}</th>
+          <th style="padding:6px 8px;text-align:right;">${t('th_delivery_date')}</th>
         </tr></thead>
         <tbody>${liveDelivered.map(c=>`<tr style="border-bottom:1px solid var(--border);">
           <td style="padding:5px 8px;font-weight:700;">${c.plate}</td>
@@ -3778,20 +3883,20 @@ function viewClosingDetails(id){
           <td style="padding:5px 8px;color:var(--success);font-weight:700;">${fmt(c.paidTotal||0)}</td>
           <td style="padding:5px 8px;color:var(--muted);">${c.dateOut||'-'}</td>
         </tr>`).join('')}</tbody>
-      </table>`:'<div style="color:var(--muted);font-size:12px;padding:8px;">لا توجد سيارات مُسلَّمة</div>'}
+      </table>`:`<div style="color:var(--muted);font-size:12px;padding:8px;">${t('closing_no_delivered')}</div>`}
     </div>
 
     <!-- Carry-over Cars -->
     ${liveCarryOver.length?`<div style="margin-bottom:16px;">
-      <div style="font-weight:700;font-size:13px;margin-bottom:8px;color:#f5a623;">⏳ سيارات محولة للمتابعة (${liveCarryOver.length}) — إيراداتها محسوبة ضمن هذا الشهر</div>
+      <div style="font-weight:700;font-size:13px;margin-bottom:8px;color:#f5a623;">⏳ ${t('closing_carryover_section')} (${liveCarryOver.length}) — ${t('closing_carryover_note')}</div>
       <table style="width:100%;border-collapse:collapse;font-size:12px;">
         <thead><tr style="background:var(--bg);">
-          <th style="padding:6px 8px;text-align:right;">اللوحة</th>
-          <th style="padding:6px 8px;text-align:right;">المالك</th>
-          <th style="padding:6px 8px;text-align:right;">الخدمة</th>
-          <th style="padding:6px 8px;text-align:right;">التقدير</th>
-          <th style="padding:6px 8px;text-align:right;">المدفوع حتى الآن</th>
-          <th style="padding:6px 8px;text-align:right;">الحالة</th>
+          <th style="padding:6px 8px;text-align:right;">${t('th_plate')}</th>
+          <th style="padding:6px 8px;text-align:right;">${t('th_owner')}</th>
+          <th style="padding:6px 8px;text-align:right;">${t('th_service')}</th>
+          <th style="padding:6px 8px;text-align:right;">${t('lbl_estimate')}</th>
+          <th style="padding:6px 8px;text-align:right;">${t('closing_paid_so_far')}</th>
+          <th style="padding:6px 8px;text-align:right;">${t('th_status')}</th>
         </tr></thead>
         <tbody>${liveCarryOver.map(c=>{
           const carStages=getCarStages(c);
@@ -3801,7 +3906,7 @@ function viewClosingDetails(id){
             <td style="padding:5px 8px;">${c.owner}</td>
             <td style="padding:5px 8px;">${c.service||'-'}</td>
             <td style="padding:5px 8px;">${fmt(c.estimate||0)}</td>
-            <td style="padding:5px 8px;color:var(--success);font-weight:700;">${fmt(c.paidTotal||0)}<br><span style="font-size:10px;color:var(--danger);">متبقي: ${fmt((c.estimate||0)-(c.paidTotal||0))}</span></td>
+            <td style="padding:5px 8px;color:var(--success);font-weight:700;">${fmt(c.paidTotal||0)}<br><span style="font-size:10px;color:var(--danger);">${t('closing_remaining_lbl')} ${fmt((c.estimate||0)-(c.paidTotal||0))}</span></td>
             <td style="padding:5px 8px;font-size:11px;">${stageLabel}</td>
           </tr>`;}).join('')}
         </tbody>
@@ -3810,13 +3915,13 @@ function viewClosingDetails(id){
 
     <!-- Expenses -->
     <div>
-      <div style="font-weight:700;font-size:13px;margin-bottom:8px;color:var(--danger);">💸 مصاريف الشهر (${liveExpenses.length})</div>
+      <div style="font-weight:700;font-size:13px;margin-bottom:8px;color:var(--danger);">💸 ${t('closing_expenses_section')} (${liveExpenses.length})</div>
       ${liveExpenses.length?`<table style="width:100%;border-collapse:collapse;font-size:12px;">
         <thead><tr style="background:var(--bg);">
-          <th style="padding:6px 8px;text-align:right;">التاريخ</th>
-          <th style="padding:6px 8px;text-align:right;">البيان</th>
-          <th style="padding:6px 8px;text-align:right;">النوع</th>
-          <th style="padding:6px 8px;text-align:right;">المبلغ</th>
+          <th style="padding:6px 8px;text-align:right;">${t('th_date')}</th>
+          <th style="padding:6px 8px;text-align:right;">${t('th_statement')}</th>
+          <th style="padding:6px 8px;text-align:right;">${t('th_type')}</th>
+          <th style="padding:6px 8px;text-align:right;">${t('th_amount')}</th>
         </tr></thead>
         <tbody>${liveExpenses.map(e=>`<tr style="border-bottom:1px solid var(--border);">
           <td style="padding:5px 8px;">${e.date||'-'}</td>
@@ -3825,15 +3930,15 @@ function viewClosingDetails(id){
           <td style="padding:5px 8px;color:var(--danger);font-weight:700;">${fmt(e.amount)}</td>
         </tr>`).join('')}</tbody>
         <tfoot><tr style="background:var(--bg);">
-          <td colspan="3" style="padding:6px 8px;font-weight:700;text-align:right;">الإجمالي</td>
+          <td colspan="3" style="padding:6px 8px;font-weight:700;text-align:right;">${t('closing_total_lbl')}</td>
           <td style="padding:6px 8px;font-weight:900;color:var(--danger);">${fmt(mc.totalExpenses)}</td>
         </tr></tfoot>
-      </table>`:'<div style="color:var(--muted);font-size:12px;padding:8px;">لا توجد مصاريف</div>'}
+      </table>`:`<div style="color:var(--muted);font-size:12px;padding:8px;">${t('closing_no_expenses')}</div>`}
     </div>
 
     <div style="margin-top:16px;padding:10px 14px;background:var(--bg);border-radius:10px;font-size:11px;color:var(--muted);">
-      أُغلق في: ${mc.closedAt} &nbsp;|&nbsp; بواسطة: ${mc.closedBy}
-      &nbsp;|&nbsp; <a onclick="recalcClosing('${mc.id}');closeModal('modal-closing-details')" style="color:var(--accent);cursor:pointer;">🔄 تحديث الأرقام</a>
+      ${t('closing_closed_info')} ${mc.closedAt} &nbsp;|&nbsp; ${t('closing_by')} ${mc.closedBy}
+      &nbsp;|&nbsp; <a onclick="recalcClosing('${mc.id}');closeModal('modal-closing-details')" style="color:var(--accent);cursor:pointer;">🔄 ${t('closing_update_link')}</a>
     </div>`;
   openModal('modal-closing-details');
 }
@@ -3858,36 +3963,36 @@ function renderMonthlyClosing(){
     <div class="card" style="margin-bottom:16px;border:1px solid rgba(79,172,254,.25);">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;margin-bottom:14px;">
         <div>
-          <div style="font-weight:900;font-size:14px;">⏳ ${monthLabel(now)} — الشهر الحالي</div>
-          <div style="font-size:11px;color:var(--muted);margin-top:2px;">أرقام حية غير مُقفَلة</div>
+          <div style="font-weight:900;font-size:14px;">⏳ ${monthLabel(now)} — ${t('closing_current_month')}</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px;">${t('closing_live_data')}</div>
         </div>
         ${isAdmin&&!prevClosed?`<button onclick="openClosingModal()" style="background:rgba(233,69,96,.15);color:var(--danger);border:1px solid rgba(233,69,96,.3);border-radius:8px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;">
-          ⚠️ إغلاق ${monthLabel(prev)} لم يُنجز بعد
+          ${t('closing_prev_pending').replace('{m}',monthLabel(prev))}
         </button>`:''}
       </div>
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;">
         <div style="text-align:center;padding:10px;background:rgba(79,172,254,.07);border-radius:10px;">
           <div style="font-size:20px;font-weight:900;color:#4facfe;">${curData.carsReceived}</div>
-          <div style="font-size:10px;color:var(--muted);">سيارة واردة</div>
+          <div style="font-size:10px;color:var(--muted);">${t('closing_cars_received')}</div>
         </div>
         <div style="text-align:center;padding:10px;background:rgba(0,212,170,.07);border-radius:10px;">
           <div style="font-size:20px;font-weight:900;color:var(--success);">${fmt(curData.totalPaid)}</div>
-          <div style="font-size:10px;color:var(--muted);">إيرادات</div>
+          <div style="font-size:10px;color:var(--muted);">${t('closing_revenue_lbl')}</div>
         </div>
         <div style="text-align:center;padding:10px;background:rgba(233,69,96,.07);border-radius:10px;">
           <div style="font-size:20px;font-weight:900;color:var(--danger);">${fmt(curData.totalExpenses)}</div>
-          <div style="font-size:10px;color:var(--muted);">مصاريف</div>
+          <div style="font-size:10px;color:var(--muted);">${t('closing_expenses_lbl')}</div>
         </div>
         <div style="text-align:center;padding:10px;background:rgba(0,0,0,.04);border-radius:10px;">
           <div style="font-size:20px;font-weight:900;color:${profColor};">${fmt(curData.grossProfit)}</div>
-          <div style="font-size:10px;color:var(--muted);">صافي الربح</div>
+          <div style="font-size:10px;color:var(--muted);">${t('closing_net_profit_lbl')}</div>
         </div>
       </div>
     </div>`;
 
   // Closed months list
   if(!state.monthlyClosings.length){
-    cl.innerHTML = '<div class="empty-state"><div class="empty-icon">📅</div><p>لا توجد إغلاقات شهرية حتى الآن</p><p style="font-size:12px;color:var(--muted);">اضغط "إغلاق شهر جديد" لبدء التتبع الشهري</p></div>';
+    cl.innerHTML = `<div class="empty-state"><div class="empty-icon">📅</div><p>${t('closing_no_data')}</p><p style="font-size:12px;color:var(--muted);">${t('closing_no_data_hint')}</p></div>`;
     return;
   }
 
@@ -3898,30 +4003,30 @@ function renderMonthlyClosing(){
       <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;margin-bottom:14px;">
         <div>
           <div style="font-weight:900;font-size:14px;">✅ ${mc.monthLabel}</div>
-          <div style="font-size:11px;color:var(--muted);margin-top:2px;">أُغلق: ${mc.closedAt} | بواسطة: ${mc.closedBy}</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px;">${t('closing_closed_on')} ${mc.closedAt} | ${t('closing_by')} ${mc.closedBy}</div>
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;">
-          ${isAdmin?`<button onclick="recalcClosing('${mc.id}')" class="btn btn-outline btn-sm" title="تحديث الأرقام">🔄 تحديث</button>`:''}
-          <button onclick="viewClosingDetails('${mc.id}')" class="btn btn-primary btn-sm">التفاصيل</button>
+          ${isAdmin?`<button onclick="recalcClosing('${mc.id}')" class="btn btn-outline btn-sm" title="${t('closing_update_title')}">${t('closing_update_btn')}</button>`:''}
+          <button onclick="viewClosingDetails('${mc.id}')" class="btn btn-primary btn-sm">${t('closing_details_btn')}</button>
           ${isAdmin?`<button onclick="deleteClosing('${mc.id}')" class="btn btn-danger btn-sm">🗑️</button>`:''}
         </div>
       </div>
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px;">
         <div style="text-align:center;padding:10px;background:rgba(79,172,254,.07);border-radius:10px;">
           <div style="font-size:18px;font-weight:900;color:#4facfe;">${mc.carsReceived}</div>
-          <div style="font-size:10px;color:var(--muted);">سيارة واردة</div>
+          <div style="font-size:10px;color:var(--muted);">${t('closing_cars_received')}</div>
         </div>
         <div style="text-align:center;padding:10px;background:rgba(0,212,170,.07);border-radius:10px;">
           <div style="font-size:18px;font-weight:900;color:var(--success);">${fmt(mc.totalPaid)}</div>
-          <div style="font-size:10px;color:var(--muted);">إيرادات محصلة</div>
+          <div style="font-size:10px;color:var(--muted);">${t('closing_collected')}</div>
         </div>
         <div style="text-align:center;padding:10px;background:rgba(233,69,96,.07);border-radius:10px;">
           <div style="font-size:18px;font-weight:900;color:var(--danger);">${fmt(mc.totalExpenses)}</div>
-          <div style="font-size:10px;color:var(--muted);">مصاريف</div>
+          <div style="font-size:10px;color:var(--muted);">${t('closing_expenses_lbl')}</div>
         </div>
         <div style="text-align:center;padding:10px;background:rgba(0,0,0,.04);border-radius:10px;">
           <div style="font-size:18px;font-weight:900;color:${pc};">${fmt(mc.grossProfit)}</div>
-          <div style="font-size:10px;color:pc;">${mc.profitMargin}% ربح</div>
+          <div style="font-size:10px;color:${pc};">${mc.profitMargin}${t('closing_profit_pct')}</div>
         </div>
       </div>
       <!-- Profit Bar -->
@@ -3929,7 +4034,7 @@ function renderMonthlyClosing(){
         <div style="height:100%;width:${pct}%;background:${pc};border-radius:4px;"></div>
       </div>
       ${mc.carsCarryOver>0?`<div style="padding:6px 12px;background:rgba(245,166,35,.1);border-radius:8px;font-size:11px;color:#f5a623;">
-        ⏳ ${mc.carsCarryOver} سيارة كانت في الورشة عند الإغلاق — محسوبة ضمن هذا الشهر
+        ⏳ ${mc.carsCarryOver} ${t('closing_carry_note')}
       </div>`:''}
     </div>`;
   }).join('');
