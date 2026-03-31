@@ -1445,7 +1445,7 @@ document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click
 function addCar(){
   const plate=document.getElementById('car-plate').value.trim();
   const owner=document.getElementById('car-owner').value.trim();
-  if(!plate||!owner){alert('يرجى إدخال رقم اللوحة واسم المالك');return;}
+  if(!plate||!owner){alert(t('msg_plate_owner_req'));return;}
   const estimate=parseFloat(document.getElementById('car-estimate').value)||0;
   const deposit=parseFloat(document.getElementById('car-deposit').value)||0;
   const svcType=document.getElementById('car-service').value;
@@ -1689,10 +1689,10 @@ function addExpense(){
 }
 
 // DELETE
-function deleteCar(id){const _dc=getSession();if(!_dc||_dc.role!=='admin'){alert('🔒 حذف السيارات للمسؤول فقط');return;}if(!confirm('هل تريد حذف هذه السيارة؟'))return;state.cars=state.cars.filter(c=>c.id!==id);saveState();renderAll();}
-function deleteExpense(id){if(!confirm('حذف المصروف؟'))return;state.expenses=state.expenses.filter(e=>e.id!==id);saveState();renderAll();}
-function deleteService(id){if(!confirm('حذف الخدمة؟'))return;state.services=state.services.filter(s=>s.id!==id);saveState();renderAll();}
-function deleteOrder(id){if(!confirm('حذف الأمر؟'))return;state.orders=state.orders.filter(o=>o.id!==id);saveState();renderAll();}
+function deleteCar(id){const _dc=getSession();if(!_dc||_dc.role!=='admin'){alert(t('msg_admin_only_delete'));return;}if(!confirm(t('msg_confirm_delete_car')))return;state.cars=state.cars.filter(c=>c.id!==id);saveState();renderAll();}
+function deleteExpense(id){if(!confirm(t('msg_confirm_delete_expense')))return;state.expenses=state.expenses.filter(e=>e.id!==id);saveState();renderAll();}
+function deleteService(id){if(!confirm(t('msg_confirm_delete_service')))return;state.services=state.services.filter(s=>s.id!==id);saveState();renderAll();}
+function deleteOrder(id){if(!confirm(t('msg_confirm_delete_order')))return;state.orders=state.orders.filter(o=>o.id!==id);saveState();renderAll();}
 
 function saveAlertDays(){state.alertDays=parseInt(document.getElementById('alert-days').value)||3;saveState();renderAll();}
 
@@ -1708,7 +1708,7 @@ function loadAllPhotos() {
 }
 function saveAllPhotos(all) {
   try { localStorage.setItem(PHOTOS_KEY, JSON.stringify(all)); } catch(e) {
-    alert('مساحة التخزين ممتلئة. احذف بعض الصور القديمة.');
+    alert(t('msg_storage_full'));
   }
 }
 function getCarPhotos(carId) {
@@ -1801,7 +1801,7 @@ function openPhotoLightbox(carId, type, idx) {
 }
 
 function deleteCarPhoto(carId, type, idx) {
-  if (!confirm('حذف هذه الصورة؟')) return;
+  if (!confirm(t('msg_confirm_delete_photo'))) return;
   const photos = getCarPhotos(carId);
   photos[type].splice(idx, 1);
   setCarPhotos(carId, photos);
@@ -1814,7 +1814,7 @@ async function handleCarPhotos(input, type) {
   if (!carId) return;
   const photos = getCarPhotos(carId);
   for (const file of input.files) {
-    if (photos[type].length >= 6) { alert('الحد الأقصى 6 صور لكل قسم'); break; }
+    if (photos[type].length >= 6) { alert(t('msg_max_6_photos_section')); break; }
     const compressed = await compressImage(file);
     photos[type].push(compressed);
   }
@@ -1827,7 +1827,7 @@ async function handleCarPhotos(input, type) {
 async function handleAddCarPhotos(input) {
   const grid = document.getElementById('add-car-photo-grid');
   for (const file of input.files) {
-    if (_pendingPhotos.length >= 6) { alert('الحد الأقصى 6 صور'); break; }
+    if (_pendingPhotos.length >= 6) { alert(t('msg_max_6_photos')); break; }
     const compressed = await compressImage(file);
     _pendingPhotos.push(compressed);
   }
@@ -1905,8 +1905,8 @@ function saveTplStage(i){
 
 function deleteTplStage(i){
   const stages=state.stageTemplates[_currentTplService];
-  if(stages.length<=2){alert('الحد الأدنى مرحلتان');return;}
-  if(!confirm('حذف هذه المرحلة من القالب؟'))return;
+  if(stages.length<=2){alert(t('msg_min_2_stages'));return;}
+  if(!confirm(t('msg_confirm_delete_tpl_stage')))return;
   stages.splice(i,1);
   saveState();renderTplStageList();
 }
@@ -1915,7 +1915,7 @@ function addTplStage(){
   if(!_currentTplService)return;
   const icon=document.getElementById('tpl-new-icon').value.trim()||'🔹';
   const label=document.getElementById('tpl-new-label').value.trim();
-  if(!label){alert('أدخل اسم المرحلة');return;}
+  if(!label){alert(t('msg_stage_name_req'));return;}
   const stages=state.stageTemplates[_currentTplService];
   stages.splice(stages.length-1,0,{icon,label});
   saveState();
@@ -1937,7 +1937,7 @@ function renderStagesManageList(){
 function saveStage(i){
   const icon=document.getElementById('edit-icon-'+i).value.trim()||state.stages[i].icon;
   const label=document.getElementById('edit-label-'+i).value.trim();
-  if(!label){alert('أدخل اسم الحالة');return;}
+  if(!label){alert(t('msg_stage_name_req'));return;}
   state.stages[i]={icon,label};
   syncStageArrays();
   saveState();
@@ -1947,7 +1947,7 @@ function saveStage(i){
 function addStage(){
   const icon=document.getElementById('new-stage-icon').value.trim()||'🔹';
   const label=document.getElementById('new-stage-label').value.trim();
-  if(!label){alert('أدخل اسم الحالة');return;}
+  if(!label){alert(t('msg_stage_name_req'));return;}
   // Insert before last stage (تسليم)
   state.stages.splice(state.stages.length-1,0,{icon,label});
   syncStageArrays();
@@ -1958,8 +1958,8 @@ function addStage(){
   renderAll();
 }
 function deleteStage(i){
-  if(i===0||i===state.stages.length-1){alert('لا يمكن حذف الحالة الأولى أو الأخيرة');return;}
-  if(!confirm('حذف هذه الحالة؟ السيارات في هذه الحالة ستنتقل للحالة السابقة.'))return;
+  if(i===0||i===state.stages.length-1){alert('Cannot delete first or last stage');return;}
+  if(!confirm(t('msg_confirm_delete_stage')))return;
   // Shift cars that were at this stage or beyond
   state.cars.forEach(c=>{
     if(c.stage===i) c.stage=Math.max(0,i-1);
@@ -2654,7 +2654,7 @@ function sendWAById(carId) {
 
 function copyLink(url) {
   navigator.clipboard.writeText(url).then(() => {
-    alert('✅ تم نسخ الرابط!');
+    alert(t('msg_link_copied'));
   }).catch(() => {
     prompt('انسخ الرابط:', url);
   });
@@ -3337,6 +3337,30 @@ var LANG = {
     rpt_profit_lbl:'ربح', rpt_loss_lbl:'خسارة', rpt_requests:'طلب',
     rpt_no_data:'لا توجد بيانات', rpt_total_cars:'إجمالي السيارات',
     rpt_delivered:'تم تسليمها', rpt_in_workshop:'في الورشة',
+    // Alert & Confirmation messages
+    msg_plate_owner_req:'يرجى إدخال رقم اللوحة واسم المالك',
+    msg_admin_only_delete:'🔒 حذف السيارات للمسؤول فقط',
+    msg_confirm_delete_car:'هل تريد حذف هذه السيارة؟',
+    msg_confirm_delete_expense:'حذف المصروف؟',
+    msg_confirm_delete_service:'حذف الخدمة؟',
+    msg_confirm_delete_order:'حذف الأمر؟',
+    msg_storage_full:'مساحة التخزين ممتلئة. احذف بعض الصور القديمة.',
+    msg_confirm_delete_photo:'حذف هذه الصورة؟',
+    msg_max_6_photos_section:'الحد الأقصى 6 صور لكل قسم',
+    msg_max_6_photos:'الحد الأقصى 6 صور',
+    msg_min_2_stages:'الحد الأدنى مرحلتان',
+    msg_confirm_delete_tpl_stage:'حذف هذه المرحلة من القالب؟',
+    msg_stage_name_req:'أدخل اسم المرحلة',
+    msg_link_copied:'✅ تم نسخ الرابط!',
+    msg_confirm_logout:'هل تريد تسجيل الخروج؟',
+    msg_confirm_delete_user:'حذف المستخدم @{user}؟',
+    msg_admin_only:'🔒 للمسؤول فقط',
+    msg_month_already_closed:'هذا الشهر مغلق بالفعل',
+    msg_confirm_delete_closing:'هل تريد حذف هذا الإغلاق نهائياً؟',
+    msg_confirm_delete_stage:'حذف هذه الحالة؟ السيارات في هذه الحالة ستنتقل للحالة السابقة.',
+    msg_all_fields_req:'يرجى ملء جميع الحقول',
+    role_admin:'👑 مسؤول', role_worker:'👷 عامل',
+    lbl_current_account:'الحساب الحالي', btn_delete:'حذف',
   },
   en: {
     nav_dashboard:'Dashboard', nav_cars:'Cars in Workshop', nav_delivered:'Delivered Cars',
@@ -3467,6 +3491,30 @@ var LANG = {
     rpt_profit_lbl:'Profit', rpt_loss_lbl:'Loss', rpt_requests:'Request',
     rpt_no_data:'No data', rpt_total_cars:'Total Cars',
     rpt_delivered:'Delivered', rpt_in_workshop:'In Workshop',
+    // Alert & Confirmation messages
+    msg_plate_owner_req:'Please enter plate number and owner name',
+    msg_admin_only_delete:'🔒 Only admin can delete cars',
+    msg_confirm_delete_car:'Delete this car?',
+    msg_confirm_delete_expense:'Delete expense?',
+    msg_confirm_delete_service:'Delete service?',
+    msg_confirm_delete_order:'Delete order?',
+    msg_storage_full:'Storage is full. Delete some old photos.',
+    msg_confirm_delete_photo:'Delete this photo?',
+    msg_max_6_photos_section:'Maximum 6 photos per section',
+    msg_max_6_photos:'Maximum 6 photos',
+    msg_min_2_stages:'Minimum 2 stages',
+    msg_confirm_delete_tpl_stage:'Delete this stage from template?',
+    msg_stage_name_req:'Enter stage name',
+    msg_link_copied:'✅ Link copied!',
+    msg_confirm_logout:'Log out?',
+    msg_confirm_delete_user:'Delete user @{user}?',
+    msg_admin_only:'🔒 Admin only',
+    msg_month_already_closed:'This month is already closed',
+    msg_confirm_delete_closing:'Delete this closing permanently?',
+    msg_confirm_delete_stage:'Delete this stage? Cars in this stage will move to previous stage.',
+    msg_all_fields_req:'Please fill all fields',
+    role_admin:'👑 Admin', role_worker:'👷 Worker',
+    lbl_current_account:'Current Account', btn_delete:'Delete',
   }
 };
 function t(key) {
@@ -3554,7 +3602,7 @@ function doLogin() {
 
 // ── Logout ───────────────────────────────────────────────────────────
 function logout() {
-  if (!confirm('هل تريد تسجيل الخروج؟')) return;
+  if (!confirm(t('msg_confirm_logout'))) return;
   clearSession();
   document.getElementById('auth-username').value = '';
   document.getElementById('auth-password').value = '';
@@ -3620,7 +3668,7 @@ function openUsersModal() {
 
 function renderUsersList() {
   const users = getUsers();
-  const roleLabel = r => r === 'admin' ? '<span style="color:#e94560;font-weight:700;">👑 مسؤول</span>' : '<span style="color:#4facfe;font-weight:700;">👷 عامل</span>';
+  const roleLabel = r => r === 'admin' ? `<span style="color:#e94560;font-weight:700;">${t('role_admin')}</span>` : `<span style="color:#4facfe;font-weight:700;">${t('role_worker')}</span>`;
   document.getElementById('users-list').innerHTML = users.map((u, i) => `
     <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:10px;margin-bottom:8px;">
       <div>
@@ -3628,8 +3676,8 @@ function renderUsersList() {
         <div style="font-size:11px;margin-top:2px;">${roleLabel(u.role)}</div>
       </div>
       ${u.username !== getSession()?.username
-        ? `<button onclick="deleteUser(${i})" style="background:rgba(233,69,96,.15);border:1px solid rgba(233,69,96,.25);color:#e94560;border-radius:8px;padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer;">حذف</button>`
-        : '<span style="font-size:11px;color:var(--muted);">الحساب الحالي</span>'}
+        ? `<button onclick="deleteUser(${i})" style="background:rgba(233,69,96,.15);border:1px solid rgba(233,69,96,.25);color:#e94560;border-radius:8px;padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer;" data-i18n="btn_delete">حذف</button>`
+        : `<span style="font-size:11px;color:var(--muted);">${t('lbl_current_account')}</span>`}
     </div>`).join('');
 }
 
@@ -3640,7 +3688,7 @@ function saveUser() {
   const msgEl    = document.getElementById('user-save-msg');
 
   if (!username || !password) {
-    msgEl.innerHTML = '<span style="color:#e94560;">⚠️ يرجى ملء جميع الحقول</span>'; return;
+    msgEl.innerHTML = `<span style="color:#e94560;">⚠️ ${t('msg_all_fields_req')}</span>`; return;
   }
   const users = getUsers();
   const existing = users.findIndex(u => u.username === username);
@@ -3658,7 +3706,7 @@ function saveUser() {
 
 function deleteUser(idx) {
   const users = getUsers();
-  if (!confirm(`حذف المستخدم @${users[idx].username}؟`)) return;
+  if (!confirm(t('msg_confirm_delete_user').replace('{user}',users[idx].username))) return;
   users.splice(idx, 1);
   saveUsers(users);
   renderUsersList();
@@ -3722,7 +3770,7 @@ function getMonthlyData(monthStr){
 let _pendingCloseMonth = null;
 function openClosingModal(){
   const session = getSession();
-  if(!session||session.role!=='admin'){alert('🔒 للمسؤول فقط');return;}
+  if(!session||session.role!=='admin'){alert(t('msg_admin_only'));return;}
   const now     = monthYM();
   const prev    = prevMonthYM(now);
   // اقترح إغلاق الشهر السابق افتراضياً إذا لم يُغلق
@@ -3794,7 +3842,7 @@ function confirmClosingNow(){
   const monthStr = _pendingCloseMonth;
   if(!monthStr) return;
   if(state.monthlyClosings.find(mc=>mc.month===monthStr)){
-    alert('هذا الشهر مغلق بالفعل');
+    alert(t('msg_month_already_closed'));
     closeModal('modal-closing');
     return;
   }
@@ -3844,7 +3892,7 @@ function recalcClosing(id){
 }
 
 function deleteClosing(id){
-  if(!confirm('هل تريد حذف هذا الإغلاق نهائياً؟')) return;
+  if(!confirm(t('msg_confirm_delete_closing'))) return;
   state.monthlyClosings = state.monthlyClosings.filter(mc=>mc.id!==id);
   saveState(); renderAll();
 }
