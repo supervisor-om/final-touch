@@ -126,6 +126,15 @@ textarea{resize:vertical;min-height:70px;}
 .car-tpl-btn:hover{background:rgba(245,166,35,.2);border-color:#f5a623;}
 .day-btn{padding:4px 10px;border:1px solid rgba(0,212,170,.3);background:rgba(0,212,170,.07);color:#00d4aa;border-radius:8px;font-family:var(--font-main);font-size:11px;font-weight:700;cursor:pointer;transition:all .2s;}
 .day-btn:hover{background:rgba(0,212,170,.2);}
+.pay-method-btn{padding:7px 14px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.05);color:var(--muted);border-radius:20px;font-family:var(--font-main);font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;}
+.pay-method-btn:hover{background:rgba(255,255,255,.1);}
+.pay-method-btn.active{border-color:var(--success);background:rgba(0,212,170,.15);color:var(--success);}
+.pay-method-btn.active[id="pm-bank"]{border-color:#4facfe;background:rgba(79,172,254,.15);color:#4facfe;}
+.pay-method-btn.active[id="pm-mixed"]{border-color:#f5a623;background:rgba(245,166,35,.15);color:#f5a623;}
+.pay-method-btn.active[id="pm-unpaid"]{border-color:var(--danger);background:rgba(233,69,96,.15);color:var(--danger);}
+.badge-debt{background:rgba(233,69,96,.2);color:#e94560;border:1px solid rgba(233,69,96,.4);border-radius:12px;padding:2px 8px;font-size:10px;font-weight:700;}
+.filter-del-btn{padding:5px 12px;border-radius:20px;border:1px solid rgba(255,255,255,.15);background:transparent;color:var(--muted);font-family:var(--font-main);font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;}
+.filter-del-btn.active,.filter-del-btn:hover{background:rgba(79,172,254,.15);border-color:#4facfe;color:#4facfe;}
 #customer-suggestions .sugg-item{padding:10px 14px;cursor:pointer;font-size:13px;border-bottom:1px solid rgba(255,255,255,.06);transition:background .15s;}
 #customer-suggestions .sugg-item:hover{background:rgba(255,255,255,.07);}
 #customer-suggestions .sugg-item:last-child{border-bottom:none;}
@@ -768,12 +777,51 @@ label{font-size:14px;}
   <!-- DELIVERED -->
   <div class="page" id="page-delivered">
     <div class="card">
-      <div class="card-header"><div class="card-title"><span data-i18n="card_delivered">✅ السيارات المُسلَّمة</span> (<span id="delivered-count">0</span>)</div></div>
+      <div class="card-header" style="flex-wrap:wrap;gap:10px;">
+        <div class="card-title"><span data-i18n="card_delivered">✅ السيارات المُسلَّمة</span> (<span id="delivered-count">0</span>)</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;" id="delivered-filters">
+          <button class="filter-del-btn active" onclick="setDeliveredFilter('all',this)" data-i18n="filter_all">الكل</button>
+          <button class="filter-del-btn" onclick="setDeliveredFilter('unpaid',this)">⚠️ <span data-i18n="filter_unpaid">مديونية</span></button>
+          <button class="filter-del-btn" onclick="setDeliveredFilter('cash',this)">💵 <span data-i18n="pm_cash">كاش</span></button>
+          <button class="filter-del-btn" onclick="setDeliveredFilter('bank',this)">🏦 <span data-i18n="pm_bank">تحويل بنكي</span></button>
+          <button class="filter-del-btn" onclick="setDeliveredFilter('mixed',this)">🔀 <span data-i18n="pm_mixed">مختلط</span></button>
+        </div>
+      </div>
       <div class="card-body" style="padding:0;">
         <div class="table-wrap">
-          <table><thead><tr><th data-i18n="th_plate">اللوحة</th><th data-i18n="th_owner">المالك</th><th data-i18n="th_car">السيارة</th><th data-i18n="th_service">الخدمة</th><th data-i18n="th_amount">المبلغ</th><th data-i18n="th_paid">المدفوع</th><th data-i18n="th_entry_date">تاريخ الدخول</th><th data-i18n="th_delivery_date">تاريخ التسليم</th><th data-i18n="th_days">الأيام</th><th data-i18n="th_actions">إجراءات</th></tr></thead>
+          <table><thead><tr><th data-i18n="th_plate">اللوحة</th><th data-i18n="th_owner">المالك</th><th data-i18n="th_car">السيارة</th><th data-i18n="th_service">الخدمة</th><th data-i18n="th_amount">المبلغ</th><th data-i18n="th_paid">المدفوع</th><th data-i18n="th_payment_method">الدفع</th><th data-i18n="th_entry_date">تاريخ الدخول</th><th data-i18n="th_delivery_date">تاريخ التسليم</th><th data-i18n="th_days">الأيام</th><th data-i18n="th_actions">إجراءات</th></tr></thead>
           <tbody id="delivered-table-body"></tbody></table>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Pay Modal -->
+  <div class="modal-overlay" id="modal-quick-pay">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title" data-i18n="modal_quick_pay">💳 تسجيل دفعة</div>
+        <button class="modal-close" onclick="closeModal('modal-quick-pay')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div id="quick-pay-info" style="padding:12px;background:rgba(255,255,255,.04);border-radius:10px;margin-bottom:16px;font-size:13px;"></div>
+        <div class="form-group">
+          <label data-i18n="lbl_new_payment">💰 مبلغ الدفعة الجديدة (ر.ع)</label>
+          <input type="number" id="quick-pay-amount" placeholder="0.000" step="0.001" oninput="calcQuickPay()">
+        </div>
+        <div style="margin-bottom:12px;">
+          <div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:8px;" data-i18n="lbl_payment_method">💳 طريقة الدفع</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button type="button" id="qp-cash" onclick="setQPMethod('cash')" class="pay-method-btn active">💵 <span data-i18n="pm_cash">كاش</span></button>
+            <button type="button" id="qp-bank" onclick="setQPMethod('bank')" class="pay-method-btn">🏦 <span data-i18n="pm_bank">تحويل بنكي</span></button>
+            <button type="button" id="qp-mixed" onclick="setQPMethod('mixed')" class="pay-method-btn">🔀 <span data-i18n="pm_mixed">مختلط</span></button>
+          </div>
+        </div>
+        <div id="quick-pay-preview" style="padding:10px 14px;background:rgba(0,212,170,.07);border-radius:10px;font-size:13px;display:none;"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal('modal-quick-pay')" data-i18n="btn_cancel">إلغاء</button>
+        <button class="btn btn-success" onclick="confirmQuickPay()" data-i18n="btn_save_payment">✓ تسجيل الدفعة</button>
       </div>
     </div>
   </div>
@@ -1146,6 +1194,16 @@ label{font-size:14px;}
           <div class="form-group"><label data-i18n="lbl_total_amount_omr">المبلغ الكلي (ر.ع)</label><input type="number" id="update-amount" placeholder="0.000" step="0.001" oninput="calcRemaining()"></div>
           <div class="form-group"><label data-i18n="lbl_paid_so_far">المدفوع حتى الآن (ر.ع)</label><input type="number" id="update-paid" placeholder="0.000" step="0.001" oninput="calcRemaining()"></div>
         </div>
+        <!-- Payment Method -->
+        <div style="margin-bottom:12px;">
+          <div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:8px;" data-i18n="lbl_payment_method">💳 طريقة الدفع</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button type="button" id="pm-cash" onclick="setPaymentMethod('cash')" class="pay-method-btn active">💵 <span data-i18n="pm_cash">كاش</span></button>
+            <button type="button" id="pm-bank" onclick="setPaymentMethod('bank')" class="pay-method-btn">🏦 <span data-i18n="pm_bank">تحويل بنكي</span></button>
+            <button type="button" id="pm-mixed" onclick="setPaymentMethod('mixed')" class="pay-method-btn">🔀 <span data-i18n="pm_mixed">مختلط</span></button>
+            <button type="button" id="pm-unpaid" onclick="setPaymentMethod('unpaid')" class="pay-method-btn">⚠️ <span data-i18n="pm_unpaid">بدون دفع</span></button>
+          </div>
+        </div>
         <div class="payment-box" id="payment-preview">
           <div class="payment-row"><span data-i18n="pay_total">المبلغ الكلي</span><span id="pp-total">0.000 ر.ع</span></div>
           <div class="payment-row paid"><span data-i18n="pay_paid">✅ المدفوع</span><span id="pp-paid">0.000 ر.ع</span></div>
@@ -1486,6 +1544,7 @@ function editCar(id){
   if(paySection)paySection.style.display=isAdmin?'':'none';
   const stageBtns=document.getElementById('stage-buttons-row');
   if(stageBtns)stageBtns.style.display='flex';
+  setPaymentMethod(car.paymentMethod||'cash');
   updateStageUI();calcRemaining();
   openModal('modal-update-car');
   // تحميل صور السيارة (محلي أولاً، ثم من السحابة)
@@ -1563,6 +1622,80 @@ function calcRemaining(){
   document.getElementById('pp-status').textContent=rem<=0?t('lbl_fully_paid'):`${t('lbl_remaining_payment')} ${rem.toFixed(3)} ر.ع`;
   document.getElementById('pp-status').style.color=rem<=0?'var(--success)':'var(--danger)';
 }
+function setPaymentMethod(method){
+  ['cash','bank','mixed','unpaid'].forEach(m=>{
+    const btn=document.getElementById('pm-'+m);
+    if(btn) btn.classList.toggle('active', m===method);
+  });
+}
+// Payment method icon helper
+function pmIcon(method){
+  return {cash:'💵',bank:'🏦',mixed:'🔀',unpaid:'⚠️'}[method]||'💵';
+}
+function pmLabel(method){
+  return {cash:t('pm_cash'),bank:t('pm_bank'),mixed:t('pm_mixed'),unpaid:t('pm_unpaid')}[method]||t('pm_cash');
+}
+// Delivered table filter state
+var _deliveredFilter='all';
+function setDeliveredFilter(f,btn){
+  _deliveredFilter=f;
+  document.querySelectorAll('.filter-del-btn').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  renderDeliveredTable();
+}
+// Quick Pay
+var _qpCarId=null, _qpMethod='cash';
+function openQuickPay(carId){
+  _qpCarId=carId;_qpMethod='cash';
+  const car=state.cars.find(c=>c.id===carId);
+  if(!car)return;
+  const rem=Math.max(0,(car.estimate||0)-(car.paidTotal||0));
+  document.getElementById('quick-pay-info').innerHTML=`
+    <div style="font-weight:700;">${car.plate} — ${car.owner}</div>
+    <div style="color:var(--muted);font-size:12px;margin-top:4px;">${car.service||''}</div>
+    <div style="margin-top:8px;display:flex;gap:16px;">
+      <span>${t('pay_total')}: <strong>${fmt(car.estimate||0)}</strong></span>
+      <span style="color:var(--success);">${t('pay_paid')}: <strong>${fmt(car.paidTotal||0)}</strong></span>
+      <span style="color:var(--danger);">${t('pay_remaining')}: <strong>${fmt(rem)}</strong></span>
+    </div>`;
+  document.getElementById('quick-pay-amount').value='';
+  document.getElementById('quick-pay-preview').style.display='none';
+  ['cash','bank','mixed'].forEach(m=>{
+    const btn=document.getElementById('qp-'+m);
+    if(btn) btn.classList.toggle('active',m==='cash');
+  });
+  openModal('modal-quick-pay');
+}
+function setQPMethod(m){
+  _qpMethod=m;
+  ['cash','bank','mixed'].forEach(x=>{
+    const btn=document.getElementById('qp-'+x);
+    if(btn) btn.classList.toggle('active',x===m);
+  });
+}
+function calcQuickPay(){
+  const car=state.cars.find(c=>c.id===_qpCarId);if(!car)return;
+  const amount=parseFloat(document.getElementById('quick-pay-amount').value)||0;
+  const newTotal=Math.min(car.estimate||0,(car.paidTotal||0)+amount);
+  const rem=Math.max(0,(car.estimate||0)-newTotal);
+  const prev=document.getElementById('quick-pay-preview');
+  if(amount>0){
+    prev.style.display='block';
+    prev.innerHTML=`${t('pay_paid')}: <strong style="color:var(--success);">${fmt(newTotal)}</strong> &nbsp;|&nbsp; ${t('pay_remaining')}: <strong style="color:${rem>0?'var(--danger)':'var(--success)'};">${fmt(rem)}</strong>${rem<=0?' ✅ '+t('lbl_fully_paid'):''}`;
+  } else { prev.style.display='none'; }
+}
+function confirmQuickPay(){
+  const car=state.cars.find(c=>c.id===_qpCarId);if(!car)return;
+  const amount=parseFloat(document.getElementById('quick-pay-amount').value)||0;
+  if(amount<=0){alert(t('msg_enter_amount'));return;}
+  car.paidTotal=Math.min(car.estimate||0,(car.paidTotal||0)+amount);
+  car.paymentMethod=_qpMethod;
+  // Update invoice if exists
+  const inv=state.invoices.find(i=>i.carId===car.id);
+  if(inv){inv.paid=car.paidTotal;inv.paymentMethod=_qpMethod;}
+  saveState();closeModal('modal-quick-pay');renderAll();
+  showSyncBanner('ok','✅ '+t('msg_payment_saved'));
+}
 function updateCar(){
   const car=state.cars.find(c=>c.id===state.currentEditCar);
   if(!car)return;
@@ -1571,6 +1704,7 @@ function updateCar(){
   car.status=statusFromStage(currentStage,getCarStages(car));
   car.estimate=parseFloat(document.getElementById('update-amount').value)||0;
   car.paidTotal=parseFloat(document.getElementById('update-paid').value)||0;
+  car.paymentMethod=document.querySelector('.pay-method-btn.active')?.id?.replace('pm-','')||'cash';
   car.notes=document.getElementById('update-notes').value;
   const newPhone=document.getElementById('update-phone').value.trim();
   if(newPhone) car.phone=newPhone;
@@ -1578,7 +1712,7 @@ function updateCar(){
   car.expectedDate=document.getElementById('update-expected-date').value||car.expectedDate||'';
   if(car.status==='delivered'&&!car.dateOut){
     car.dateOut=today();
-    const inv={id:state.invoiceCounter++,carId:car.id,owner:car.owner,plate:car.plate,model:car.model,service:car.service,amount:car.estimate,deposit:car.deposit||0,paid:car.paidTotal,date:today(),notes:car.notes};
+    const inv={id:state.invoiceCounter++,carId:car.id,owner:car.owner,plate:car.plate,model:car.model,service:car.service,amount:car.estimate,deposit:car.deposit||0,paid:car.paidTotal,date:today(),notes:car.notes,paymentMethod:car.paymentMethod};
     state.invoices.push(inv);
   }
   saveState();closeModal('modal-update-car');renderAll();
@@ -1608,6 +1742,7 @@ function generateReceipt(invId){
       <div class="receipt-row"><span>السيارة</span><span><strong>${inv.model||'—'}</strong></span></div>
       <div class="receipt-row"><span>نوع الخدمة</span><span><strong>${inv.service}</strong></span></div>
       ${inv.notes?`<div class="receipt-row"><span>الأعمال المنجزة</span><span style="max-width:180px;text-align:left;font-size:11px;">${inv.notes}</span></div>`:''}
+      ${inv.paymentMethod?`<div class="receipt-row"><span>طريقة الدفع</span><span>${pmIcon(inv.paymentMethod)} ${pmLabel(inv.paymentMethod)}</span></div>`:''}
       <div class="receipt-row"><span>المبلغ الكلي</span><span>${parseFloat(inv.amount).toFixed(3)} ر.ع</span></div>
       <div class="receipt-row paid"><span>✅ المدفوع</span><span>${parseFloat(inv.paid||0).toFixed(3)} ر.ع</span></div>
       ${remaining>0?`<div class="receipt-row remaining"><span>⏳ المتبقي</span><span>${remaining.toFixed(3)} ر.ع</span></div>`:''}
@@ -2069,25 +2204,39 @@ function renderCarsTable(){
 function renderDeliveredTable(){
   const session=getSession();
   const isAdmin=session&&session.role==='admin';
-  const delivered=state.cars.filter(c=>c.status==='delivered');
-  document.getElementById('delivered-count').textContent=delivered.length;
+  const allDelivered=state.cars.filter(c=>c.status==='delivered');
+  document.getElementById('delivered-count').textContent=allDelivered.length;
+  // Apply filter
+  let delivered=allDelivered;
+  if(_deliveredFilter==='unpaid') delivered=allDelivered.filter(c=>Math.max(0,(c.estimate||0)-(c.paidTotal||0))>0);
+  else if(_deliveredFilter==='cash') delivered=allDelivered.filter(c=>(c.paymentMethod||'cash')==='cash');
+  else if(_deliveredFilter==='bank') delivered=allDelivered.filter(c=>c.paymentMethod==='bank');
+  else if(_deliveredFilter==='mixed') delivered=allDelivered.filter(c=>c.paymentMethod==='mixed');
   const tbody=document.getElementById('delivered-table-body');
-  if(!delivered.length){tbody.innerHTML=`<tr><td colspan="10"><div class="empty-state"><div class="empty-icon">✅</div><p>${t('empty_delivered')}</p></div></td></tr>`;return;}
+  if(!delivered.length){tbody.innerHTML=`<tr><td colspan="11"><div class="empty-state"><div class="empty-icon">✅</div><p>${t('empty_delivered')}</p></div></td></tr>`;return;}
   tbody.innerHTML=delivered.map(c=>{
     const inv=state.invoices.find(i=>i.carId===c.id);
     const days=c.dateOut&&c.dateIn?Math.floor((new Date(c.dateOut)-new Date(c.dateIn))/(1000*60*60*24)):0;
-    return`<tr>
+    const rem=Math.max(0,(c.estimate||0)-(c.paidTotal||0));
+    const hasDebt=rem>0;
+    const pm=c.paymentMethod||'cash';
+    return`<tr${hasDebt?' style="background:rgba(233,69,96,.04);"':''}>
       <td><strong>${c.plate}</strong></td><td>${c.owner}</td><td>${c.model||'—'}</td>
       <td>${serviceBadge(c.service)}</td>
       <td><strong style="color:var(--gold);">${(c.estimate||0).toFixed(3)} ر.ع</strong></td>
-      <td style="color:var(--success);">${(c.paidTotal||0).toFixed(3)} ر.ع</td>
+      <td>${hasDebt
+        ?`<div style="color:var(--success);font-size:12px;">${(c.paidTotal||0).toFixed(3)} ر.ع</div><span class="badge-debt">⚠️ ${rem.toFixed(3)} ر.ع</span>`
+        :`<span style="color:var(--success);">${(c.paidTotal||0).toFixed(3)} ر.ع</span>`
+      }</td>
+      <td title="${pmLabel(pm)}" style="font-size:16px;text-align:center;">${pmIcon(pm)}</td>
       <td>${formatDate(c.dateIn)}</td><td>${formatDate(c.dateOut)}</td>
       <td>${days} ${t('lbl_days_unit')}</td>
       <td><div style="display:flex;gap:5px;flex-wrap:wrap;">
         ${inv?`<button class="btn btn-outline btn-sm" onclick="generateReceipt(${inv.id})">🧾 ${t('status_receipt')}</button>`:''}
+        ${isAdmin&&hasDebt?`<button class="btn btn-success btn-sm" onclick="openQuickPay('${c.id}')">💳 ${t('btn_add_payment')}</button>`:''}
         ${isAdmin?`<button class="btn btn-primary btn-sm" onclick="editCar('${c.id}')">✏️</button>`:''}
         ${isAdmin?`<button class="btn btn-danger btn-sm" onclick="deleteCar('${c.id}')">🗑️</button>`:''}
-        ${!inv&&!isAdmin?'—':''}
+        ${!inv&&!isAdmin&&!hasDebt?'—':''}
       </div></td>
     </tr>`;
   }).join('');
@@ -3388,6 +3537,17 @@ var LANG = {
     lbl_username:'اسم المستخدم', ph_username:'مثال: ahmed',
     lbl_password:'كلمة المرور', lbl_role:'الصلاحية',
     btn_save_user:'💾 حفظ',
+    // Payment method & debt tracking
+    lbl_payment_method:'💳 طريقة الدفع',
+    pm_cash:'كاش', pm_bank:'تحويل بنكي', pm_mixed:'مختلط', pm_unpaid:'بدون دفع',
+    modal_quick_pay:'💳 تسجيل دفعة',
+    lbl_new_payment:'💰 مبلغ الدفعة الجديدة (ر.ع)',
+    btn_save_payment:'✓ تسجيل الدفعة',
+    btn_add_payment:'💳 دفعة',
+    filter_all:'الكل', filter_unpaid:'مديونية',
+    th_payment_method:'الدفع',
+    msg_enter_amount:'أدخل مبلغ الدفعة',
+    msg_payment_saved:'✅ تم تسجيل الدفعة',
   },
   en: {
     nav_dashboard:'Dashboard', nav_cars:'Cars in Workshop', nav_delivered:'Delivered Cars',
@@ -3562,6 +3722,17 @@ var LANG = {
     lbl_username:'Username', ph_username:'Example: ahmed',
     lbl_password:'Password', lbl_role:'Role',
     btn_save_user:'💾 Save',
+    // Payment method & debt tracking
+    lbl_payment_method:'💳 Payment Method',
+    pm_cash:'Cash', pm_bank:'Bank Transfer', pm_mixed:'Mixed', pm_unpaid:'Unpaid',
+    modal_quick_pay:'💳 Record Payment',
+    lbl_new_payment:'💰 New Payment Amount (OMR)',
+    btn_save_payment:'✓ Record Payment',
+    btn_add_payment:'💳 Pay',
+    filter_all:'All', filter_unpaid:'Debt',
+    th_payment_method:'Payment',
+    msg_enter_amount:'Enter payment amount',
+    msg_payment_saved:'✅ Payment recorded',
   }
 };
 function t(key) {
