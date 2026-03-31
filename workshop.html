@@ -789,7 +789,7 @@ label{font-size:14px;}
       </div>
       <div class="card-body" style="padding:0;">
         <div class="table-wrap">
-          <table><thead><tr><th data-i18n="th_plate">اللوحة</th><th data-i18n="th_owner">المالك</th><th data-i18n="th_car">السيارة</th><th data-i18n="th_service">الخدمة</th><th data-i18n="th_amount">المبلغ</th><th data-i18n="th_paid">المدفوع</th><th data-i18n="th_payment_method">الدفع</th><th data-i18n="th_entry_date">تاريخ الدخول</th><th data-i18n="th_delivery_date">تاريخ التسليم</th><th data-i18n="th_days">الأيام</th><th data-i18n="th_actions">إجراءات</th></tr></thead>
+          <table><thead id="delivered-table-head"></thead>
           <tbody id="delivered-table-body"></tbody></table>
         </div>
       </div>
@@ -2212,22 +2212,32 @@ function renderDeliveredTable(){
   else if(_deliveredFilter==='cash') delivered=allDelivered.filter(c=>(c.paymentMethod||'cash')==='cash');
   else if(_deliveredFilter==='bank') delivered=allDelivered.filter(c=>c.paymentMethod==='bank');
   else if(_deliveredFilter==='mixed') delivered=allDelivered.filter(c=>c.paymentMethod==='mixed');
+  // Build header based on role
+  const thead=document.getElementById('delivered-table-head');
+  if(isAdmin){
+    thead.innerHTML=`<tr><th>${t('th_plate')}</th><th>${t('th_owner')}</th><th>${t('th_car')}</th><th>${t('th_service')}</th><th>${t('th_amount')}</th><th>${t('th_paid')}</th><th>${t('th_payment_method')}</th><th>${t('th_entry_date')}</th><th>${t('th_delivery_date')}</th><th>${t('th_days')}</th><th>${t('th_actions')}</th></tr>`;
+  } else {
+    thead.innerHTML=`<tr><th>${t('th_plate')}</th><th>${t('th_owner')}</th><th>${t('th_car')}</th><th>${t('th_service')}</th><th>${t('lbl_fault_desc')}</th><th>${t('th_payment_method')}</th><th>${t('th_entry_date')}</th><th>${t('th_delivery_date')}</th><th>${t('th_days')}</th><th>${t('th_actions')}</th></tr>`;
+  }
   const tbody=document.getElementById('delivered-table-body');
-  if(!delivered.length){tbody.innerHTML=`<tr><td colspan="11"><div class="empty-state"><div class="empty-icon">✅</div><p>${t('empty_delivered')}</p></div></td></tr>`;return;}
+  const emptyColspan=isAdmin?11:10;
+  if(!delivered.length){tbody.innerHTML=`<tr><td colspan="${emptyColspan}"><div class="empty-state"><div class="empty-icon">✅</div><p>${t('empty_delivered')}</p></div></td></tr>`;return;}
   tbody.innerHTML=delivered.map(c=>{
     const inv=state.invoices.find(i=>i.carId===c.id);
     const days=c.dateOut&&c.dateIn?Math.floor((new Date(c.dateOut)-new Date(c.dateIn))/(1000*60*60*24)):0;
     const rem=Math.max(0,(c.estimate||0)-(c.paidTotal||0));
     const hasDebt=rem>0;
     const pm=c.paymentMethod||'cash';
-    return`<tr${hasDebt?' style="background:rgba(233,69,96,.04);"':''}>
+    const faultDesc=c.notes||c.faultDesc||'—';
+    return`<tr${hasDebt&&isAdmin?' style="background:rgba(233,69,96,.04);"':''}>
       <td><strong>${c.plate}</strong></td><td>${c.owner}</td><td>${c.model||'—'}</td>
       <td>${serviceBadge(c.service)}</td>
+      ${isAdmin?`
       <td><strong style="color:var(--gold);">${(c.estimate||0).toFixed(3)} ر.ع</strong></td>
       <td>${hasDebt
         ?`<div style="color:var(--success);font-size:12px;">${(c.paidTotal||0).toFixed(3)} ر.ع</div><span class="badge-debt">⚠️ ${rem.toFixed(3)} ر.ع</span>`
         :`<span style="color:var(--success);">${(c.paidTotal||0).toFixed(3)} ر.ع</span>`
-      }</td>
+      }</td>`:`<td style="font-size:12px;max-width:160px;">${faultDesc}</td>`}
       <td title="${pmLabel(pm)}" style="font-size:16px;text-align:center;">${pmIcon(pm)}</td>
       <td>${formatDate(c.dateIn)}</td><td>${formatDate(c.dateOut)}</td>
       <td>${days} ${t('lbl_days_unit')}</td>
@@ -2236,7 +2246,7 @@ function renderDeliveredTable(){
         ${isAdmin&&hasDebt?`<button class="btn btn-success btn-sm" onclick="openQuickPay('${c.id}')">💳 ${t('btn_add_payment')}</button>`:''}
         ${isAdmin?`<button class="btn btn-primary btn-sm" onclick="editCar('${c.id}')">✏️</button>`:''}
         ${isAdmin?`<button class="btn btn-danger btn-sm" onclick="deleteCar('${c.id}')">🗑️</button>`:''}
-        ${!inv&&!isAdmin&&!hasDebt?'—':''}
+        ${!inv&&!isAdmin?'—':''}
       </div></td>
     </tr>`;
   }).join('');
