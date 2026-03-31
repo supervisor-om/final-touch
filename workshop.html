@@ -1076,8 +1076,8 @@ label{font-size:14px;}
         </button>
         <div id="optional-fields" style="display:none;margin-top:10px;">
           <div class="form-grid">
-            <div class="form-group"><label data-i18n="lbl_km">الكيلومترات</label><input type="number" id="car-km" placeholder="مثال: 85000"></div>
-            <div class="form-group full"><label data-i18n="lbl_fault_desc">وصف العطل / المطلوب</label><textarea id="car-notes" placeholder="تفاصيل العطل أو الخدمة المطلوبة..."></textarea></div>
+            <div class="form-group"><label data-i18n="lbl_km">الكيلومترات</label><input type="number" id="car-km" data-i18n-placeholder="ph_km" placeholder="مثال: 85000"></div>
+            <div class="form-group full"><label data-i18n="lbl_fault_desc">وصف العطل / المطلوب</label><textarea id="car-notes" data-i18n-placeholder="ph_notes" placeholder="تفاصيل العطل أو الخدمة المطلوبة..."></textarea></div>
           </div>
         </div>
         <!-- Hidden inputs so addCar() still works when optional is collapsed -->
@@ -1124,7 +1124,7 @@ label{font-size:14px;}
             <div style="font-size:11px;font-weight:700;color:#4facfe;margin-bottom:6px;" data-i18n="lbl_photo_reception">🔵 عند الاستلام</div>
             <div id="photo-grid-reception" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px;"></div>
             <label style="display:inline-flex;align-items:center;gap:5px;background:rgba(79,172,254,.1);border:1px dashed rgba(79,172,254,.4);color:#4facfe;border-radius:8px;padding:6px 12px;font-size:11px;font-weight:700;cursor:pointer;">
-              ➕ صورة
+              <span data-i18n="lbl_add_photo_sm">➕ صورة</span>
               <input type="file" accept="image/*" multiple style="display:none;" onchange="handleCarPhotos(this,'reception')">
             </label>
           </div>
@@ -1132,7 +1132,7 @@ label{font-size:14px;}
             <div style="font-size:11px;font-weight:700;color:#00d4aa;margin-bottom:6px;" data-i18n="lbl_photo_delivery">🟢 عند التسليم</div>
             <div id="photo-grid-delivery" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px;"></div>
             <label style="display:inline-flex;align-items:center;gap:5px;background:rgba(0,212,170,.1);border:1px dashed rgba(0,212,170,.4);color:#00d4aa;border-radius:8px;padding:6px 12px;font-size:11px;font-weight:700;cursor:pointer;">
-              ➕ صورة
+              <span data-i18n="lbl_add_photo_sm">➕ صورة</span>
               <input type="file" accept="image/*" multiple style="display:none;" onchange="handleCarPhotos(this,'delivery')">
             </label>
           </div>
@@ -1157,9 +1157,9 @@ label{font-size:14px;}
         <label data-i18n="lbl_expected_del_date">📅 تاريخ التسليم المتوقع</label>
         <input type="date" id="update-expected-date">
       </div>
-      <div class="form-group"><label data-i18n="lbl_repair_notes">ملاحظات الإصلاح</label><textarea id="update-notes" placeholder="تفاصيل الأعمال المنجزة..."></textarea></div>
-      <div class="form-group"><label>📞 رقم هاتف العميل</label><input type="text" id="update-phone" placeholder="مثال: 96812345678 أو 91234567"><div style="font-size:11px;color:#8892a4;margin-top:3px;">أدخل الرقم كاملاً مع كود الدولة (عُمان: 968XXXXXXXX)</div></div>
-      <div class="form-group"><label style="color:#25d366;">📱 مفتاح WhatsApp (CallMeBot)</label><input type="text" id="update-wakey" placeholder="أدخل API Key من CallMeBot لإرسال إشعارات تلقائية" style="direction:ltr;font-family:monospace;font-size:12px;"><div style="font-size:11px;color:var(--muted);margin-top:4px;">اطلب من العميل إرسال "I allow callmebot to send me messages" لـ +34 644 597 364 على واتساب</div></div>
+      <div class="form-group"><label data-i18n="lbl_repair_notes">ملاحظات الإصلاح</label><textarea id="update-notes" data-i18n-placeholder="ph_repair_notes" placeholder="تفاصيل الأعمال المنجزة..."></textarea></div>
+      <div class="form-group"><label data-i18n="lbl_phone_update">📞 رقم هاتف العميل</label><input type="text" id="update-phone" data-i18n-placeholder="ph_phone" placeholder="مثال: 96812345678 أو 91234567"><div style="font-size:11px;color:#8892a4;margin-top:3px;" data-i18n="hint_phone_update">أدخل الرقم كاملاً مع كود الدولة (عُمان: 968XXXXXXXX)</div></div>
+      <div class="form-group"><label style="color:#25d366;" data-i18n="lbl_wakey">📱 مفتاح WhatsApp (CallMeBot)</label><input type="text" id="update-wakey" data-i18n-placeholder="ph_wakey" placeholder="أدخل API Key من CallMeBot" style="direction:ltr;font-family:monospace;font-size:12px;"><div style="font-size:11px;color:var(--muted);margin-top:4px;" data-i18n="hint_wakey">اطلب من العميل إرسال "I allow callmebot to send me messages" لـ +34 644 597 364 على واتساب</div></div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-outline" onclick="closeModal('modal-update-car')" data-i18n="btn_cancel">إلغاء</button>
@@ -1190,18 +1190,18 @@ label{font-size:14px;}
         <div class="form-group"><label data-i18n="lbl_car_select">السيارة</label><select id="order-car"></select></div>
         <div class="form-group"><label data-i18n="lbl_work_type_lbl">نوع العمل</label>
           <select id="order-type">
-            <option value="صيانة ميكانيكية">صيانة ميكانيكية</option>
-            <option value="سمكرة">سمكرة وهيكل</option>
-            <option value="دهان">دهان وتلميع</option>
-            <option value="كهرباء">كهرباء ودوائر</option>
-            <option value="تكييف">نظام التكييف</option>
-            <option value="إطارات">إطارات وفرامل</option>
-            <option value="زيت">تغيير زيت وفلاتر</option>
+            <option value="صيانة ميكانيكية" data-i18n="ord_mech">صيانة ميكانيكية</option>
+            <option value="سمكرة" data-i18n="ord_body">سمكرة وهيكل</option>
+            <option value="دهان" data-i18n="ord_paint">دهان وتلميع</option>
+            <option value="كهرباء" data-i18n="ord_elec">كهرباء ودوائر</option>
+            <option value="تكييف" data-i18n="ord_ac">نظام التكييف</option>
+            <option value="إطارات" data-i18n="ord_tires">إطارات وفرامل</option>
+            <option value="زيت" data-i18n="ord_oil">تغيير زيت وفلاتر</option>
           </select>
         </div>
-        <div class="form-group"><label data-i18n="lbl_technician_lbl">الفني المسؤول</label><input type="text" id="order-tech" list="workers-datalist" placeholder="اختر أو اكتب اسم الفني" autocomplete="off"></div>
+        <div class="form-group"><label data-i18n="lbl_technician_lbl">الفني المسؤول</label><input type="text" id="order-tech" list="workers-datalist" data-i18n-placeholder="ph_order_tech" placeholder="اختر أو اكتب اسم الفني" autocomplete="off"></div>
         <div class="form-group"><label data-i18n="lbl_cost_omr">التكلفة (ر.ع)</label><input type="number" id="order-cost" placeholder="0.000" step="0.001"></div>
-        <div class="form-group full"><label data-i18n="lbl_work_desc">وصف العمل</label><textarea id="order-desc" placeholder="تفاصيل العمل..."></textarea></div>
+        <div class="form-group full"><label data-i18n="lbl_work_desc">وصف العمل</label><textarea id="order-desc" data-i18n-placeholder="ph_work_desc" placeholder="تفاصيل العمل..."></textarea></div>
       </div>
     </div>
     <div class="modal-footer">
@@ -2067,6 +2067,8 @@ function renderCarsTable(){
 }
 
 function renderDeliveredTable(){
+  const session=getSession();
+  const isAdmin=session&&session.role==='admin';
   const delivered=state.cars.filter(c=>c.status==='delivered');
   document.getElementById('delivered-count').textContent=delivered.length;
   const tbody=document.getElementById('delivered-table-body');
@@ -2081,7 +2083,12 @@ function renderDeliveredTable(){
       <td style="color:var(--success);">${(c.paidTotal||0).toFixed(3)} ر.ع</td>
       <td>${formatDate(c.dateIn)}</td><td>${formatDate(c.dateOut)}</td>
       <td>${days} ${t('lbl_days_unit')}</td>
-      <td>${inv?`<button class="btn btn-outline btn-sm" onclick="generateReceipt(${inv.id})">🧾 ${t('status_receipt')}</button>`:'—'}</td>
+      <td><div style="display:flex;gap:5px;flex-wrap:wrap;">
+        ${inv?`<button class="btn btn-outline btn-sm" onclick="generateReceipt(${inv.id})">🧾 ${t('status_receipt')}</button>`:''}
+        ${isAdmin?`<button class="btn btn-primary btn-sm" onclick="editCar('${c.id}')">✏️</button>`:''}
+        ${isAdmin?`<button class="btn btn-danger btn-sm" onclick="deleteCar('${c.id}')">🗑️</button>`:''}
+        ${!inv&&!isAdmin?'—':''}
+      </div></td>
     </tr>`;
   }).join('');
 }
@@ -3259,6 +3266,14 @@ var LANG = {
     ph_phone:'مثال: 96812345678',
     ph_model:'مثال: Toyota Camry 2022',
     hint_phone_intl:'أدخل الرقم كاملاً مع كود الدولة للإشعارات (عُمان: 968XXXXXXXX)',
+    ph_km:'مثال: 85000', ph_notes:'تفاصيل العطل أو الخدمة المطلوبة...',
+    ph_repair_notes:'تفاصيل الأعمال المنجزة...',
+    lbl_phone_update:'📞 رقم هاتف العميل', hint_phone_update:'أدخل الرقم كاملاً مع كود الدولة (عُمان: 968XXXXXXXX)',
+    lbl_wakey:'📱 مفتاح WhatsApp (CallMeBot)', ph_wakey:'أدخل API Key من CallMeBot',
+    hint_wakey:'اطلب من العميل إرسال "I allow callmebot to send me messages" لـ +34 644 597 364 على واتساب',
+    ph_order_tech:'اختر أو اكتب اسم الفني', ph_work_desc:'تفاصيل العمل...',
+    ord_mech:'صيانة ميكانيكية', ord_body:'سمكرة وهيكل', ord_paint:'دهان وتلميع',
+    ord_elec:'كهرباء ودوائر', ord_ac:'نظام التكييف', ord_tires:'إطارات وفرامل', ord_oil:'تغيير زيت وفلاتر',
     lbl_estimate:'المبلغ التقديري (ر.ع)', lbl_deposit_adv:'💰 الدفعة المقدمة (ر.ع)',
     lbl_extra_details:'تفاصيل إضافية (اختياري)', lbl_km:'الكيلومترات',
     lbl_fault_desc:'وصف العطل / المطلوب',
@@ -3425,6 +3440,14 @@ var LANG = {
     ph_phone:'e.g., 96812345678',
     ph_model:'e.g., Toyota Camry 2022',
     hint_phone_intl:'Enter full number with country code for notifications (Oman: 968XXXXXXXX)',
+    ph_km:'e.g., 85000', ph_notes:'Fault details or required service...',
+    ph_repair_notes:'Details of work completed...',
+    lbl_phone_update:'📞 Customer Phone', hint_phone_update:'Enter full number with country code (Oman: 968XXXXXXXX)',
+    lbl_wakey:'📱 WhatsApp Key (CallMeBot)', ph_wakey:'Enter API Key from CallMeBot',
+    hint_wakey:'Ask the customer to send "I allow callmebot to send me messages" to +34 644 597 364 on WhatsApp',
+    ph_order_tech:'Choose or enter technician name', ph_work_desc:'Work details...',
+    ord_mech:'Mechanical Maintenance', ord_body:'Body Work', ord_paint:'Paint & Polish',
+    ord_elec:'Electrical & Circuits', ord_ac:'AC System', ord_tires:'Tires & Brakes', ord_oil:'Oil & Filter Change',
     lbl_estimate:'Estimated Amount (OMR)', lbl_deposit_adv:'💰 Advance Payment (OMR)',
     lbl_extra_details:'Extra Details (optional)', lbl_km:'Kilometers',
     lbl_fault_desc:'Fault Description / Required',
