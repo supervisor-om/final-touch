@@ -1416,7 +1416,7 @@ function showPage(id){
     if(_sess && _sess.role!=='admin' && ADMIN_PAGES_SET.indexOf(id)!==-1){
       var b=document.createElement('div');
       b.style.cssText='position:fixed;top:80px;left:50%;transform:translateX(-50%);background:rgba(233,69,96,.9);color:#fff;padding:12px 24px;border-radius:12px;font-weight:700;font-size:13px;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,.4);';
-      b.textContent='🔒 هذه الصفحة للمسؤول فقط';
+      b.textContent=t('msg_admin_page_only');
       document.body.appendChild(b);setTimeout(function(){b.remove();},2500);
       return;
     }
@@ -1560,7 +1560,7 @@ function calcRemaining(){
   document.getElementById('pp-total').textContent=total.toFixed(3)+' ر.ع';
   document.getElementById('pp-paid').textContent=paid.toFixed(3)+' ر.ع';
   document.getElementById('pp-remaining').textContent=rem.toFixed(3)+' ر.ع';
-  document.getElementById('pp-status').textContent=rem<=0?'✅ مدفوع بالكامل':`⏳ متبقي ${rem.toFixed(3)} ر.ع`;
+  document.getElementById('pp-status').textContent=rem<=0?t('lbl_fully_paid'):`${t('lbl_remaining_payment')} ${rem.toFixed(3)} ر.ع`;
   document.getElementById('pp-status').style.color=rem<=0?'var(--success)':'var(--danger)';
 }
 function updateCar(){
@@ -1649,7 +1649,7 @@ function addService(){
   document.getElementById('svc-edit-id').value='';
   ['svc-name','svc-price','svc-desc'].forEach(id=>{document.getElementById(id).value='';});
   document.getElementById('svc-type').value='صيانة';
-  document.getElementById('modal-add-service').querySelector('.modal-title').textContent='🛠️ إضافة خدمة';
+  document.getElementById('modal-add-service').querySelector('.modal-title').textContent=t('modal_add_service');
   openModal('modal-add-service');
 }
 function editService(id){
@@ -1659,7 +1659,7 @@ function editService(id){
   document.getElementById('svc-type').value=s.type;
   document.getElementById('svc-price').value=s.price;
   document.getElementById('svc-desc').value=s.desc||'';
-  document.getElementById('modal-add-service').querySelector('.modal-title').textContent='✏️ تعديل الخدمة';
+  document.getElementById('modal-add-service').querySelector('.modal-title').textContent=t('modal_edit_service');
   openModal('modal-add-service');
 }
 function saveService(){
@@ -3361,6 +3361,9 @@ var LANG = {
     msg_all_fields_req:'يرجى ملء جميع الحقول',
     role_admin:'👑 مسؤول', role_worker:'👷 عامل',
     lbl_current_account:'الحساب الحالي', btn_delete:'حذف',
+    msg_admin_page_only:'🔒 هذه الصفحة للمسؤول فقط',
+    lbl_fully_paid:'✅ مدفوع بالكامل', lbl_remaining_payment:'⏳ متبقي',
+    modal_add_service:'🛠️ إضافة خدمة', modal_edit_service:'✏️ تعديل الخدمة',
   },
   en: {
     nav_dashboard:'Dashboard', nav_cars:'Cars in Workshop', nav_delivered:'Delivered Cars',
@@ -3515,6 +3518,9 @@ var LANG = {
     msg_all_fields_req:'Please fill all fields',
     role_admin:'👑 Admin', role_worker:'👷 Worker',
     lbl_current_account:'Current Account', btn_delete:'Delete',
+    msg_admin_page_only:'🔒 This page is for admin only',
+    lbl_fully_paid:'✅ Fully Paid', lbl_remaining_payment:'⏳ Remaining',
+    modal_add_service:'🛠️ Add Service', modal_edit_service:'✏️ Edit Service',
   }
 };
 function t(key) {
