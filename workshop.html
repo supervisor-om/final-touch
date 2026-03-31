@@ -588,22 +588,22 @@ label{font-size:14px;}
   <div class="auth-box">
     <div class="auth-logo">
       <img id="auth-logo-img" src="" alt="logo" style="width:120px;height:120px;object-fit:contain;display:block;margin:0 auto 8px;filter:drop-shadow(0 4px 20px rgba(233,69,96,.5));">
-      <div class="auth-logo-title">اللمسة الأخيرة</div>
+      <div class="auth-logo-title" data-i18n="auth_app_name">اللمسة الأخيرة</div>
       <div class="auth-logo-sub">THE FINAL TOUCH</div>
     </div>
-    <div class="auth-title">🔐 تسجيل الدخول</div>
+    <div class="auth-title" data-i18n="auth_title">🔐 تسجيل الدخول</div>
     <div class="auth-field">
-      <label>اسم المستخدم</label>
-      <input type="text" id="auth-username" placeholder="أدخل اسم المستخدم" autocomplete="username"
+      <label data-i18n="auth_username_lbl">اسم المستخدم</label>
+      <input type="text" id="auth-username" data-i18n-placeholder="auth_username_ph" placeholder="أدخل اسم المستخدم" autocomplete="username"
         onkeydown="if(event.key==='Enter')document.getElementById('auth-password').focus()">
     </div>
     <div class="auth-field">
-      <label>كلمة المرور</label>
-      <input type="password" id="auth-password" placeholder="أدخل كلمة المرور" autocomplete="current-password"
+      <label data-i18n="auth_password_lbl">كلمة المرور</label>
+      <input type="password" id="auth-password" data-i18n-placeholder="auth_password_ph" placeholder="أدخل كلمة المرور" autocomplete="current-password"
         onkeydown="if(event.key==='Enter')doLogin()">
     </div>
-    <button class="auth-btn" onclick="doLogin()">دخول</button>
-    <div class="auth-error" id="auth-error">❌ اسم المستخدم أو كلمة المرور غير صحيحة</div>
+    <button class="auth-btn" data-i18n="btn_login" onclick="doLogin()">دخول</button>
+    <div class="auth-error" id="auth-error" data-i18n="auth_error_msg">❌ اسم المستخدم أو كلمة المرور غير صحيحة</div>
   </div>
 </div>
 <!-- ═══════════════════════════════════════════════════════════ -->
@@ -618,25 +618,25 @@ label{font-size:14px;}
     <div class="modal-body">
       <div id="users-list" style="margin-bottom:20px;"></div>
       <div style="border-top:1px solid var(--border);padding-top:16px;">
-        <div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:12px;">➕ إضافة / تعديل مستخدم</div>
+        <div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:12px;" data-i18n="modal_add_edit_user">➕ إضافة / تعديل مستخدم</div>
         <div class="form-grid">
           <div class="form-group">
-            <label>اسم المستخدم</label>
-            <input type="text" id="new-username" placeholder="مثال: ahmed">
+            <label data-i18n="lbl_username">اسم المستخدم</label>
+            <input type="text" id="new-username" data-i18n-placeholder="ph_username" placeholder="مثال: ahmed">
           </div>
           <div class="form-group">
-            <label>كلمة المرور</label>
+            <label data-i18n="lbl_password">كلمة المرور</label>
             <input type="password" id="new-password" placeholder="كلمة المرور">
           </div>
           <div class="form-group">
-            <label>الصلاحية</label>
+            <label data-i18n="lbl_role">الصلاحية</label>
             <select id="new-role">
               <option value="worker">👷 عامل</option>
               <option value="admin">👑 مسؤول</option>
             </select>
           </div>
           <div class="form-group" style="align-self:flex-end;">
-            <button class="btn btn-success" onclick="saveUser()" style="width:100%;">💾 حفظ</button>
+            <button class="btn btn-success" onclick="saveUser()" style="width:100%;" data-i18n="btn_save_user">💾 حفظ</button>
           </div>
         </div>
         <div id="user-save-msg" style="font-size:12px;margin-top:8px;"></div>
@@ -3364,6 +3364,15 @@ var LANG = {
     msg_admin_page_only:'🔒 هذه الصفحة للمسؤول فقط',
     lbl_fully_paid:'✅ مدفوع بالكامل', lbl_remaining_payment:'⏳ متبقي',
     modal_add_service:'🛠️ إضافة خدمة', modal_edit_service:'✏️ تعديل الخدمة',
+    // Auth page
+    auth_title:'🔐 تسجيل الدخول', auth_app_name:'اللمسة الأخيرة',
+    auth_username_lbl:'اسم المستخدم', auth_username_ph:'أدخل اسم المستخدم',
+    auth_password_lbl:'كلمة المرور', auth_password_ph:'أدخل كلمة المرور',
+    btn_login:'دخول', auth_error_msg:'❌ اسم المستخدم أو كلمة المرور غير صحيحة',
+    modal_add_edit_user:'➕ إضافة / تعديل مستخدم',
+    lbl_username:'اسم المستخدم', ph_username:'مثال: ahmed',
+    lbl_password:'كلمة المرور', lbl_role:'الصلاحية',
+    btn_save_user:'💾 حفظ',
   },
   en: {
     nav_dashboard:'Dashboard', nav_cars:'Cars in Workshop', nav_delivered:'Delivered Cars',
@@ -3521,6 +3530,15 @@ var LANG = {
     msg_admin_page_only:'🔒 This page is for admin only',
     lbl_fully_paid:'✅ Fully Paid', lbl_remaining_payment:'⏳ Remaining',
     modal_add_service:'🛠️ Add Service', modal_edit_service:'✏️ Edit Service',
+    // Auth page
+    auth_title:'🔐 Login', auth_app_name:'The Final Touch',
+    auth_username_lbl:'Username', auth_username_ph:'Enter username',
+    auth_password_lbl:'Password', auth_password_ph:'Enter password',
+    btn_login:'Login', auth_error_msg:'❌ Invalid username or password',
+    modal_add_edit_user:'➕ Add / Edit User',
+    lbl_username:'Username', ph_username:'Example: ahmed',
+    lbl_password:'Password', lbl_role:'Role',
+    btn_save_user:'💾 Save',
   }
 };
 function t(key) {
