@@ -1410,6 +1410,7 @@ let state = {
   jobCardCounter:75,
   monthlyClosings:[],
   alertDays:3,
+  serviceTypes:['صيانة','سمكرة','دهان','كهرباء','أخرى'],
   stages:[
     {icon:'📋',label:'استلام'},
     {icon:'🔍',label:'تشخيص'},
@@ -1447,7 +1448,7 @@ function loadState(){
   try{const s=localStorage.getItem('finaltouchv2');if(s){const p=JSON.parse(s);state={...state,...p};
     if(!state.stages||!state.stages.length)state.stages=[{icon:'📋',label:'استلام'},{icon:'🔍',label:'تشخيص'},{icon:'🔧',label:'إصلاح'},{icon:'🎨',label:'دهان'},{icon:'✅',label:'جاهزة للتسليم'},{icon:'📦',label:'تسليم'}];
     if(!state.stageTemplates)state.stageTemplates={};
-    if(!state.serviceTypes)state.serviceTypes=[];
+    if(!state.serviceTypes||!state.serviceTypes.length)state.serviceTypes=['صيانة','سمكرة','دهان','كهرباء','أخرى'];
   }}catch(e){}
 }
 function saveState(){localStorage.setItem('finaltouchv2',JSON.stringify(state));}
@@ -1788,29 +1789,51 @@ function addOrder(){
 
 // ADD SERVICE
 // ── Service Types ─────────────────────────────────────────────────────
-var _defaultServiceTypes=['صيانة','سمكرة','دهان','كهرباء','أخرى'];
 function getAllServiceTypes(){
-  return [..._defaultServiceTypes,...(state.serviceTypes||[])];
+  return state.serviceTypes||[];
 }
 function populateSvcTypeSelect(selectedVal){
   const sel=document.getElementById('svc-type');
   if(!sel)return;
   const types=getAllServiceTypes();
-  sel.innerHTML=types.map(tp=>`<option value="${tp}"${tp===(selectedVal||'صيانة')?' selected':''}>${tp}</option>`).join('');
+  const def=selectedVal||(types[0]||'');
+  sel.innerHTML=types.map(tp=>`<option value="${tp}"${tp===def?' selected':''}>${tp}</option>`).join('');
 }
 function renderCustomTypesList(){
   const list=document.getElementById('custom-types-list');
   if(!list)return;
-  const custom=state.serviceTypes||[];
-  if(!custom.length){
-    list.innerHTML=`<span style="font-size:11px;color:var(--muted);">—</span>`;
-    return;
+  const types=getAllServiceTypes();
+  if(!types.length){list.innerHTML=`<span style="font-size:11px;color:var(--muted);">—</span>`;return;}
+  list.innerHTML=types.map((tp,i)=>`
+    <div style="display:flex;align-items:center;gap:5px;padding:5px 8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:8px;margin-bottom:5px;">
+      <span id="type-lbl-${i}" style="flex:1;font-size:13px;">${tp}</span>
+      <input id="type-inp-${i}" value="${tp}" style="display:none;flex:1;padding:3px 7px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.25);border-radius:6px;color:#fff;font-family:var(--font-main);font-size:12px;" onkeydown="if(event.key==='Enter')confirmEditType(${i})">
+      <button type="button" id="type-edit-btn-${i}" onclick="startEditType(${i})" style="background:none;border:none;cursor:pointer;font-size:13px;color:var(--muted);padding:2px 4px;">✏️</button>
+      <button type="button" id="type-save-btn-${i}" onclick="confirmEditType(${i})" style="display:none;background:none;border:none;cursor:pointer;font-size:13px;color:var(--success);padding:2px 4px;font-weight:700;">✓</button>
+      <button type="button" onclick="deleteServiceType(${i})" style="background:none;border:none;cursor:pointer;font-size:13px;color:var(--danger);padding:2px 4px;">✕</button>
+    </div>`).join('');
+}
+function startEditType(i){
+  document.getElementById('type-lbl-'+i).style.display='none';
+  document.getElementById('type-edit-btn-'+i).style.display='none';
+  document.getElementById('type-inp-'+i).style.display='';
+  document.getElementById('type-save-btn-'+i).style.display='';
+  document.getElementById('type-inp-'+i).focus();
+}
+function confirmEditType(i){
+  const inp=document.getElementById('type-inp-'+i);
+  const newName=inp.value.trim();
+  if(!newName)return;
+  const oldName=state.serviceTypes[i];
+  if(newName!==oldName){
+    if(state.serviceTypes.filter((_,j)=>j!==i).includes(newName))return;
+    state.serviceTypes[i]=newName;
+    state.services.forEach(s=>{if(s.type===oldName)s.type=newName;});
+    const curSel=document.getElementById('svc-type')?.value;
+    populateSvcTypeSelect(curSel===oldName?newName:curSel);
+    saveState();
   }
-  list.innerHTML=custom.map(tp=>`
-    <span style="display:inline-flex;align-items:center;gap:4px;padding:3px 8px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:20px;font-size:12px;">
-      ${tp}
-      <button type="button" onclick="deleteServiceType('${tp}')" style="background:none;border:none;color:var(--danger);cursor:pointer;font-size:11px;padding:0 2px;line-height:1;">✕</button>
-    </span>`).join('');
+  renderCustomTypesList();
 }
 function toggleAddTypeForm(){
   const panel=document.getElementById('add-type-panel');
@@ -1824,19 +1847,20 @@ function saveNewServiceType(){
   const name=inp.value.trim();
   if(!name)return;
   if(getAllServiceTypes().includes(name)){inp.value='';return;}
-  if(!state.serviceTypes)state.serviceTypes=[];
   state.serviceTypes.push(name);
   saveState();
   inp.value='';
   populateSvcTypeSelect(name);
   renderCustomTypesList();
 }
-function deleteServiceType(name){
+function deleteServiceType(i){
+  if((state.serviceTypes||[]).length<=1){alert(t('msg_min_1_type'));return;}
+  const name=state.serviceTypes[i];
   if(!confirm(t('msg_confirm_delete_type')))return;
-  state.serviceTypes=(state.serviceTypes||[]).filter(t2=>t2!==name);
+  state.serviceTypes.splice(i,1);
   saveState();
   const curVal=document.getElementById('svc-type')?.value;
-  populateSvcTypeSelect(curVal===name?'صيانة':curVal);
+  populateSvcTypeSelect(curVal===name?(state.serviceTypes[0]||''):curVal);
   renderCustomTypesList();
 }
 // ──────────────────────────────────────────────────────────────────────
@@ -3654,8 +3678,9 @@ var LANG = {
     th_payment_method:'الدفع',
     msg_enter_amount:'أدخل مبلغ الدفعة',
     msg_payment_saved:'✅ تم تسجيل الدفعة',
-    lbl_custom_types:'📂 الأنواع المخصصة',
+    lbl_custom_types:'📂 الأنواع',
     msg_confirm_delete_type:'حذف هذا النوع؟',
+    msg_min_1_type:'يجب أن يبقى نوع واحد على الأقل',
   },
   en: {
     nav_dashboard:'Dashboard', nav_cars:'Cars in Workshop', nav_delivered:'Delivered Cars',
@@ -3841,8 +3866,9 @@ var LANG = {
     th_payment_method:'Payment',
     msg_enter_amount:'Enter payment amount',
     msg_payment_saved:'✅ Payment recorded',
-    lbl_custom_types:'📂 Custom Types',
+    lbl_custom_types:'📂 Types',
     msg_confirm_delete_type:'Delete this type?',
+    msg_min_1_type:'At least one type must remain',
   }
 };
 function t(key) {
