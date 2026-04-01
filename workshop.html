@@ -51,6 +51,7 @@ nav{flex:1;padding:12px 0;overflow-y:auto;}
 .btn-sm{padding:6px 12px;font-size:12px;}
 .btn-danger{background:linear-gradient(135deg,#e94560,#c0392b);color:white;}
 .btn-gold{background:linear-gradient(135deg,#f5a623,#e67e22);color:white;}
+.btn-warning{background:linear-gradient(135deg,#f5a623,#f39c12);color:#1a1a2e;}
 .btn-info{background:linear-gradient(135deg,#4facfe,#00f2fe);color:#1a1a2e;}
 .page{display:none;padding:24px;}
 .page.active{display:block;}
@@ -435,6 +436,7 @@ tr:hover td{background:rgba(79,172,254,.05)!important;}
 .btn-info:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(79,172,254,.32);}
 .btn-danger:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(233,69,96,.32);}
 .btn-gold:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(245,166,35,.32);}
+.btn-warning:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(245,166,35,.32);}
 .btn-outline:hover{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.2);}
 
 /* ---- Badges ---- */
@@ -1911,6 +1913,22 @@ function addExpense(){
   renderAll();
 }
 
+// RETURN TO WORKSHOP
+function returnToWorkshop(id){
+  const _s=getSession();if(!_s||_s.role!=='admin'){alert(t('msg_admin_only'));return;}
+  if(!confirm(t('msg_confirm_return_workshop')))return;
+  const car=state.cars.find(c=>c.id===id);
+  if(!car)return;
+  const stages=getCarStages(car);
+  // Put car back at the repair stage (stage index 2, or second-to-last if short)
+  const repairStage=Math.min(2,stages.length-2);
+  car.stage=Math.max(1,repairStage);
+  car.status=statusFromStage(car.stage,stages);
+  car.dateOut=null;
+  saveState();renderAll();
+  showSyncBanner('ok',t('msg_returned_workshop'));
+}
+
 // DELETE
 function deleteCar(id){const _dc=getSession();if(!_dc||_dc.role!=='admin'){alert(t('msg_admin_only_delete'));return;}if(!confirm(t('msg_confirm_delete_car')))return;state.cars=state.cars.filter(c=>c.id!==id);saveState();renderAll();}
 function deleteExpense(id){if(!confirm(t('msg_confirm_delete_expense')))return;state.expenses=state.expenses.filter(e=>e.id!==id);saveState();renderAll();}
@@ -2332,6 +2350,7 @@ function renderDeliveredTable(){
       <td><div style="display:flex;gap:5px;flex-wrap:wrap;">
         ${inv?`<button class="btn btn-outline btn-sm" onclick="generateReceipt(${inv.id})">🧾 ${t('status_receipt')}</button>`:''}
         ${isAdmin&&hasDebt?`<button class="btn btn-success btn-sm" onclick="openQuickPay('${c.id}')">💳 ${t('btn_add_payment')}</button>`:''}
+        ${isAdmin?`<button class="btn btn-warning btn-sm" onclick="returnToWorkshop('${c.id}')" title="${t('btn_return_workshop')}">🔄</button>`:''}
         ${isAdmin?`<button class="btn btn-primary btn-sm" onclick="editCar('${c.id}')">✏️</button>`:''}
         ${isAdmin?`<button class="btn btn-danger btn-sm" onclick="deleteCar('${c.id}')">🗑️</button>`:''}
         ${!inv&&!isAdmin?'—':''}
@@ -3681,6 +3700,9 @@ var LANG = {
     lbl_custom_types:'📂 الأنواع',
     msg_confirm_delete_type:'حذف هذا النوع؟',
     msg_min_1_type:'يجب أن يبقى نوع واحد على الأقل',
+    btn_return_workshop:'إعادة إلى الورشة',
+    msg_confirm_return_workshop:'إعادة هذه السيارة إلى الورشة؟ سيتم إلغاء تاريخ التسليم.',
+    msg_returned_workshop:'✅ تمت إعادة السيارة إلى الورشة',
   },
   en: {
     nav_dashboard:'Dashboard', nav_cars:'Cars in Workshop', nav_delivered:'Delivered Cars',
@@ -3869,6 +3891,9 @@ var LANG = {
     lbl_custom_types:'📂 Types',
     msg_confirm_delete_type:'Delete this type?',
     msg_min_1_type:'At least one type must remain',
+    btn_return_workshop:'Return to Workshop',
+    msg_confirm_return_workshop:'Return this car to the workshop? Delivery date will be cleared.',
+    msg_returned_workshop:'✅ Car returned to workshop',
   }
 };
 function t(key) {
