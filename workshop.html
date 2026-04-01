@@ -3064,6 +3064,14 @@ function showSyncBanner(type, msg) {
   if (type === 'ok') setTimeout(() => banner.remove(), 4000);
 }
 
+// ── Merge two arrays by item.id — local wins for duplicates, keeps all items ─
+function mergeById(local, remote) {
+  const map = {};
+  (remote || []).forEach(item => { if (item && item.id) map[item.id] = item; });
+  (local  || []).forEach(item => { if (item && item.id) map[item.id] = item; });
+  return Object.values(map);
+}
+
 // ── Load from cloud ──────────────────────────────────────────────────────────
 async function loadFromCloud() {
   try {
@@ -3104,7 +3112,26 @@ async function loadFromCloud() {
       showSyncStatus('synced');
       showSyncBanner('ok', '🔄 تم استقبال تحديثات جديدة من السحابة');
     } else {
-      // Local is newer → push to cloud
+      // Local is newer — but merge any items that exist only in cloud
+      // to avoid losing data entered on another device.
+      const mergedCars    = mergeById(state.cars,    data.cars);
+      const mergedOrders  = mergeById(state.orders,  data.orders);
+      const mergedExpenses= mergeById(state.expenses, data.expenses);
+      const mergedInvoices= mergeById(state.invoices, data.invoices);
+      const changed = mergedCars.length    !== state.cars.length    ||
+                      mergedOrders.length  !== state.orders.length  ||
+                      mergedExpenses.length!== state.expenses.length||
+                      mergedInvoices.length!== state.invoices.length;
+      if (changed) {
+        state.cars     = mergedCars;
+        state.orders   = mergedOrders;
+        state.expenses = mergedExpenses;
+        state.invoices = mergedInvoices;
+        syncStageArrays();
+        renderAll();
+        showSyncBanner('ok', '🔀 تم دمج بيانات من أجهزة متعددة');
+      }
+      // Push merged (or unchanged) local state to cloud
       await saveToCloud(true);
     }
   } catch(e) {
@@ -3185,6 +3212,11 @@ function showSyncStatus(status) {
 // ── Override saveState ───────────────────────────────────────────────────────
 const _origSaveState = saveState;
 saveState = function() {
+  // Update timestamp immediately so offline changes are correctly dated.
+  // Without this, state.updatedAt stays at the last successful cloud-save,
+  // causing the device to think cloud is newer when it comes back online
+  // and overwrite local changes.
+  state.updatedAt = new Date().toISOString();
   _origSaveState();
   if (syncEnabled) saveToCloud(false);
 };
