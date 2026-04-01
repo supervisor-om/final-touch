@@ -2907,6 +2907,31 @@ function sendWhatsApp() {
   sendWAById(sel.value);
 }
 
+// ── WhatsApp opener — tries desktop app first, falls back to web ─────
+var _waBannerData = {};
+function openWA(phone, text) {
+  const enc = encodeURIComponent(text);
+  // whatsapp:// URI opens the installed desktop or mobile app directly
+  const appUrl = 'whatsapp://send' + (phone ? '?phone=' + phone + '&text=' + enc : '?text=' + enc);
+  const webUrl = 'https://wa.me/' + (phone || '') + '?text=' + enc;
+
+  // Click a temporary <a> — triggers the protocol handler without navigating away
+  const a = document.createElement('a');
+  a.href = appUrl;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+
+  // If window loses focus or page hides → app launched → cancel web fallback
+  const fallback = setTimeout(() => window.open(webUrl, '_blank'), 2500);
+  const cancel = () => clearTimeout(fallback);
+  window.addEventListener('blur', cancel, { once: true });
+  document.addEventListener('visibilitychange', function _h() {
+    if (document.hidden) { cancel(); document.removeEventListener('visibilitychange', _h); }
+  });
+}
+// ─────────────────────────────────────────────────────────────────────
+
 function sendWAById(carId) {
   const car = state.cars.find(c => c.id === carId);
   if (!car) return;
@@ -2920,9 +2945,7 @@ function sendWAById(carId) {
     url + nl + nl +
     'ورشة اللمسة الأخيرة 🔧';
   const phone = car.phone ? car.phone.replace(/[^0-9]/g, '') : '';
-  const base = 'https://wa.me/';
-  const waURL = (phone ? base + phone : base) + '?text=' + encodeURIComponent(msg);
-  window.open(waURL, '_blank');
+  openWA(phone, msg);
 }
 
 function copyLink(url) {
@@ -4708,18 +4731,17 @@ function sendWelcomeMessage(car) {
     if (phone.startsWith('00'))         phone = phone.slice(2);
     else if (phone.startsWith('0'))     phone = '968' + phone.slice(1);
     else if (/^[79]\d{7}$/.test(phone)) phone = '968' + phone;
-    const waUrl = 'https://wa.me/' + phone + '?text=' + encodeURIComponent(msg);
+    _waBannerData.welcome = { phone, msg };
     banner.innerHTML = `
       <span style="font-size:22px;">💬</span>
       <div style="flex:1;">
         <div style="color:#fff;font-size:13px;font-weight:700;">أرسل رسالة ترحيب للعميل</div>
         <div style="color:rgba(255,255,255,.7);font-size:11px;">${car.owner} — ${car.plate}</div>
       </div>
-      <a href="${waUrl}" target="_blank" rel="noopener"
-         style="background:#25d366;color:#fff;border-radius:10px;padding:8px 16px;font-size:13px;font-weight:900;text-decoration:none;white-space:nowrap;"
-         onclick="setTimeout(()=>document.getElementById('wa-welcome-banner')?.remove(),500)">
+      <button onclick="openWA(_waBannerData.welcome.phone,_waBannerData.welcome.msg);setTimeout(()=>document.getElementById('wa-welcome-banner')?.remove(),500)"
+         style="background:#25d366;color:#fff;border-radius:10px;padding:8px 16px;font-size:13px;font-weight:900;border:none;cursor:pointer;white-space:nowrap;font-family:var(--font-main);">
         إرسال ▶
-      </a>
+      </button>
       <button onclick="document.getElementById('wa-welcome-banner').remove()"
         style="background:rgba(255,255,255,.1);border:none;color:#fff;border-radius:8px;width:28px;height:28px;cursor:pointer;font-size:16px;flex-shrink:0;">✕</button>`;
   } else {
@@ -4785,12 +4807,11 @@ function sendPushNotification(car) {
     else if (/^[79]\d{7}$/.test(phone)) phone = '968' + phone;
 
     if (phone) {
-      const waUrl = 'https://wa.me/' + phone + '?text=' + encodeURIComponent(msg);
-      actionHtml = `<a href="${waUrl}" target="_blank" rel="noopener"
-         style="background:#fff;color:#25d366;border-radius:10px;padding:8px 18px;font-size:13px;font-weight:900;text-decoration:none;white-space:nowrap;"
-         onclick="setTimeout(()=>document.getElementById('wa-notify-banner')?.remove(),500)">
+      _waBannerData.notify = { phone, msg };
+      actionHtml = `<button onclick="openWA(_waBannerData.notify.phone,_waBannerData.notify.msg);setTimeout(()=>document.getElementById('wa-notify-banner')?.remove(),500)"
+         style="background:#fff;color:#25d366;border-radius:10px;padding:8px 18px;font-size:13px;font-weight:900;border:none;cursor:pointer;white-space:nowrap;font-family:var(--font-main);">
         إرسال ▶
-      </a>`;
+      </button>`;
     } else {
       actionHtml = `<span style="background:rgba(0,0,0,.2);color:#fff;border-radius:10px;padding:8px 14px;font-size:12px;">رقم غير صحيح</span>`;
     }
@@ -4816,7 +4837,7 @@ function sendPushNotification(car) {
 function openCallMeBotActivation(phone) {
   const activationMsg = 'I allow callmebot to send me messages';
   const botPhone = '34644597364';
-  window.open('https://wa.me/' + botPhone + '?text=' + encodeURIComponent(activationMsg), '_blank');
+  openWA(botPhone, activationMsg);
 }
 
 function saveWaBotKey() {
