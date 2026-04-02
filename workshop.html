@@ -1535,9 +1535,54 @@ function statusBadge(s){
 }
 function serviceBadge(s){
   if(!s)return'—';
-  if(s.includes('دهان'))return`<span class="badge badge-paint">🎨 ${s}</span>`;
-  if(s.includes('سمكرة'))return`<span class="badge badge-body">🔨 ${s}</span>`;
-  return`<span class="badge badge-maint">🔧 ${s}</span>`;
+  const label=translateServiceName(s);
+  if(s.includes('دهان')||s.toLowerCase().includes('paint'))return`<span class="badge badge-paint">🎨 ${label}</span>`;
+  if(s.includes('سمكرة')||s.toLowerCase().includes('body'))return`<span class="badge badge-body">🔨 ${label}</span>`;
+  return`<span class="badge badge-maint">🔧 ${label}</span>`;
+}
+function translateStageLabel(label){
+  if(currentLang==='ar'||!label)return label;
+  const map={
+    'استلام':'Receive','استلام السيارة':'Car Received',
+    'تشخيص':'Diagnose','تشخيص العطل':'Diagnosing',
+    'إصلاح':'Repair','بدء الإصلاح':'Repair',
+    'دهان':'Paint','الدهان والتشطيب':'Paint & Finish','دهان السيارة':'Paint',
+    'جاهزة':'Ready','جاهزة للتسليم':'Ready for Delivery',
+    'تسليم':'Delivery','تم التسليم':'Delivered',
+    'سمكرة':'Body Work',
+    'في الانتظار':'Waiting',
+    'تشطيبات قبل الدهان':'Pre-Paint Prep',
+    'تشخيص كهربائي':'Electrical Diagnose',
+    'إصلاح كهربائي':'Electrical Repair',
+    'تغيير الزيت والفلاتر':'Oil & Filter Change',
+    'إصلاح الفرامل':'Brake Repair',
+    'إصلاح المكيف':'AC Repair',
+  };
+  return map[label]||label;
+}
+function translateServiceName(s){
+  if(currentLang==='ar'||!s)return s;
+  const map={
+    'صيانة ميكانيكية':'Mechanical Maintenance',
+    'سمكرة وهيكل':'Body Work',
+    'دهان وتلميع':'Paint & Polish',
+    'خدمة شاملة':'Full Service',
+    'تغيير زيت':'Oil Change',
+    'تغيير زيت المحرك':'Engine Oil Change',
+    'فرامل':'Brakes',
+    'مكيف':'AC System',
+    'كهرباء':'Electrical',
+    'صيانة':'Maintenance',
+    'سمكرة':'Body Work',
+    'دهان':'Paint',
+  };
+  // Exact match first
+  if(map[s])return map[s];
+  // Partial match
+  for(const ar in map){
+    if(s.includes(ar))return map[ar];
+  }
+  return s;
 }
 function stageFromStatus(s,stages){const arr=stages||state.stages;const last=arr.length-1;return{waiting:0,progress:Math.min(2,last),done:Math.max(0,last-1),delivered:last}[s]||0;}
 function statusFromStage(i,stages){const last=(stages||state.stages).length-1;return i>=last?'delivered':i>=(last-1)?'done':i>=1?'progress':'waiting';}
@@ -1648,7 +1693,7 @@ function quickStatus(carId,e){
   const carStages=getCarStages(car);
   popup.innerHTML=carStages.map((s,i)=>`
     <div class="qs-item${car.stage===i?' qs-active':''}" onclick="applyQuickStatus('${carId}',${i})">
-      ${s.icon} ${s.label}
+      ${s.icon} ${translateStageLabel(s.label)}
     </div>`).join('');
   document.body.appendChild(popup);
   setTimeout(()=>document.addEventListener('click',closeQsPopup,{once:true}),0);
@@ -1679,7 +1724,7 @@ function updateStageUI(){
   const car=state.cars.find(c=>c.id===state.currentEditCar);
   const stages=getCarStages(car);
   const last=stages.length-1;
-  track.innerHTML=stages.map((s,i)=>`<div class="stage-item" id="stage-${i}"><div class="stage-dot">${s.icon}</div><div class="stage-label">${s.label}</div></div>`).join('');
+  track.innerHTML=stages.map((s,i)=>`<div class="stage-item" id="stage-${i}"><div class="stage-dot">${s.icon}</div><div class="stage-label">${translateStageLabel(s.label)}</div></div>`).join('');
   stages.forEach((_,i)=>{
     const item=document.getElementById('stage-'+i);
     const dot=item.querySelector('.stage-dot');
@@ -1687,7 +1732,7 @@ function updateStageUI(){
     if(i<currentStage){item.classList.add('done');dot.classList.add('done');dot.textContent='✓';}
     else if(i===currentStage){item.classList.add('active');dot.classList.add('active');dot.textContent=stages[i].icon;}
   });
-  btnsRow.innerHTML=stages.map((s,i)=>`<button class="btn ${i===last?'btn-success':'btn-outline'} btn-sm" onclick="setStage(${i})">${s.icon} ${s.label}</button>`).join('');
+  btnsRow.innerHTML=stages.map((s,i)=>`<button class="btn ${i===last?'btn-success':'btn-outline'} btn-sm" onclick="setStage(${i})">${s.icon} ${translateStageLabel(s.label)}</button>`).join('');
 }
 function calcRemaining(){
   const total=parseFloat(document.getElementById('update-amount').value)||0;
@@ -2402,7 +2447,7 @@ function renderCarsTable(){
   tbody.innerHTML=cars.map((c,i)=>{
     const days=daysSince(c.dateIn);const over=days>=state.alertDays;
     const rem=Math.max(0,(c.estimate||0)-(c.paidTotal||0));
-    const stageLabel=STAGE_ICONS[c.stage||0]+' '+STAGES[c.stage||0];
+    const stageLabel=STAGE_ICONS[c.stage||0]+' '+translateStageLabel(STAGES[c.stage||0]);
     return`<tr>
       <td>${i+1}</td><td><strong>${c.plate}</strong></td><td>${c.owner}</td><td>${c.phone||'—'}</td>
       <td>${c.model||'—'}</td><td>${serviceBadge(c.service)}</td>
@@ -3129,7 +3174,7 @@ function renderTrackingPage() {
   if (!tbody) return;
   tbody.innerHTML = active.length ? active.map(c => {
     const url = getTrackingURL(c);
-    const stg = STAGE_ICONS[c.stage||0] + ' ' + STAGES[c.stage||0];
+    const stg = STAGE_ICONS[c.stage||0] + ' ' + translateStageLabel(STAGES[c.stage||0]);
     return `<tr>
       <td><strong>${c.plate}</strong></td>
       <td>${c.owner}</td>
@@ -4756,7 +4801,7 @@ function viewClosingDetails(id){
         </tr></thead>
         <tbody>${liveCarryOver.map(c=>{
           const carStages=getCarStages(c);
-          const stageLabel=carStages[c.stage]?carStages[c.stage].icon+' '+carStages[c.stage].label:'—';
+          const stageLabel=carStages[c.stage]?carStages[c.stage].icon+' '+translateStageLabel(carStages[c.stage].label):'—';
           return`<tr style="border-bottom:1px solid var(--border);">
             <td style="padding:5px 8px;font-weight:700;">${c.plate}</td>
             <td style="padding:5px 8px;">${c.owner}</td>
@@ -5144,7 +5189,7 @@ function sendPushNotification(car) {
   const carStages = getCarStages(car);
   const idx   = car.stage || 0;
   const s     = carStages[idx] || carStages[carStages.length-1];
-  const label = s.icon + ' ' + s.label;
+  const label = s.icon + ' ' + translateStageLabel(s.label);
 
   // Remove old banner if exists
   const old = document.getElementById('wa-notify-banner');
