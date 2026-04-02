@@ -56,6 +56,12 @@ nav{flex:1;padding:12px 0;overflow-y:auto;}
 .page{display:none;padding:24px;}
 .page.active{display:block;}
 .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:24px;}
+.chart-container{position:relative;height:180px;margin-top:10px;}
+.chart-bar{position:absolute;bottom:0;width:12%;background:linear-gradient(180deg,var(--accent),rgba(233,69,96,.3));border-radius:4px 4px 0 0;transition:height .5s ease;}
+.chart-label{position:absolute;bottom:-22px;left:50%;transform:translateX(-50%);font-size:10px;color:var(--muted);white-space:nowrap;}
+.chart-value{position:absolute;top:-18px;left:50%;transform:translateX(-50%);font-size:10px;font-weight:700;color:#fff;}
+.mini-stat{font-size:11px;color:var(--muted);margin-top:6px;}
+.mini-stat span{color:var(--success);font-weight:700;}
 .stat-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;position:relative;overflow:hidden;transition:transform .2s;backdrop-filter:blur(10px);}
 .stat-card:hover{transform:translateY(-3px);}
 .stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
@@ -64,6 +70,9 @@ nav{flex:1;padding:12px 0;overflow-y:auto;}
 .stat-card.blue::before{background:var(--info);}
 .stat-card.gold::before{background:var(--gold);}
 .stat-card.purple::before{background:#9b59b6;}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+div.stat-card:not([class*="::before"]):has(.stat-icon){}
+div[style*="--accent"]::before{background:var(--accent)!important;}
 .stat-icon{font-size:28px;margin-bottom:10px;display:block;}
 .stat-value{font-family:var(--font-display);font-size:24px;font-weight:900;color:#fff;line-height:1;}
 .stat-label{font-size:12px;color:var(--muted);margin-top:4px;}
@@ -728,6 +737,8 @@ label{font-size:14px;}
       <div class="stat-card red"><span class="stat-icon">💸</span><div class="stat-value" id="stat-expenses">0 ر.ع</div><div class="stat-label" data-i18n="stat_expenses">إجمالي المصروفات</div></div>
       <div class="stat-card gold"><span class="stat-icon">📦</span><div class="stat-value" id="stat-profit">0 ر.ع</div><div class="stat-label" data-i18n="stat_profit">${t('closing_net_profit_lbl')}</div></div>
       <div class="stat-card purple"><span class="stat-icon">⏳</span><div class="stat-value" id="stat-pending">0 ر.ع</div><div class="stat-label" data-i18n="stat_pending">مبالغ معلقة (غير مقبوضة)</div></div>
+      <div class="stat-card" style="--accent:#9b59b6;--color:#9b59b6;"><span class="stat-icon">📞</span><div class="stat-value" id="stat-delivered-today">0</div><div class="stat-label">🚗 سيارات مُسلَّمة هذا الشهر</div></div>
+      <div class="stat-card" style="--accent:#e67e22;--color:#e67e22;"><span class="stat-icon">⏱️</span><div class="stat-value" id="stat-avg-days">0</div><div class="stat-label">📅 متوسط أيام الإصلاح</div></div>
     </div>
     <div class="two-col-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:18px;">
       <div class="card">
@@ -745,6 +756,19 @@ label{font-size:14px;}
         <div class="card-body" style="padding:0;">
           <table><thead><tr><th data-i18n="th_plate">اللوحة</th><th data-i18n="th_owner">المالك</th><th data-i18n="th_status">الحالة</th><th data-i18n="th_days">الأيام</th></tr></thead>
           <tbody id="dash-cars-table"></tbody></table>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Monthly Revenue Chart -->
+    <div class="card" style="margin-top:18px;">
+      <div class="card-header"><div class="card-title">📈 الإيرادات الشهرية</div></div>
+      <div class="card-body">
+        <div id="monthly-chart" class="chart-container" style="display:flex;align-items:flex-end;justify-content:space-around;padding:20px 10px 30px;gap:8px;"></div>
+        <div style="display:flex;justify-content:space-between;margin-top:16px;padding-top:12px;border-top:1px solid var(--border);">
+          <div class="mini-stat">📊 إجمالي السيارات: <span id="chart-total-cars">0</span></div>
+          <div class="mini-stat">💰 متوسط الإيراد/شهر: <span id="chart-avg-revenue">0 ر.ع</span></div>
+          <div class="mini-stat">📈 أفضل شهر: <span id="chart-best-month">-</span></div>
         </div>
       </div>
     </div>
@@ -2247,6 +2271,20 @@ function renderDashboard(){
   document.getElementById('stat-profit').style.color=profit>=0?'var(--success)':'var(--danger)';
   document.getElementById('stat-pending').textContent=fmt(pending);
 
+  // Delivered this month
+  const now=new Date();
+  const monthStart=new Date(now.getFullYear(),now.getMonth(),1);
+  const deliveredThisMonth=state.cars.filter(c=>c.status==='delivered'&&c.dateOut&&new Date(c.dateOut)>=monthStart).length;
+  document.getElementById('stat-delivered-today').textContent=deliveredThisMonth;
+
+  // Average repair days
+  const deliveredCars=state.cars.filter(c=>c.status==='delivered'&&c.dateIn&&c.dateOut);
+  const avgDays=deliveredCars.length?Math.round(deliveredCars.reduce((s,c)=>s+Math.ceil((new Date(c.dateOut)-new Date(c.dateIn))/(1000*60*60*24)),0)/deliveredCars.length):0;
+  document.getElementById('stat-avg-days').textContent=avgDays||'-';
+
+  // Monthly revenue chart
+  renderMonthlyChart();
+
   const alerted=getAlertedCars();
   const banner=document.getElementById('alert-banner-area');
   banner.innerHTML=alerted.length?`<div class="alert-banner"><span class="ab-icon">🔔</span><div class="ab-text">يوجد <span class="ab-count">${alerted.length}</span> سيارة تجاوزت ${state.alertDays} أيام في الورشة! <button class="btn btn-outline btn-sm" style="margin-right:10px;" onclick="showPage('alerts')">عرض التفاصيل</button></div></div>`:'';
@@ -2267,6 +2305,42 @@ function renderDashboard(){
     const over=days>=state.alertDays;
     return`<tr><td><strong>${c.plate}</strong></td><td>${c.owner}</td><td>${statusBadge(c.status)}</td><td style="color:${over?'var(--danger)':'var(--success)'};">${days} ${t('lbl_days_unit')}${over?' ⚠️':''}</td></tr>`;
   }).join(''):`<tr><td colspan="4"><div class="empty-state"><div class="empty-icon">🚗</div><p>${t('empty_cars')}</p></div></td></tr>`;
+}
+
+function renderMonthlyChart(){
+  const now=new Date();
+  const months=[];
+  const monthNames=['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+  
+  for(let i=5;i>=0;i--){
+    const d=new Date(now.getFullYear(),now.getMonth()-i,1);
+    const nextM=new Date(now.getFullYear(),now.getMonth()-i+1,0);
+    const start=d.toISOString().split('T')[0];
+    const end=nextM.toISOString().split('T')[0];
+    const monthRevenue=state.invoices.filter(inv=>inv.date>=start&&inv.date<=end).reduce((s,i)=>s+i.amount,0);
+    months.push({name:monthNames[d.getMonth()],revenue:monthRevenue,month:d.getMonth()});
+  }
+  
+  const max=Math.max(...months.map(m=>m.revenue),1);
+  const chart=document.getElementById('monthly-chart');
+  if(!chart)return;
+  
+  chart.innerHTML=months.map(m=>{
+    const height=max>0?Math.max(Math.round(m.revenue/max*100),4):4;
+    const color=m.revenue===max?'var(--success)':m.revenue>max*.5?'var(--info)':'var(--accent)';
+    return`<div style="position:relative;flex:1;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;">
+      <div class="chart-value">${m.revenue?fmt(m.revenue):''}</div>
+      <div style="width:100%;height:${height}%;background:${color};border-radius:6px 6px 0 0;transition:all .5s;opacity:${m.revenue?1:0.3};"></div>
+      <div class="chart-label">${m.name}</div>
+    </div>`;
+  }).join('');
+  
+  const totalCars=state.cars.filter(c=>c.status==='delivered').length;
+  const avgRev=months.length?Math.round(months.reduce((s,m)=>s+m.revenue,0)/months.length):0;
+  const best=months.reduce((a,b)=>b.revenue>a.revenue?b:a,{revenue:0,name:'-'});
+  document.getElementById('chart-total-cars').textContent=totalCars;
+  document.getElementById('chart-avg-revenue').textContent=fmt(avgRev);
+  document.getElementById('chart-best-month').textContent=best.name!='-'?best.name+' ('+fmt(best.revenue)+')':'-';
 }
 
 function renderCarsTable(){
