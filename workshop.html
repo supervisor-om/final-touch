@@ -1526,7 +1526,12 @@ function formatDate(d){if(!d)return'—';return new Date(d).toLocaleDateString('
 function daysSince(d){if(!d)return 0;return Math.floor((Date.now()-new Date(d))/(1000*60*60*24));}
 
 function statusBadge(s){
-  return {waiting:'<span class="badge badge-waiting">⏳ انتظار</span>',progress:'<span class="badge badge-progress">🔧 إصلاح</span>',done:'<span class="badge badge-done">✅ جاهزة</span>',delivered:'<span class="badge badge-delivered">📦 مُسلَّمة</span>'}[s]||s;
+  return {
+    waiting:  `<span class="badge badge-waiting">⏳ ${t('status_waiting')}</span>`,
+    progress: `<span class="badge badge-progress">🔧 ${t('status_progress')}</span>`,
+    done:     `<span class="badge badge-done">✅ ${t('status_done')}</span>`,
+    delivered:`<span class="badge badge-delivered">📦 ${t('status_delivered')}</span>`
+  }[s]||s;
 }
 function serviceBadge(s){
   if(!s)return'—';
@@ -2667,7 +2672,7 @@ function renderInvoicesTable(){
       <td><strong>${(inv.amount||0).toFixed(3)} ر.ع</strong></td>
       <td style="color:var(--info);">${(inv.deposit||0).toFixed(3)} ر.ع</td>
       <td style="color:var(--success);">${(inv.paid||0).toFixed(3)} ر.ع</td>
-      <td style="color:${rem>0?'var(--danger)':'var(--success)'};">${rem>0?rem.toFixed(3)+' ر.ع':`✅ ${t('status_done')}`}</td>
+      <td style="color:${rem>0?'var(--danger)':'var(--success)'};">${rem>0?rem.toFixed(3)+' ر.ع':`✅ ${t('lbl_fully_paid')}`}</td>
       <td>${formatDate(inv.date)}</td>
       <td><button class="btn btn-outline btn-sm" onclick="generateReceipt(${inv.id})">🧾 ${t('status_receipt')}</button></td>
     </tr>`;
@@ -3089,6 +3094,17 @@ addCar = function() {
 // ══════════════════════════════════════════
 // TRACKING FUNCTIONS
 // ══════════════════════════════════════════
+function getStageLabels(){
+  return currentLang==='en'
+    ?['Car Received','Diagnosing Fault','Repair in Progress','Paint & Finishing','Ready for Pickup','Delivered']
+    :['استلام السيارة','تشخيص العطل','بدء الإصلاح','الدهان والتشطيب','جاهزة للتسليم','تم التسليم'];
+}
+function getStageDescs(){
+  return currentLang==='en'
+    ?['Your car has been received at the workshop','Diagnosing the fault','Technicians are working on your car','Paint and final polishing stage','Your car is ready, you may come pick it up 🎉','Car has been delivered successfully ✅']
+    :['تم استلام سيارتك في الورشة','يتم فحص وتشخيص العطل','الفنيون يعملون على إصلاح سيارتك','مرحلة الدهان والتلميع النهائي','سيارتك جاهزة، يمكنك المجيء لاستلامها 🎉','تم تسليم السيارة بنجاح ✅'];
+}
+// Keep as arrays for backwards compatibility (used in a few places)
 const STAGE_LABELS = ['استلام السيارة','تشخيص العطل','بدء الإصلاح','الدهان والتشطيب','جاهزة للتسليم','تم التسليم'];
 const STAGE_DESCS  = ['تم استلام سيارتك في الورشة','يتم فحص وتشخيص العطل','الفنيون يعملون على إصلاح سيارتك','مرحلة الدهان والتلميع النهائي','سيارتك جاهزة، يمكنك المجيء لاستلامها 🎉','تم تسليم السيارة بنجاح ✅'];
 const STAGE_COLORS = ['#8892a4','#4facfe','#f5a623','#9b59b6','#00d4aa','#00d4aa'];
@@ -3140,7 +3156,7 @@ function previewWA() {
   const car = state.cars.find(c => c.id === sel.value);
   if (!car) return;
   const url = getTrackingURL(car);
-  const stage = STAGE_LABELS[car.stage||0];
+  const stage = getStageLabels()[car.stage||0];
   const msgLines = [
     'مرحباً ' + car.owner + ' 👋',
     '',
@@ -3193,7 +3209,7 @@ function sendWAById(carId) {
   const car = state.cars.find(c => c.id === carId);
   if (!car) return;
   const url = getTrackingURL(car);
-  const stage = STAGE_LABELS[car.stage||0];
+  const stage = getStageLabels()[car.stage||0];
   const nl = '\n';
   const msg = 'مرحباً ' + car.owner + ' 👋' + nl + nl +
     'سيارتك ' + car.plate + ' (' + (car.model||'') + ')' + nl +
@@ -3253,10 +3269,10 @@ function showCarTracking(car) {
 
   // Status badge
   const statusMap = {
-    waiting:   '<span style="background:rgba(245,166,35,.2);color:#f5a623;padding:5px 14px;border-radius:20px;font-size:12px;font-weight:700;">⏳ في الانتظار</span>',
-    progress:  '<span style="background:rgba(79,172,254,.2);color:#4facfe;padding:5px 14px;border-radius:20px;font-size:12px;font-weight:700;">🔧 تحت الإصلاح</span>',
-    done:      '<span style="background:rgba(0,212,170,.2);color:#00d4aa;padding:5px 14px;border-radius:20px;font-size:12px;font-weight:700;">✅ جاهزة للتسليم</span>',
-    delivered: '<span style="background:rgba(150,150,150,.2);color:#aaa;padding:5px 14px;border-radius:20px;font-size:12px;font-weight:700;">📦 تم التسليم</span>',
+    waiting:   `<span style="background:rgba(245,166,35,.2);color:#f5a623;padding:5px 14px;border-radius:20px;font-size:12px;font-weight:700;">⏳ ${t('status_waiting')}</span>`,
+    progress:  `<span style="background:rgba(79,172,254,.2);color:#4facfe;padding:5px 14px;border-radius:20px;font-size:12px;font-weight:700;">🔧 ${t('status_progress')}</span>`,
+    done:      `<span style="background:rgba(0,212,170,.2);color:#00d4aa;padding:5px 14px;border-radius:20px;font-size:12px;font-weight:700;">✅ ${t('status_done')}</span>`,
+    delivered: `<span style="background:rgba(150,150,150,.2);color:#aaa;padding:5px 14px;border-radius:20px;font-size:12px;font-weight:700;">📦 ${t('status_delivered')}</span>`,
   };
 
   document.getElementById('trk-car-plate').textContent = car.plate;
@@ -3269,7 +3285,7 @@ function showCarTracking(car) {
 
   // Stages
   const stagesEl = document.getElementById('trk-stages-display');
-  stagesEl.innerHTML = STAGE_LABELS.map((lbl, i) => {
+  stagesEl.innerHTML = getStageLabels().map((lbl, i) => {
     const isDone   = i < stage;
     const isActive = i === stage;
     const isPending = i > stage;
@@ -3282,7 +3298,7 @@ function showCarTracking(car) {
         </div>
         <div style="flex:1;">
           <div style="font-size:13px;font-weight:700;color:${textColor};">${lbl}</div>
-          <div style="font-size:11px;color:#4a5568;margin-top:2px;">${isActive||isDone ? STAGE_DESCS[i] : '...'}</div>
+          <div style="font-size:11px;color:#4a5568;margin-top:2px;">${isActive||isDone ? getStageDescs()[i] : '...'}</div>
         </div>
         ${isActive ? '<div style="font-size:11px;color:'+STAGE_COLORS[i]+';font-weight:700;">← الحالة الآن</div>' : ''}
         ${isDone   ? '<div style="font-size:14px;color:#00d4aa;">✓</div>' : ''}
@@ -3800,7 +3816,7 @@ var LANG = {
     nav_customers:'العملاء', nav_tracking:'تتبع العملاء', nav_users:'إدارة المستخدمين',
     sec_home:'الرئيسية', sec_cars_mgmt:'إدارة السيارات', sec_services:'الخدمات',
     sec_finance:'المالية', sec_system:'النظام',
-    status_waiting:'في الانتظار', status_progress:'تحت الإصلاح', status_done:'جاهزة للتسليم',
+    status_waiting:'في الانتظار', status_progress:'تحت الإصلاح', status_done:'جاهزة للتسليم', status_delivered:'مُسلَّمة',
     filter_all:'الكل', filter_cars_all:'كل السيارات',
     btn_add_car:'➕ إضافة سيارة', btn_add_order:'➕ إضافة أمر صيانة',
     btn_add_service:'➕ إضافة خدمة', btn_add_expense:'➕ إضافة مصروف',
@@ -3918,7 +3934,7 @@ var LANG = {
     empty_services_tbl:'لا توجد خدمات', empty_invoices:'لا توجد فواتير',
     empty_expenses_tbl:'لا توجد مصروفات',
     // Status labels
-    status_in_progress:'جاري', status_done:'مكتمل', status_receipt:'إيصال',
+    status_in_progress:'جاري', status_order_done:'مكتمل', status_receipt:'إيصال',
     status_click_change:'انقر لتغيير الحالة', lbl_print_job_card:'طباعة بطاقة العمل',
     lbl_update:'تحديث',
     // Stage management modal
@@ -4027,7 +4043,7 @@ var LANG = {
     nav_customers:'Customers', nav_tracking:'Customer Tracking', nav_users:'User Management',
     sec_home:'Home', sec_cars_mgmt:'Cars Management', sec_services:'Services',
     sec_finance:'Finance', sec_system:'System',
-    status_waiting:'Waiting', status_progress:'In Progress', status_done:'Ready for Delivery',
+    status_waiting:'Waiting', status_progress:'In Progress', status_done:'Ready for Delivery', status_delivered:'Delivered',
     filter_all:'All', filter_cars_all:'All Cars',
     btn_add_car:'➕ Add Car', btn_add_order:'➕ Add Order',
     btn_add_service:'➕ Add Service', btn_add_expense:'➕ Add Expense',
@@ -4145,7 +4161,7 @@ var LANG = {
     empty_services_tbl:'No services', empty_invoices:'No invoices',
     empty_expenses_tbl:'No expenses',
     // Status labels
-    status_in_progress:'In Progress', status_done:'Completed', status_receipt:'Receipt',
+    status_in_progress:'In Progress', status_order_done:'Completed', status_receipt:'Receipt',
     status_click_change:'Click to change stage', lbl_print_job_card:'Print Job Card',
     lbl_update:'Update',
     // Stage management modal
