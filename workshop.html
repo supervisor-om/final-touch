@@ -4303,7 +4303,8 @@ function clearSession() { try{sessionStorage.removeItem('ft_session');}catch(e){
 
 // ── Login ────────────────────────────────────────────────────────────
 function clearAllData() {
-  if(!confirm('هل تريد حذف جميع البيانات؟ سيتم تسجيل خروجك.'))return;
+  if(!confirm('⚠️ تحذير: سيتم حذف جميع البيانات نهائياً!\n\nيشمل ذلك:\n• جميع السيارات والفواتير\n• جميع المصروفات والخدمات\n• جميع الحسابات والإعدادات\n\nهذا الإجراء لا يمكن التراجع عنه.\nهل أنت متأكد تماماً؟'))return;
+  if(!confirm('تأكيد أخير: هل تريد فعلاً حذف كل البيانات؟'))return;
   localStorage.clear();
   sessionStorage.clear();
   location.reload();
