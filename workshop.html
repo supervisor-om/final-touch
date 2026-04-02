@@ -799,16 +799,16 @@ label{font-size:14px;}
     <div class="filter-row">
       <input type="text" id="search-cars" placeholder="🔍 بحث..." oninput="renderCarsTable()">
       <select id="filter-status" onchange="renderCarsTable()">
-        <option value="">كل الحالات</option>
-        <option value="waiting">في الانتظار</option>
-        <option value="progress">تحت الإصلاح</option>
-        <option value="done">جاهزة للتسليم</option>
+        <option value="" data-i18n="filter_all">الكل</option>
+        <option value="waiting" data-i18n="status_waiting">في الانتظار</option>
+        <option value="progress" data-i18n="status_progress">تحت الإصلاح</option>
+        <option value="done" data-i18n="status_done">جاهزة للتسليم</option>
       </select>
       <select id="filter-service" onchange="renderCarsTable()">
-        <option value="">كل الخدمات</option>
-        <option value="صيانة">صيانة</option>
-        <option value="سمكرة">سمكرة</option>
-        <option value="دهان">دهان</option>
+        <option value="" data-i18n="filter_all">كل الخدمات</option>
+        <option value="صيانة" data-i18n="svc_maintenance">صيانة</option>
+        <option value="سمكرة" data-i18n="svc_body">سمكرة</option>
+        <option value="دهان" data-i18n="svc_paint">دهان</option>
       </select>
       <button id="page-add-car-btn" class="btn btn-primary" onclick="openModal('modal-add-car')" data-i18n="btn_add_car">➕ إضافة سيارة</button>
     </div>
@@ -3785,6 +3785,8 @@ var LANG = {
     nav_customers:'العملاء', nav_tracking:'تتبع العملاء', nav_users:'إدارة المستخدمين',
     sec_home:'الرئيسية', sec_cars_mgmt:'إدارة السيارات', sec_services:'الخدمات',
     sec_finance:'المالية', sec_system:'النظام',
+    status_waiting:'في الانتظار', status_progress:'تحت الإصلاح', status_done:'جاهزة للتسليم',
+    filter_all:'الكل', filter_cars_all:'كل السيارات',
     btn_add_car:'➕ إضافة سيارة', btn_add_order:'➕ إضافة أمر صيانة',
     btn_add_service:'➕ إضافة خدمة', btn_add_expense:'➕ إضافة مصروف',
     btn_save:'💾 حفظ', btn_close:'إغلاق', btn_cancel:'إلغاء', btn_logout:'خروج ↩',
@@ -4008,6 +4010,8 @@ var LANG = {
     nav_customers:'Customers', nav_tracking:'Customer Tracking', nav_users:'User Management',
     sec_home:'Home', sec_cars_mgmt:'Cars Management', sec_services:'Services',
     sec_finance:'Finance', sec_system:'System',
+    status_waiting:'Waiting', status_progress:'In Progress', status_done:'Ready for Delivery',
+    filter_all:'All', filter_cars_all:'All Cars',
     btn_add_car:'➕ Add Car', btn_add_order:'➕ Add Order',
     btn_add_service:'➕ Add Service', btn_add_expense:'➕ Add Expense',
     btn_save:'💾 Save', btn_close:'Close', btn_cancel:'Cancel', btn_logout:'Logout ↩',
@@ -4264,8 +4268,9 @@ function getUsers() {
     if (raw) return JSON.parse(raw);
   } catch(e) {}
   var defaults = [
-    { username: 'admin',  password: 'admin1234', role: 'admin'  },
-    { username: 'worker', password: '1234',       role: 'worker' }
+    { username: 'admin',      password: 'admin1234',   role: 'admin'      },
+    { username: 'accountant', password: 'account1234', role: 'accountant' },
+    { username: 'worker',     password: '1234',        role: 'worker'     }
   ];
   try { localStorage.setItem('ft_users', JSON.stringify(defaults)); } catch(e) {}
   return defaults;
