@@ -641,6 +641,9 @@ label{font-size:14px;}
     </div>
     <button class="auth-btn" data-i18n="btn_login" onclick="doLogin()">دخول</button>
     <div class="auth-error" id="auth-error" data-i18n="auth_error_msg">❌ اسم المستخدم أو كلمة المرور غير صحيحة</div>
+    <div style="margin-top:16px;text-align:center;">
+      <button onclick="clearAllData()" style="background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;text-decoration:underline;">🗑️ حذف البيانات القديمة</button>
+    </div>
   </div>
 </div>
 <!-- ═══════════════════════════════════════════════════════════ -->
@@ -3982,6 +3985,7 @@ var LANG = {
     auth_password_lbl:'كلمة المرور', auth_password_ph:'أدخل كلمة المرور',
     btn_login:'دخول', auth_error_msg:'❌ اسم المستخدم أو كلمة المرور غير صحيحة',
     msg_enter_credentials:'يرجى إدخال اسم المستخدم وكلمة المرور',
+    btn_clear_data:'حذف البيانات القديمة',
     modal_add_edit_user:'➕ إضافة / تعديل مستخدم',
     lbl_username:'اسم المستخدم', ph_username:'مثال: ahmed',
     lbl_password:'كلمة المرور', lbl_role:'الصلاحية',
@@ -4209,6 +4213,7 @@ var LANG = {
     auth_password_lbl:'Password', auth_password_ph:'Enter password',
     btn_login:'Login', auth_error_msg:'❌ Invalid username or password',
     msg_enter_credentials:'Please enter username and password',
+    btn_clear_data:'Clear Old Data',
     modal_add_edit_user:'➕ Add / Edit User',
     lbl_username:'Username', ph_username:'Example: ahmed',
     lbl_password:'Password', lbl_role:'Role',
@@ -4285,6 +4290,13 @@ function setSession(u) { try{sessionStorage.setItem('ft_session',JSON.stringify(
 function clearSession() { try{sessionStorage.removeItem('ft_session');}catch(e){} }
 
 // ── Login ────────────────────────────────────────────────────────────
+function clearAllData() {
+  if(!confirm('هل تريد حذف جميع البيانات؟ سيتم تسجيل خروجك.'))return;
+  localStorage.clear();
+  sessionStorage.clear();
+  location.reload();
+}
+
 function doLogin() {
   var username = document.getElementById('auth-username').value.trim();
   var password = document.getElementById('auth-password').value;
