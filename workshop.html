@@ -4338,6 +4338,7 @@ function setLang(lang) {
   });
   var btn = document.getElementById('lang-toggle-btn');
   if (btn) btn.textContent = lang === 'ar' ? '🌐 EN' : '🌐 عربي';
+  renderAll();
 }
 
 // ── Auth helpers (no top-level const to avoid script-block conflicts) ─
