@@ -170,6 +170,21 @@ textarea{resize:vertical;min-height:70px;}
 
 /* ALERT BANNER */
 .alert-banner{background:linear-gradient(135deg,rgba(233,69,96,.15),rgba(255,107,53,.1));border:1px solid rgba(233,69,96,.3);border-radius:12px;padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;gap:12px;}
+.smart-notif{display:flex;align-items:flex-start;gap:12px;padding:12px 16px;border-radius:12px;margin-bottom:10px;transition:all .3s;}
+.smart-notif:hover{transform:translateX(-4px);}
+.smart-notif.warning{background:rgba(245,166,35,.12);border:1px solid rgba(245,166,35,.25);}
+.smart-notif.danger{background:rgba(233,69,96,.12);border:1px solid rgba(233,69,96,.25);}
+.smart-notif.success{background:rgba(0,212,170,.12);border:1px solid rgba(0,212,170,.25);}
+.smart-notif.info{background:rgba(79,172,254,.12);border:1px solid rgba(79,172,254,.25);}
+.smart-notif-icon{font-size:20px;flex-shrink:0;margin-top:2px;}
+.smart-notif-content{flex:1;}
+.smart-notif-title{font-size:13px;font-weight:700;margin-bottom:3px;}
+.smart-notif-desc{font-size:12px;opacity:.8;}
+.smart-notif-action{margin-top:6px;}
+.notif-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-left:6px;}
+.notif-dot.red{background:var(--danger);}
+.notif-dot.orange{background:var(--gold);}
+.notif-dot.green{background:var(--success);}
 .alert-banner .ab-icon{font-size:24px;}
 .alert-banner .ab-text{font-size:13px;font-weight:600;}
 .alert-banner .ab-count{background:var(--accent);color:white;padding:2px 10px;border-radius:20px;font-size:12px;font-weight:700;margin-right:8px;}
@@ -721,6 +736,11 @@ label{font-size:14px;}
     </div>
     <div class="topbar-actions">
       <div id="sync-indicator" style="padding:6px 14px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:20px;">
+      <div id="smart-notif-bell" style="position:relative;cursor:pointer;" onclick="toggleSmartNotifs()">
+        <span style="font-size:18px;">🔔</span>
+        <span id="smart-notif-count" style="position:absolute;top:-6px;right:-8px;background:var(--accent);color:white;font-size:10px;font-weight:700;padding:2px 6px;border-radius:20px;display:none;">0</span>
+      </div>
+      <div id="smart-notif-panel" style="display:none;position:absolute;top:100%;left:0;width:320px;background:#1a2a4a;border:1px solid var(--border);border-radius:12px;padding:12px;margin-top:8px;z-index:1000;box-shadow:0 8px 32px rgba(0,0,0,.5);max-height:400px;overflow-y:auto;"></div>
         <span style="color:#f5a623;font-size:12px;font-weight:700;">⏳ جاري الاتصال...</span>
       </div>
       <button id="lang-toggle-btn" onclick="setLang(currentLang==='ar'?'en':'ar')" style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);color:#fff;border-radius:20px;padding:5px 14px;font-family:var(--font-main);font-size:12px;font-weight:700;cursor:pointer;">🌐 EN</button>
@@ -2434,6 +2454,151 @@ function renderDeliveredTable(){
       </div></td>
     </tr>`;
   }).join('');
+}
+
+// Smart Notification System
+function getSmartNotifications(){
+  const notifs=[];
+  const now=new Date();
+  
+  // 1. Cars exceeding alert days
+  const delayedCars=getAlertedCars();
+  if(delayedCars.length){
+    notifs.push({
+      type:'danger',
+      icon:'🚨',
+      title:'سيارات متأخرة',
+      desc:`${delayedCars.length} سيارة تجاوزت ${state.alertDays} أيام`,
+      action:`عرض ${delayedCars.length} سيارة`,
+      actionFn:"showPage('alerts')"
+    });
+  }
+  
+  // 2. Cars exceeding 7 days (critical)
+  const criticalCars=state.cars.filter(c=>c.status!=='delivered'&&daysSince(c.dateIn)>=7);
+  if(criticalCars.length){
+    notifs.push({
+      type:'warning',
+      icon:'⚠️',
+      title:'تأخير خطير',
+      desc:`${criticalCars.length} سيارة تجاوزت أسبوع كامل`,
+      action:'مراجعة عاجلة',
+      actionFn:"showPage('cars')"
+    });
+  }
+  
+  // 3. Cars ready for delivery (done status)
+  const readyCars=state.cars.filter(c=>c.status==='done');
+  if(readyCars.length){
+    notifs.push({
+      type:'success',
+      icon:'✅',
+      title:'جاهزة للتسليم',
+      desc:`${readyCars.length} سيارة جاهزة ولم يتم تسليمها`,
+      action:'تسليم السيارات',
+      actionFn:"filterByStatus('done')"
+    });
+  }
+  
+  // 4. Empty workshop warning
+  const activeCars=state.cars.filter(c=>c.status!=='delivered');
+  if(activeCars.length===0){
+    notifs.push({
+      type:'info',
+      icon:'📭',
+      title:'الورشة فارغة',
+      desc:'لا توجد سيارات حالياً في الورشة',
+      action:'إضافة سيارة',
+      actionFn:"openModal('modal-add-car')"
+    });
+  }
+  
+  // 5. Unpaid delivered cars
+  const unpaidCars=state.cars.filter(c=>c.status==='delivered'&&c.paymentStatus!=='paid');
+  if(unpaidCars.length){
+    const totalDebt=unpaidCars.reduce((s,c)=>s+(c.estimate||0),0);
+    notifs.push({
+      type:'warning',
+      icon:'💰',
+      title:'أقساط مستحقة',
+      desc:`${unpaidCars.length} سيارة بديون (${fmt(totalDebt)} ر.ع)`,
+      action:'عرض التفاصيل',
+      actionFn:"showPage('delivered')"
+    });
+  }
+  
+  return notifs;
+}
+
+function renderSmartNotifications(){
+  const notifs=getSmartNotifications();
+  
+  // Render in page-alerts
+  const container=document.getElementById('smart-notifs-container');
+  if(container){
+    container.innerHTML=notifs.map(n=>`
+      <div class="smart-notif ${n.type}" onclick="${n.actionFn}">
+        <div class="smart-notif-icon">${n.icon}</div>
+        <div class="smart-notif-content">
+          <div class="smart-notif-title">${n.title}</div>
+          <div class="smart-notif-desc">${n.desc}</div>
+          <div class="smart-notif-action"><button class="btn btn-outline btn-sm">${n.action}</button></div>
+        </div>
+      </div>
+    `).join('');
+  }
+  
+  // Update topbar badge
+  const count=notifs.length;
+  const badge=document.getElementById('smart-notif-count');
+  const bell=document.getElementById('smart-notif-bell');
+  if(badge){
+    badge.textContent=count;
+    badge.style.display=count>0?'inline':'none';
+  }
+  
+  // Update nav badge
+  const navBadge=document.getElementById('badge-alerts');
+  if(navBadge){
+    navBadge.textContent=notifs.filter(n=>n.type==='danger'||n.type==='warning').length||'';
+    navBadge.style.display=navBadge.textContent?'inline':'none';
+  }
+}
+
+function toggleSmartNotifs(){
+  const panel=document.getElementById('smart-notif-panel');
+  if(panel.style.display==='none'){
+    const notifs=getSmartNotifications();
+    panel.innerHTML=notifs.length?notifs.map(n=>`
+      <div class="smart-notif ${n.type}" style="margin-bottom:8px;" onclick="this.parentElement.style.display='none';${n.actionFn}">
+        <div class="smart-notif-icon">${n.icon}</div>
+        <div class="smart-notif-content">
+          <div class="smart-notif-title">${n.title}</div>
+          <div class="smart-notif-desc">${n.desc}</div>
+        </div>
+      </div>
+    `).join(''):'<div style="text-align:center;color:var(--muted);padding:20px;">✅ لا توجد إشعارات</div>';
+    panel.style.display='block';
+  } else {
+    panel.style.display='none';
+  }
+}
+
+// Close panel when clicking outside
+document.addEventListener('click',function(e){
+  const panel=document.getElementById('smart-notif-panel');
+  const bell=document.getElementById('smart-notif-bell');
+  if(panel&&!bell?.contains(e.target)&&!panel.contains(e.target)){
+    panel.style.display='none';
+  }
+});
+
+function filterByStatus(status){
+  showPage('cars');
+  setTimeout(()=>{
+    const sel=document.getElementById('filter-status');
+    if(sel){sel.value=status;renderCarsTable();}
+  },100);
 }
 
 function renderAlertsTable(){
