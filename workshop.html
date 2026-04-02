@@ -757,8 +757,8 @@ label{font-size:14px;}
       <div class="stat-card red"><span class="stat-icon">💸</span><div class="stat-value" id="stat-expenses">0 ر.ع</div><div class="stat-label" data-i18n="stat_expenses">إجمالي المصروفات</div></div>
       <div class="stat-card gold"><span class="stat-icon">📦</span><div class="stat-value" id="stat-profit">0 ر.ع</div><div class="stat-label" data-i18n="stat_profit">${t('closing_net_profit_lbl')}</div></div>
       <div class="stat-card purple"><span class="stat-icon">⏳</span><div class="stat-value" id="stat-pending">0 ر.ع</div><div class="stat-label" data-i18n="stat_pending">مبالغ معلقة (غير مقبوضة)</div></div>
-      <div class="stat-card" style="--accent:#9b59b6;--color:#9b59b6;"><span class="stat-icon">📞</span><div class="stat-value" id="stat-delivered-today">0</div><div class="stat-label">🚗 سيارات مُسلَّمة هذا الشهر</div></div>
-      <div class="stat-card" style="--accent:#e67e22;--color:#e67e22;"><span class="stat-icon">⏱️</span><div class="stat-value" id="stat-avg-days">0</div><div class="stat-label">📅 متوسط أيام الإصلاح</div></div>
+      <div class="stat-card" style="--accent:#9b59b6;--color:#9b59b6;"><span class="stat-icon">📞</span><div class="stat-value" id="stat-delivered-today">0</div><div class="stat-label" data-i18n="stat_delivered_month">🚗 سيارات مُسلَّمة هذا الشهر</div></div>
+      <div class="stat-card" style="--accent:#e67e22;--color:#e67e22;"><span class="stat-icon">⏱️</span><div class="stat-value" id="stat-avg-days">0</div><div class="stat-label" data-i18n="stat_avg_repair_days">📅 متوسط أيام الإصلاح</div></div>
     </div>
     <div class="two-col-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:18px;">
       <div class="card">
@@ -782,13 +782,13 @@ label{font-size:14px;}
     
     <!-- Monthly Revenue Chart -->
     <div class="card" style="margin-top:18px;">
-      <div class="card-header"><div class="card-title">📈 الإيرادات الشهرية</div></div>
+      <div class="card-header"><div class="card-title" data-i18n="monthly_chart_title">📈 الإيرادات الشهرية</div></div>
       <div class="card-body">
         <div id="monthly-chart" class="chart-container" style="display:flex;align-items:flex-end;justify-content:space-around;padding:20px 10px 30px;gap:8px;"></div>
         <div style="display:flex;justify-content:space-between;margin-top:16px;padding-top:12px;border-top:1px solid var(--border);">
-          <div class="mini-stat">📊 إجمالي السيارات: <span id="chart-total-cars">0</span></div>
-          <div class="mini-stat">💰 متوسط الإيراد/شهر: <span id="chart-avg-revenue">0 ر.ع</span></div>
-          <div class="mini-stat">📈 أفضل شهر: <span id="chart-best-month">-</span></div>
+          <div class="mini-stat">📊 <span data-i18n="chart_total_cars">إجمالي السيارات</span>: <span id="chart-total-cars">0</span></div>
+          <div class="mini-stat">💰 <span data-i18n="chart_avg_revenue">متوسط الإيراد/شهر</span>: <span id="chart-avg-revenue">0</span></div>
+          <div class="mini-stat">📈 <span data-i18n="chart_best_month">أفضل شهر</span>: <span id="chart-best-month">-</span></div>
         </div>
       </div>
     </div>
@@ -2307,7 +2307,7 @@ function renderDashboard(){
 
   const alerted=getAlertedCars();
   const banner=document.getElementById('alert-banner-area');
-  banner.innerHTML=alerted.length?`<div class="alert-banner"><span class="ab-icon">🔔</span><div class="ab-text">يوجد <span class="ab-count">${alerted.length}</span> سيارة تجاوزت ${state.alertDays} أيام في الورشة! <button class="btn btn-outline btn-sm" style="margin-right:10px;" onclick="showPage('alerts')">عرض التفاصيل</button></div></div>`:'';
+  banner.innerHTML=alerted.length?`<div class="alert-banner"><span class="ab-icon">🔔</span><div class="ab-text">${t('notif_delayed_cars')}: <span class="ab-count">${alerted.length}</span> ${currentLang==='ar'?'سيارة':'car(s)'} ${currentLang==='ar'?'تجاوزت':'exceeded'} ${state.alertDays} ${t('days_unit')}! <button class="btn btn-outline btn-sm" style="margin-right:10px;" onclick="showPage('alerts')">${t('view_details')}</button></div></div>`:'';
 
   const total=state.invoices.length||1;
   const maint=state.invoices.filter(i=>i.service.includes('صيان')).length;
@@ -2468,7 +2468,7 @@ function getSmartNotifications(){
       type:'danger',
       icon:'🚨',
       title:'سيارات متأخرة',
-      desc:`${delayedCars.length} سيارة تجاوزت ${state.alertDays} أيام`,
+      desc:`${delayedCars.length} ${currentLang==='ar'?'سيارة':'car(s)'} ${currentLang==='ar'?'تجاوزت':'exceeded'} ${state.alertDays} ${t('days_unit')}`,
       action:`عرض ${delayedCars.length} سيارة`,
       actionFn:"showPage('alerts')"
     });
@@ -2481,7 +2481,7 @@ function getSmartNotifications(){
       type:'warning',
       icon:'⚠️',
       title:'تأخير خطير',
-      desc:`${criticalCars.length} سيارة تجاوزت أسبوع كامل`,
+      desc:t('notif_critical_desc').replace('{n}',criticalCars.length),
       action:'مراجعة عاجلة',
       actionFn:"showPage('cars')"
     });
@@ -2494,7 +2494,7 @@ function getSmartNotifications(){
       type:'success',
       icon:'✅',
       title:'جاهزة للتسليم',
-      desc:`${readyCars.length} سيارة جاهزة ولم يتم تسليمها`,
+      desc:t('notif_ready_desc').replace('{n}',readyCars.length),
       action:'تسليم السيارات',
       actionFn:"filterByStatus('done')"
     });
@@ -2507,7 +2507,7 @@ function getSmartNotifications(){
       type:'info',
       icon:'📭',
       title:'الورشة فارغة',
-      desc:'لا توجد سيارات حالياً في الورشة',
+      desc:t('notif_empty_desc'),
       action:'إضافة سيارة',
       actionFn:"openModal('modal-add-car')"
     });
@@ -2521,7 +2521,7 @@ function getSmartNotifications(){
       type:'warning',
       icon:'💰',
       title:'أقساط مستحقة',
-      desc:`${unpaidCars.length} سيارة بديون (${fmt(totalDebt)} ر.ع)`,
+      desc:t('notif_debt_desc').replace('{n}',unpaidCars.length).replace('{amount}',fmt(totalDebt)+(currentLang==='ar'?' ر.ع':'')),
       action:'عرض التفاصيل',
       actionFn:"showPage('delivered')"
     });
@@ -2577,7 +2577,7 @@ function toggleSmartNotifs(){
           <div class="smart-notif-desc">${n.desc}</div>
         </div>
       </div>
-    `).join(''):'<div style="text-align:center;color:var(--muted);padding:20px;">✅ لا توجد إشعارات</div>';
+    `).join(''):'<div style="text-align:center;color:var(--muted);padding:20px;">'+t('no_notifications')+'</div>';
     panel.style.display='block';
   } else {
     panel.style.display='none';
@@ -2744,7 +2744,7 @@ function renderCustomers(){
     customers[c.owner].remaining+=Math.max(0,(c.estimate||0)-(c.paidTotal||0));
   });
   const tbody=document.getElementById('customers-table-body');
-  if(!Object.keys(customers).length){tbody.innerHTML='<tr><td colspan="5"><div class="empty-state"><div class="empty-icon">👤</div><p>لا يوجد عملاء</p></div></td></tr>';return;}
+  if(!Object.keys(customers).length){tbody.innerHTML='<tr><td colspan="5"><div class="empty-state"><div class="empty-icon">👤</div><p>'+t('no_customers')+'</p></div></td></tr>';return;}
   tbody.innerHTML=Object.entries(customers).map(([name,d])=>`<tr>
     <td><strong>${name}</strong></td><td>${d.phone||'—'}</td><td>${d.cars}</td>
     <td style="color:var(--success);">${d.paid.toFixed(3)} ر.ع</td>
@@ -3249,7 +3249,7 @@ function showCarTracking(car) {
   document.getElementById('trk-owner').textContent     = car.owner;
   document.getElementById('trk-service').textContent   = car.service;
   document.getElementById('trk-date-in').textContent   = formatDate(car.dateIn);
-  document.getElementById('trk-days').innerHTML        = `<span style="color:${days > 3 ? '#e94560':'#00d4aa'}">${days} يوم${days > 3?' ⚠️':''}</span>`;
+  document.getElementById('trk-days').innerHTML        = `<span style="color:${days > 3 ? '#e94560':'#00d4aa'}">${days} ${t('days_unit')}${days > 3?' ⚠️':''}</span>`;
   document.getElementById('trk-status-badge').innerHTML = statusMap[car.status] || '';
 
   // Stages
@@ -3281,7 +3281,7 @@ function showCarTracking(car) {
   remEl.textContent = remaining.toFixed(3) + ' ر.ع';
   remEl.style.color = remaining > 0 ? '#e94560' : '#00d4aa';
   if (remaining <= 0) {
-    document.getElementById('trk-remaining-row').innerHTML = '<span style="color:#00d4aa;font-size:15px;font-weight:800;">✅ تم الدفع بالكامل</span><span style="color:#00d4aa;">✓</span>';
+    document.getElementById('trk-remaining-row').innerHTML = '<span style="color:#00d4aa;font-size:15px;font-weight:800;">✅ '+t('payment_complete')+'</span><span style="color:#00d4aa;">✓</span>';
   }
 
   // Notes
@@ -3939,6 +3939,37 @@ var LANG = {
     msg_all_fields_req:'يرجى ملء جميع الحقول',
     role_admin:'👑 مسؤول', role_worker:'👷 عامل',
     role_accountant:'💰 محاسب',
+    // Smart notification translations
+    notif_delayed_cars:'سيارات متأخرة',
+    notif_delayed_desc:'{n} سيارة تجاوزت {days} أيام',
+    notif_critical_title:'تأخير خطير',
+    notif_critical_desc:'{n} سيارة تجاوزت أسبوع كامل',
+    notif_ready_title:'جاهزة للتسليم',
+    notif_ready_desc:'{n} سيارة جاهزة ولم يتم تسليمها',
+    notif_empty_title:'الورشة فارغة',
+    notif_empty_desc:t('notif_empty_desc'),
+    notif_debt_title:'أقساط مستحقة',
+    notif_debt_desc:'{n} سيارة بديون ({amount})',
+    notif_view_cars:'عرض {n} سيارة',
+    notif_urgent_review:'مراجعة عاجلة',
+    notif_deliver_cars:'تسليم السيارات',
+    notif_add_car:'إضافة سيارة',
+    notif_view_details:'عرض التفاصيل',
+    // Common translations
+    no_cars_found:'لا توجد سيارات',
+    no_customers:'لا يوجد عملاء',
+    days_unit:'أيام',
+    overdue_warning:'متأخرة',
+    payment_complete:'تم الدفع بالكامل',
+    saved_success:'✅ تم الحفظ',
+    no_notifications:'✅ لا توجد إشعارات',
+    monthly_chart_title:'📈 الإيرادات الشهرية',
+    chart_total_cars:'إجمالي السيارات',
+    chart_avg_revenue:'متوسط الإيراد/شهر',
+    chart_best_month:'أفضل شهر',
+    stat_delivered_month:'🚗 سيارات مُسلَّمة هذا الشهر',
+    stat_avg_repair_days:'📅 متوسط أيام الإصلاح',
+
     lbl_current_account:'الحساب الحالي', btn_delete:'حذف',
     msg_admin_page_only:'🔒 هذه الصفحة للمسؤول فقط',
     lbl_fully_paid:'✅ مدفوع بالكامل', lbl_remaining_payment:'⏳ متبقي',
@@ -4131,6 +4162,38 @@ var LANG = {
     msg_all_fields_req:'Please fill all fields',
     role_admin:'👑 Admin', role_worker:'👷 Worker',
     role_accountant:'💰 Accountant',
+    // Smart notification translations
+    notif_delayed_cars:'Delayed Cars',
+    notif_delayed_desc:'{n} cars exceeded {days} days',
+    notif_critical_title:'Critical Delay',
+    notif_critical_desc:'{n} cars exceeded one week',
+    notif_ready_title:'Ready for Delivery',
+    notif_ready_desc:'{n} cars ready but not delivered',
+    notif_empty_title:'Workshop Empty',
+    notif_empty_desc:'No cars currently in workshop',
+    notif_debt_title:'Outstanding Payments',
+    notif_debt_desc:'{n} cars with debts ({amount})',
+    notif_view_cars:'View {n} Cars',
+    notif_urgent_review:'Urgent Review',
+    notif_deliver_cars:'Deliver Cars',
+    notif_add_car:'Add Car',
+    notif_view_details:'View Details',
+    // Common translations
+    no_cars_found:'No cars found',
+    no_customers:'No customers',
+    days_unit:'days',
+    overdue_warning:'overdue',
+    payment_complete:'Payment Complete',
+    saved_success:'✅ Saved',
+    view_details:'View Details',
+    no_notifications:'No notifications',
+    monthly_chart_title:'📈 Monthly Revenue',
+    chart_total_cars:'Total Cars',
+    chart_avg_revenue:'Avg. Revenue/Month',
+    chart_best_month:'Best Month',
+    stat_delivered_month:'🚗 Cars Delivered This Month',
+    stat_avg_repair_days:'📅 Avg. Repair Days',
+
     lbl_current_account:'Current Account', btn_delete:'Delete',
     msg_admin_page_only:'🔒 This page is for admin only',
     lbl_fully_paid:'✅ Fully Paid', lbl_remaining_payment:'⏳ Remaining',
@@ -4140,6 +4203,7 @@ var LANG = {
     auth_username_lbl:'Username', auth_username_ph:'Enter username',
     auth_password_lbl:'Password', auth_password_ph:'Enter password',
     btn_login:'Login', auth_error_msg:'❌ Invalid username or password',
+    msg_enter_credentials:'Please enter username and password',
     modal_add_edit_user:'➕ Add / Edit User',
     lbl_username:'Username', ph_username:'Example: ahmed',
     lbl_password:'Password', lbl_role:'Role',
@@ -4222,7 +4286,7 @@ function doLogin() {
   errEl.style.display = 'none';
 
   if (!username || !password) {
-    errEl.textContent = '⚠️ يرجى إدخال اسم المستخدم وكلمة المرور';
+    errEl.textContent = '⚠️ ' + t('msg_enter_credentials');
     errEl.style.display = 'block'; return;
   }
 
@@ -4235,7 +4299,7 @@ function doLogin() {
   }
 
   if (!user) {
-    errEl.textContent = '❌ اسم المستخدم أو كلمة المرور غير صحيحة';
+    errEl.textContent = '❌ ' + t('auth_error_msg');
     errEl.style.display = 'block';
     document.getElementById('auth-password').value = '';
     return;
@@ -4350,7 +4414,7 @@ function saveUser() {
     users.push({ username, password, role });
   }
   saveUsers(users);
-  msgEl.innerHTML = '<span style="color:#00d4aa;">✅ تم الحفظ</span>';
+  msgEl.innerHTML = '<span style="color:#00d4aa;">'+t('saved_success')+'</span>';
   ['new-username','new-password'].forEach(id => document.getElementById(id).value = '');
   renderUsersList();
   setTimeout(() => msgEl.innerHTML = '', 2000);
