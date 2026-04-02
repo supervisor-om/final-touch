@@ -305,8 +305,10 @@ textarea{resize:vertical;min-height:70px;}
 }
 .role-admin{background:rgba(233,69,96,.15);color:#e94560;border:1px solid rgba(233,69,96,.25);}
 .role-worker{background:rgba(79,172,254,.15);color:#4facfe;border:1px solid rgba(79,172,254,.25);}
+.role-accountant{background:rgba(245,166,35,.15);color:#f5a623;border:1px solid rgba(245,166,35,.25);}
 /* Hide admin-only nav items for workers */
 .worker-hidden{display:none!important;}
+.accountant-hidden{display:none!important;}
 
 /* ============================================================
    DESIGN ENHANCEMENTS
@@ -643,6 +645,7 @@ label{font-size:14px;}
             <label data-i18n="lbl_role">الصلاحية</label>
             <select id="new-role">
               <option value="worker">👷 عامل</option>
+              <option value="accountant">💰 محاسب</option>
               <option value="admin">👑 مسؤول</option>
             </select>
           </div>
@@ -675,11 +678,11 @@ label{font-size:14px;}
     <div class="nav-section"><span data-i18n="sec_services">الخدمات</span></div>
     <div class="nav-item" onclick="showPage('maintenance')"><span class="nav-icon">⚙️</span> <span data-i18n="nav_maintenance">أوامر الصيانة</span></div>
     <div class="nav-item" onclick="showPage('services')"><span class="nav-icon">🛠️</span> <span data-i18n="nav_services">قائمة الخدمات</span></div>
-    <div class="nav-section admin-only"><span data-i18n="sec_finance">المالية</span></div>
-    <div class="nav-item admin-only" onclick="showPage('invoices')"><span class="nav-icon">🧾</span> <span data-i18n="nav_invoices">الفواتير والإيصالات</span></div>
-    <div class="nav-item admin-only" onclick="showPage('expenses')"><span class="nav-icon">💸</span> <span data-i18n="nav_expenses">المصروفات</span></div>
-    <div class="nav-item admin-only" onclick="showPage('reports')"><span class="nav-icon">📈</span> <span data-i18n="nav_reports">التقارير المالية</span></div>
-    <div class="nav-item admin-only" onclick="showPage('closing')"><span class="nav-icon">📅</span> <span data-i18n="nav_closing">الإغلاق الشهري</span></div>
+    <div class="nav-section admin-only accountant-only"><span data-i18n="sec_finance">المالية</span></div>
+    <div class="nav-item admin-only accountant-only" onclick="showPage('invoices')"><span class="nav-icon">🧾</span> <span data-i18n="nav_invoices">الفواتير والإيصالات</span></div>
+    <div class="nav-item admin-only accountant-only" onclick="showPage('expenses')"><span class="nav-icon">💸</span> <span data-i18n="nav_expenses">المصروفات</span></div>
+    <div class="nav-item admin-only accountant-only" onclick="showPage('reports')"><span class="nav-icon">📈</span> <span data-i18n="nav_reports">التقارير المالية</span></div>
+    <div class="nav-item admin-only accountant-only" onclick="showPage('closing')"><span class="nav-icon">📅</span> <span data-i18n="nav_closing">الإغلاق الشهري</span></div>
     <div class="nav-section"><span data-i18n="sec_system">النظام</span></div>
     <div class="nav-item" onclick="showPage('customers')"><span class="nav-icon">👤</span> <span data-i18n="nav_customers">العملاء</span></div>
     <div class="nav-item" onclick="showPage('tracking')"><span class="nav-icon">🔍</span> <span data-i18n="nav_tracking">تتبع العملاء</span></div>
@@ -1915,7 +1918,7 @@ function addExpense(){
 
 // RETURN TO WORKSHOP
 function returnToWorkshop(id){
-  const _s=getSession();if(!_s||_s.role!=='admin'){alert(t('msg_admin_only'));return;}
+  const _s=getSession();if(!_s||(_s.role!=='admin'&&_s.role!=='accountant')){alert(t('msg_admin_only'));return;}
   if(!confirm(t('msg_confirm_return_workshop')))return;
   const car=state.cars.find(c=>c.id===id);
   if(!car)return;
@@ -1930,7 +1933,7 @@ function returnToWorkshop(id){
 }
 
 // DELETE
-function deleteCar(id){const _dc=getSession();if(!_dc||_dc.role!=='admin'){alert(t('msg_admin_only_delete'));return;}if(!confirm(t('msg_confirm_delete_car')))return;state.cars=state.cars.filter(c=>c.id!==id);saveState();renderAll();}
+function deleteCar(id){const _dc=getSession();if(!_dc||(_dc.role!=='admin'&&_dc.role!=='accountant')){alert(t('msg_admin_only_delete'));return;}if(!confirm(t('msg_confirm_delete_car')))return;state.cars=state.cars.filter(c=>c.id!==id);saveState();renderAll();}
 function deleteExpense(id){if(!confirm(t('msg_confirm_delete_expense')))return;state.expenses=state.expenses.filter(e=>e.id!==id);saveState();renderAll();}
 function deleteService(id){if(!confirm(t('msg_confirm_delete_service')))return;state.services=state.services.filter(s=>s.id!==id);saveState();renderAll();}
 function deleteOrder(id){if(!confirm(t('msg_confirm_delete_order')))return;state.orders=state.orders.filter(o=>o.id!==id);saveState();renderAll();}
@@ -3696,6 +3699,7 @@ var LANG = {
     msg_confirm_delete_stage:'حذف هذه الحالة؟ السيارات في هذه الحالة ستنتقل للحالة السابقة.',
     msg_all_fields_req:'يرجى ملء جميع الحقول',
     role_admin:'👑 مسؤول', role_worker:'👷 عامل',
+    role_accountant:'💰 محاسب',
     lbl_current_account:'الحساب الحالي', btn_delete:'حذف',
     msg_admin_page_only:'🔒 هذه الصفحة للمسؤول فقط',
     lbl_fully_paid:'✅ مدفوع بالكامل', lbl_remaining_payment:'⏳ متبقي',
@@ -3887,6 +3891,7 @@ var LANG = {
     msg_confirm_delete_stage:'Delete this stage? Cars in this stage will move to previous stage.',
     msg_all_fields_req:'Please fill all fields',
     role_admin:'👑 Admin', role_worker:'👷 Worker',
+    role_accountant:'💰 Accountant',
     lbl_current_account:'Current Account', btn_delete:'Delete',
     msg_admin_page_only:'🔒 This page is for admin only',
     lbl_fully_paid:'✅ Fully Paid', lbl_remaining_payment:'⏳ Remaining',
@@ -4016,12 +4021,18 @@ function logout() {
 function applyRole(user) {
   var isAdmin = (user.role === 'admin');
 
+  var isAccountant = (user.role === 'accountant');
+  
   document.querySelectorAll('.admin-only').forEach(function(el){
-    el.classList.toggle('worker-hidden', !isAdmin);
+    el.classList.toggle('worker-hidden', !isAdmin && !isAccountant);
+  });
+  
+  document.querySelectorAll('.accountant-only').forEach(function(el){
+    el.classList.toggle('accountant-hidden', !isAccountant);
   });
 
   document.getElementById('auth-user-name').textContent = '👤 ' + user.username;
-  document.getElementById('auth-user-role').textContent = isAdmin ? '👑 مسؤول' : '👷 عامل';
+  document.getElementById('auth-user-role').textContent = isAdmin ? '👑 مسؤول' : (user.role === 'accountant' ? '💰 محاسب' : '👷 عامل');
 
   if (isAdmin) {
     showPage('dashboard');
@@ -4070,7 +4081,7 @@ function openUsersModal() {
 
 function renderUsersList() {
   const users = getUsers();
-  const roleLabel = r => r === 'admin' ? `<span style="color:#e94560;font-weight:700;">${t('role_admin')}</span>` : `<span style="color:#4facfe;font-weight:700;">${t('role_worker')}</span>`;
+  const roleLabel = r => r === 'admin' ? `<span style="color:#e94560;font-weight:700;">${t('role_admin')}</span>` : r === 'accountant' ? `<span style="color:#f5a623;font-weight:700;">${t('role_accountant')}</span>` : `<span style="color:#4facfe;font-weight:700;">${t('role_worker')}</span>`;
   document.getElementById('users-list').innerHTML = users.map((u, i) => `
     <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:10px;margin-bottom:8px;">
       <div>
