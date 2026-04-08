@@ -618,6 +618,7 @@ label{font-size:14px;}
     <div class="nav-item admin-only" onclick="showPage('invoices')"><span class="nav-icon">🧾</span> <span data-i18n="nav_invoices">الفواتير والإيصالات</span></div>
     <div class="nav-item admin-only" onclick="showPage('expenses')"><span class="nav-icon">💸</span> <span data-i18n="nav_expenses">المصروفات</span></div>
     <div class="nav-item admin-only" onclick="showPage('reports')"><span class="nav-icon">📈</span> <span data-i18n="nav_reports">التقارير المالية</span></div>
+    <div class="nav-item admin-only" onclick="showPage('closing')"><span class="nav-icon">📅</span> <span data-i18n="nav_closing">الإغلاق الشهري</span></div>
     <div class="nav-section"><span data-i18n="sec_system">النظام</span></div>
     <div class="nav-item" onclick="showPage('customers')"><span class="nav-icon">👤</span> <span data-i18n="nav_customers">العملاء</span></div>
     <div class="nav-item" onclick="showPage('tracking')"><span class="nav-icon">🔍</span> <span data-i18n="nav_tracking">تتبع العملاء</span></div>
@@ -839,6 +840,99 @@ label{font-size:14px;}
     </div>
     <div id="report-cars" style="display:none;">
       <div class="card"><div class="card-header"><div class="card-title" data-i18n="card_cars_stats">🚗 إحصائيات السيارات</div></div><div class="card-body" id="cars-report"></div></div>
+    </div>
+  </div>
+
+  <!-- MONTHLY CLOSING -->
+  <div class="page" id="page-closing">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:10px;">
+      <div style="font-size:15px;font-weight:700;color:var(--text);" data-i18n="closing_title">📅 الإغلاق الشهري</div>
+      <button class="btn btn-primary" onclick="openCloseMonthModal()" data-i18n="btn_close_month">🔒 إغلاق شهر</button>
+    </div>
+
+    <!-- Current month live card -->
+    <div class="card" style="margin-bottom:18px;">
+      <div class="card-header">
+        <div class="card-title" id="closing-current-title">📊 الشهر الحالي</div>
+        <div style="font-size:12px;color:var(--muted);" id="closing-current-subtitle"></div>
+      </div>
+      <div class="card-body">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:16px;">
+          <div style="background:rgba(0,212,170,.1);border:1px solid rgba(0,212,170,.25);border-radius:12px;padding:14px;text-align:center;">
+            <div style="font-size:11px;color:var(--muted);margin-bottom:4px;" data-i18n="lbl_cl_revenue">الإيرادات</div>
+            <div style="font-size:20px;font-weight:900;color:var(--success);" id="cl-cur-revenue">0 ر.ع</div>
+          </div>
+          <div style="background:rgba(233,69,96,.1);border:1px solid rgba(233,69,96,.25);border-radius:12px;padding:14px;text-align:center;">
+            <div style="font-size:11px;color:var(--muted);margin-bottom:4px;" data-i18n="lbl_cl_expenses">المصروفات</div>
+            <div style="font-size:20px;font-weight:900;color:var(--danger);" id="cl-cur-expenses">0 ر.ع</div>
+          </div>
+          <div style="background:rgba(255,179,0,.1);border:1px solid rgba(255,179,0,.25);border-radius:12px;padding:14px;text-align:center;">
+            <div style="font-size:11px;color:var(--muted);margin-bottom:4px;" data-i18n="lbl_cl_profit">صافي الربح</div>
+            <div style="font-size:20px;font-weight:900;color:var(--gold);" id="cl-cur-profit">0 ر.ع</div>
+          </div>
+          <div style="background:rgba(79,172,254,.1);border:1px solid rgba(79,172,254,.25);border-radius:12px;padding:14px;text-align:center;">
+            <div style="font-size:11px;color:var(--muted);margin-bottom:4px;" data-i18n="lbl_cl_cars">السيارات</div>
+            <div style="font-size:20px;font-weight:900;color:var(--info);" id="cl-cur-cars">0</div>
+          </div>
+          <div style="background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center;">
+            <div style="font-size:11px;color:var(--muted);margin-bottom:4px;" data-i18n="lbl_cl_margin">هامش الربح</div>
+            <div style="font-size:20px;font-weight:900;color:var(--text);" id="cl-cur-margin">0%</div>
+          </div>
+          <div style="background:rgba(255,100,50,.08);border:1px solid rgba(255,100,50,.2);border-radius:12px;padding:14px;text-align:center;">
+            <div style="font-size:11px;color:var(--muted);margin-bottom:4px;" data-i18n="lbl_cl_carryover">سيارات معلقة</div>
+            <div style="font-size:20px;font-weight:900;color:#ff6432;" id="cl-cur-carryover">0</div>
+          </div>
+        </div>
+        <!-- Current month mini chart -->
+        <div style="display:flex;justify-content:center;">
+          <canvas id="chart-current-bar" width="520" height="160" style="max-width:100%;border-radius:10px;"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6-month trend chart -->
+    <div class="card" style="margin-bottom:18px;">
+      <div class="card-header">
+        <div class="card-title" data-i18n="closing_trend_title">📈 مقارنة الأشهر الستة الأخيرة</div>
+      </div>
+      <div class="card-body">
+        <div style="overflow-x:auto;">
+          <canvas id="chart-trend-bar" width="660" height="240" style="min-width:500px;max-width:100%;border-radius:10px;"></canvas>
+        </div>
+        <!-- Legend -->
+        <div style="display:flex;justify-content:center;gap:20px;margin-top:12px;flex-wrap:wrap;">
+          <div style="display:flex;align-items:center;gap:6px;font-size:12px;"><span style="width:12px;height:12px;border-radius:3px;background:#00d4aa;display:inline-block;"></span><span data-i18n="lbl_cl_revenue">الإيرادات</span></div>
+          <div style="display:flex;align-items:center;gap:6px;font-size:12px;"><span style="width:12px;height:12px;border-radius:3px;background:#e94560;display:inline-block;"></span><span data-i18n="lbl_cl_expenses">المصروفات</span></div>
+          <div style="display:flex;align-items:center;gap:6px;font-size:12px;"><span style="width:12px;height:12px;border-radius:3px;background:#ffd700;display:inline-block;"></span><span data-i18n="lbl_cl_profit">الربح</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Service distribution and monthly cars chart -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px;" id="closing-charts-row">
+      <div class="card">
+        <div class="card-header"><div class="card-title" data-i18n="closing_service_dist">🍩 توزيع الخدمات</div></div>
+        <div class="card-body" style="display:flex;flex-direction:column;align-items:center;">
+          <canvas id="chart-service-donut" width="200" height="200"></canvas>
+          <div id="chart-service-legend" style="margin-top:12px;width:100%;"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title" data-i18n="closing_cars_trend">🚗 حركة السيارات شهرياً</div></div>
+        <div class="card-body">
+          <canvas id="chart-cars-trend" width="280" height="200" style="max-width:100%;"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Closed months list -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title" data-i18n="closing_history_title">🗂️ سجل الإغلاقات</div>
+      </div>
+      <div class="card-body" style="padding:0;">
+        <div id="closing-list"></div>
+      </div>
     </div>
   </div>
 
@@ -1277,6 +1371,7 @@ let state = {
   ],
   expenses:[],
   invoices:[],
+  monthlyClosings:[],
   currentEditCar:null,
   invoiceCounter:1000,
   jobCardCounter:75,
@@ -1318,6 +1413,7 @@ function loadState(){
   try{const s=localStorage.getItem('finaltouchv2');if(s){const p=JSON.parse(s);state={...state,...p};
     if(!state.stages||!state.stages.length)state.stages=[{icon:'📋',label:'استلام'},{icon:'🔍',label:'تشخيص'},{icon:'🔧',label:'إصلاح'},{icon:'🎨',label:'دهان'},{icon:'✅',label:'جاهزة للتسليم'},{icon:'📦',label:'تسليم'}];
     if(!state.stageTemplates)state.stageTemplates={};
+    if(!state.monthlyClosings)state.monthlyClosings=[];
   }}catch(e){}
 }
 function saveState(){localStorage.setItem('finaltouchv2',JSON.stringify(state));}
@@ -1343,7 +1439,7 @@ function stageFromStatus(s,stages){const arr=stages||state.stages;const last=arr
 function statusFromStage(i,stages){const last=(stages||state.stages).length-1;return i>=last?'delivered':i>=(last-1)?'done':i>=1?'progress':'waiting';}
 
 // NAVIGATION
-const ADMIN_PAGES_SET = ['dashboard','invoices','expenses','reports'];
+const ADMIN_PAGES_SET = ['dashboard','invoices','expenses','reports','closing'];
 function showPage(id){
   // Role-based access check
   try{
@@ -1360,7 +1456,7 @@ function showPage(id){
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   document.getElementById('page-'+id).classList.add('active');
   document.querySelectorAll('.nav-item').forEach(n=>{if(n.getAttribute('onclick')&&n.getAttribute('onclick').includes("'"+id+"'"))n.classList.add('active');});
-  const titleKeys={dashboard:'nav_dashboard',cars:'nav_cars',delivered:'nav_delivered',alerts:'nav_alerts',maintenance:'nav_maintenance',services:'nav_services',invoices:'nav_invoices',expenses:'nav_expenses',reports:'nav_reports',customers:'nav_customers'};
+  const titleKeys={dashboard:'nav_dashboard',cars:'nav_cars',delivered:'nav_delivered',alerts:'nav_alerts',maintenance:'nav_maintenance',services:'nav_services',invoices:'nav_invoices',expenses:'nav_expenses',reports:'nav_reports',customers:'nav_customers',closing:'nav_closing'};
   document.getElementById('page-title').textContent=t(titleKeys[id]||'')||'';
   renderAll();
   if(document.getElementById('sidebar').classList.contains('open'))toggleSidebar();
@@ -1876,7 +1972,7 @@ function getAlertedCars(){return state.cars.filter(c=>c.status!=='delivered'&&da
 function renderAll(){
   renderDashboard();renderCarsTable();renderDeliveredTable();renderAlertsTable();
   renderOrdersTable();renderServicesTable();renderInvoicesTable();renderExpensesTable();
-  renderReports();renderCustomers();updateBadges();
+  renderReports();renderCustomers();renderMonthlyClosing();updateBadges();
 }
 
 function updateBadges(){
@@ -2132,6 +2228,620 @@ function renderCustomers(){
     <td style="color:${d.remaining>0?'var(--danger)':'var(--success)'};">${d.remaining>0?d.remaining.toFixed(3)+' ر.ع':'✅ لا يوجد'}</td>
   </tr>`).join('');
 }
+
+// ═══════════════════════════════════════════════════
+// MONTHLY CLOSING SYSTEM
+// ═══════════════════════════════════════════════════
+
+// Returns all stats for a given month string "YYYY-MM"
+// Revenue is attributed to dateIn (registration month), NOT dateOut
+function getMonthlyData(monthStr){
+  const allCars = state.cars.filter(c=>(c.dateIn||'').startsWith(monthStr));
+  const delivered = allCars.filter(c=>c.status==='delivered');
+  const carryOver = allCars.filter(c=>c.status!=='delivered');
+  const totalEstimate = allCars.reduce((s,c)=>s+(c.estimate||0),0);
+  const totalPaid = allCars.reduce((s,c)=>s+(c.paidTotal||0),0);
+  const monthExpenses = state.expenses.filter(e=>(e.date||'').startsWith(monthStr));
+  const totalExpenses = monthExpenses.reduce((s,e)=>s+(e.amount||0),0);
+  const grossProfit = totalPaid - totalExpenses;
+  const profitMargin = totalPaid>0?(grossProfit/totalPaid)*100:0;
+  // Service distribution
+  const byService = {};
+  allCars.forEach(c=>{
+    const svc = c.service||'أخرى';
+    if(!byService[svc])byService[svc]={count:0,amount:0};
+    byService[svc].count++;
+    byService[svc].amount+=(c.paidTotal||0);
+  });
+  return {
+    carsReceived:allCars.length, carsDelivered:delivered.length, carsCarryOver:carryOver.length,
+    carryOverCarIds:carryOver.map(c=>c.id), deliveredCarIds:delivered.map(c=>c.id),
+    allCarIds:allCars.map(c=>c.id),
+    totalEstimate, totalPaid, totalRemaining:totalEstimate-totalPaid,
+    expenseIds:monthExpenses.map(e=>e.id), totalExpenses, grossProfit, profitMargin,
+    byService
+  };
+}
+
+// Get label for a month string "YYYY-MM"
+function getMonthLabel(monthStr){
+  if(!monthStr)return '';
+  const months=['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+  const monthsEn=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const [y,m]=monthStr.split('-');
+  const idx=parseInt(m)-1;
+  const name=currentLang==='ar'?months[idx]:monthsEn[idx];
+  return name+' '+y;
+}
+
+// Get last N months as "YYYY-MM" strings (newest first or oldest first)
+function getLastNMonths(n, oldestFirst){
+  const result=[];
+  const now=new Date();
+  for(let i=n-1;i>=0;i--){
+    const d=new Date(now.getFullYear(),now.getMonth()-i,1);
+    result.push(d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'));
+  }
+  return oldestFirst?result:result.reverse();
+}
+
+// ── Vanilla JS Chart Helpers ─────────────────────────────────────────────────
+
+function drawBarChart(canvasId, labels, datasets, options){
+  const canvas=document.getElementById(canvasId);
+  if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width, H=canvas.height;
+  const pad={top:20,right:20,bottom:40,left:70};
+  const chartW=W-pad.left-pad.right;
+  const chartH=H-pad.top-pad.bottom;
+  ctx.clearRect(0,0,W,H);
+
+  const allVals=datasets.flatMap(d=>d.data);
+  const maxVal=Math.max(...allVals,1);
+  const minVal=Math.min(...allVals,0);
+  const range=maxVal-minVal||1;
+
+  const nGroups=labels.length;
+  const nSeries=datasets.length;
+  const groupW=chartW/nGroups;
+  const barW=Math.min(groupW*0.7/nSeries,32);
+  const gap=groupW*0.15;
+
+  // Grid lines
+  ctx.strokeStyle='rgba(255,255,255,0.07)';
+  ctx.lineWidth=1;
+  const gridSteps=5;
+  for(let i=0;i<=gridSteps;i++){
+    const y=pad.top+chartH-i*(chartH/gridSteps);
+    ctx.beginPath();ctx.moveTo(pad.left,y);ctx.lineTo(pad.left+chartW,y);ctx.stroke();
+    // Y axis labels
+    const val=minVal+i*(range/gridSteps);
+    ctx.fillStyle='rgba(255,255,255,0.45)';
+    ctx.font='10px Cairo,sans-serif';
+    ctx.textAlign='right';
+    const label=val>=1000?(val/1000).toFixed(1)+'k':val.toFixed(0);
+    ctx.fillText(label,pad.left-6,y+4);
+  }
+
+  // Bars
+  datasets.forEach((ds,si)=>{
+    ds.data.forEach((val,gi)=>{
+      const barH=Math.abs(val-minVal)/range*chartH;
+      const x=pad.left+gi*groupW+gap+(si*(barW+(nSeries>1?2:0)));
+      const y=pad.top+chartH-(val-minVal)/range*chartH;
+      // Gradient
+      const grad=ctx.createLinearGradient(0,y,0,y+barH);
+      grad.addColorStop(0,ds.color);
+      grad.addColorStop(1,ds.colorEnd||ds.color+'44');
+      ctx.fillStyle=grad;
+      const r=4;
+      ctx.beginPath();
+      ctx.moveTo(x+r,y);ctx.lineTo(x+barW-r,y);
+      ctx.quadraticCurveTo(x+barW,y,x+barW,y+r);
+      ctx.lineTo(x+barW,y+barH);ctx.lineTo(x,y+barH);
+      ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);
+      ctx.closePath();ctx.fill();
+      // Value on bar
+      if(val>0&&barH>18){
+        ctx.fillStyle='rgba(255,255,255,0.85)';
+        ctx.font='bold 9px Cairo,sans-serif';
+        ctx.textAlign='center';
+        const lbl=val>=1000?(val/1000).toFixed(1)+'k':val.toFixed(1);
+        ctx.fillText(lbl,x+barW/2,y+barH-4);
+      }
+    });
+  });
+
+  // X axis labels
+  ctx.fillStyle='rgba(255,255,255,0.6)';
+  ctx.font='10px Cairo,sans-serif';
+  ctx.textAlign='center';
+  labels.forEach((lbl,i)=>{
+    const x=pad.left+i*groupW+groupW/2;
+    ctx.fillText(lbl,x,H-8);
+  });
+}
+
+function drawDonutChart(canvasId, labels, data, colors){
+  const canvas=document.getElementById(canvasId);
+  if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width, H=canvas.height;
+  ctx.clearRect(0,0,W,H);
+  const total=data.reduce((s,v)=>s+v,0)||1;
+  const cx=W/2, cy=H/2, R=Math.min(W,H)/2-16, innerR=R*0.55;
+  let startAngle=-Math.PI/2;
+  data.forEach((val,i)=>{
+    const sweep=(val/total)*Math.PI*2;
+    ctx.beginPath();
+    ctx.moveTo(cx,cy);
+    ctx.arc(cx,cy,R,startAngle,startAngle+sweep);
+    ctx.closePath();
+    ctx.fillStyle=colors[i%colors.length];
+    ctx.fill();
+    ctx.strokeStyle='rgba(0,0,0,0.3)';
+    ctx.lineWidth=2;
+    ctx.stroke();
+    startAngle+=sweep;
+  });
+  // Inner circle (donut hole)
+  ctx.beginPath();
+  ctx.arc(cx,cy,innerR,0,Math.PI*2);
+  ctx.fillStyle='#1a1a2e';
+  ctx.fill();
+  // Center text
+  ctx.fillStyle='rgba(255,255,255,0.85)';
+  ctx.font='bold 14px Cairo,sans-serif';
+  ctx.textAlign='center';
+  ctx.textBaseline='middle';
+  ctx.fillText(data.reduce((s,v)=>s+v,0)+'',cx,cy-6);
+  ctx.font='10px Cairo,sans-serif';
+  ctx.fillStyle='rgba(255,255,255,0.5)';
+  ctx.fillText(currentLang==='ar'?'سيارة':'cars',cx,cy+10);
+  ctx.textBaseline='alphabetic';
+}
+
+function drawLineChart(canvasId, labels, datasets){
+  const canvas=document.getElementById(canvasId);
+  if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width, H=canvas.height;
+  const pad={top:20,right:20,bottom:36,left:40};
+  const chartW=W-pad.left-pad.right, chartH=H-pad.top-pad.bottom;
+  ctx.clearRect(0,0,W,H);
+  const allVals=datasets.flatMap(d=>d.data);
+  const maxVal=Math.max(...allVals,1);
+  // Grid
+  ctx.strokeStyle='rgba(255,255,255,0.06)';ctx.lineWidth=1;
+  for(let i=0;i<=4;i++){
+    const y=pad.top+i*(chartH/4);
+    ctx.beginPath();ctx.moveTo(pad.left,y);ctx.lineTo(pad.left+chartW,y);ctx.stroke();
+  }
+  // Lines
+  const n=labels.length;
+  datasets.forEach(ds=>{
+    if(!ds.data.length)return;
+    ctx.strokeStyle=ds.color;
+    ctx.lineWidth=2.5;
+    ctx.lineJoin='round';
+    ctx.beginPath();
+    ds.data.forEach((v,i)=>{
+      const x=pad.left+i*(chartW/(n-1||1));
+      const y=pad.top+chartH-(v/maxVal)*chartH;
+      i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+    });
+    ctx.stroke();
+    // Dots
+    ds.data.forEach((v,i)=>{
+      const x=pad.left+i*(chartW/(n-1||1));
+      const y=pad.top+chartH-(v/maxVal)*chartH;
+      ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);
+      ctx.fillStyle=ds.color;ctx.fill();
+      ctx.strokeStyle='#1a1a2e';ctx.lineWidth=2;ctx.stroke();
+      // Value label
+      ctx.fillStyle='rgba(255,255,255,0.75)';
+      ctx.font='9px Cairo,sans-serif';ctx.textAlign='center';
+      ctx.fillText(v,x,y-9);
+    });
+  });
+  // X labels
+  ctx.fillStyle='rgba(255,255,255,0.5)';
+  ctx.font='9px Cairo,sans-serif';ctx.textAlign='center';
+  labels.forEach((lbl,i)=>{
+    const x=pad.left+i*(chartW/(n-1||1));
+    ctx.fillText(lbl,x,H-8);
+  });
+}
+
+// ── Render Monthly Closing Page ───────────────────────────────────────────────
+
+function renderMonthlyClosing(){
+  if(!document.getElementById('page-closing'))return;
+  if(!state.monthlyClosings)state.monthlyClosings=[];
+
+  const now=new Date();
+  const curMonth=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+  const data=getMonthlyData(curMonth);
+
+  // Update current month card
+  document.getElementById('closing-current-title').textContent='📊 '+getMonthLabel(curMonth);
+  document.getElementById('closing-current-subtitle').textContent=t('lbl_cl_received')+': '+data.carsReceived+' | '+t('lbl_cl_delivered')+': '+data.carsDelivered+' | '+t('lbl_cl_carryover_count')+': '+data.carsCarryOver;
+  document.getElementById('cl-cur-revenue').textContent=fmt(data.totalPaid);
+  document.getElementById('cl-cur-expenses').textContent=fmt(data.totalExpenses);
+  document.getElementById('cl-cur-profit').textContent=fmt(data.grossProfit);
+  document.getElementById('cl-cur-profit').style.color=data.grossProfit>=0?'var(--success)':'var(--danger)';
+  document.getElementById('cl-cur-cars').textContent=data.carsReceived;
+  document.getElementById('cl-cur-margin').textContent=data.profitMargin.toFixed(1)+'%';
+  document.getElementById('cl-cur-margin').style.color=data.profitMargin>=0?'var(--success)':'var(--danger)';
+  document.getElementById('cl-cur-carryover').textContent=data.carsCarryOver;
+
+  // Current month mini bar chart (revenue vs expenses vs profit)
+  setTimeout(()=>{
+    drawBarChart('chart-current-bar',
+      [t('lbl_cl_revenue'),t('lbl_cl_expenses'),t('lbl_cl_profit')],
+      [{data:[data.totalPaid,data.totalExpenses,Math.max(0,data.grossProfit)],color:'#00d4aa',colorEnd:'#00d4aa44'}],
+      {}
+    );
+    const canvas=document.getElementById('chart-current-bar');
+    if(canvas){
+      const ctx=canvas.getContext('2d');
+      if(data.grossProfit<0){
+        // Draw loss bar in red
+        const W=canvas.width,H=canvas.height;
+        const pad={top:20,right:20,bottom:40,left:70};
+        const chartH=H-pad.top-pad.bottom;
+        const maxV=Math.max(data.totalPaid,data.totalExpenses,1);
+        const barH=Math.abs(data.grossProfit)/maxV*chartH;
+        const bw=Math.min((W-pad.left-pad.right)/3*0.7,32);
+        const x=pad.left+(W-pad.left-pad.right)/3*2+(W-pad.left-pad.right)/3*0.15;
+        const y=pad.top;
+        const grad=ctx.createLinearGradient(0,y,0,y+barH);
+        grad.addColorStop(0,'#e94560');grad.addColorStop(1,'#e9456044');
+        ctx.fillStyle=grad;
+        const r=4;
+        ctx.beginPath();
+        ctx.moveTo(x+r,y);ctx.lineTo(x+bw-r,y);
+        ctx.quadraticCurveTo(x+bw,y,x+bw,y+r);
+        ctx.lineTo(x+bw,y+barH);ctx.lineTo(x,y+barH);
+        ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);
+        ctx.closePath();ctx.fill();
+      }
+    }
+  },50);
+
+  // 6-month trend chart
+  const last6=getLastNMonths(6,true);
+  const trendLabels=last6.map(m=>{
+    const parts=m.split('-');
+    const monthNames=['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+    const monthNamesEn=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    return currentLang==='ar'?monthNames[parseInt(parts[1])-1]:monthNamesEn[parseInt(parts[1])-1];
+  });
+  const trendRevenue=last6.map(m=>getMonthlyData(m).totalPaid);
+  const trendExpenses=last6.map(m=>getMonthlyData(m).totalExpenses);
+  const trendProfit=last6.map(m=>Math.max(0,getMonthlyData(m).grossProfit));
+  setTimeout(()=>drawBarChart('chart-trend-bar',trendLabels,[
+    {data:trendRevenue,color:'#00d4aa',colorEnd:'#00d4aa33'},
+    {data:trendExpenses,color:'#e94560',colorEnd:'#e9456033'},
+    {data:trendProfit,color:'#ffd700',colorEnd:'#ffd70033'}
+  ],{}),60);
+
+  // Service donut chart (last 3 months aggregate)
+  const last3=getLastNMonths(3,true);
+  const svcMap={};
+  last3.forEach(m=>{
+    const d=getMonthlyData(m);
+    Object.entries(d.byService).forEach(([k,v])=>{
+      if(!svcMap[k])svcMap[k]=0;
+      svcMap[k]+=v.count;
+    });
+  });
+  const svcLabels=Object.keys(svcMap);
+  const svcData=svcLabels.map(k=>svcMap[k]);
+  const donutColors=['#00d4aa','#4facfe','#ffd700','#e94560','#a29bfe','#fd79a8','#55efc4','#fdcb6e'];
+  setTimeout(()=>{
+    drawDonutChart('chart-service-donut',svcLabels,svcData.length?svcData:[1],svcLabels.length?donutColors:['#333']);
+    const legEl=document.getElementById('chart-service-legend');
+    if(legEl)legEl.innerHTML=svcLabels.length?svcLabels.map((lbl,i)=>`
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 0;font-size:12px;">
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span style="width:10px;height:10px;border-radius:50%;background:${donutColors[i%donutColors.length]};display:inline-block;"></span>
+          <span>${lbl}</span>
+        </div>
+        <strong>${svcData[i]}</strong>
+      </div>`).join(''):'<div style="color:var(--muted);font-size:12px;text-align:center;">لا توجد بيانات</div>';
+  },70);
+
+  // Cars trend line chart
+  const carCounts=last6.map(m=>getMonthlyData(m).carsReceived);
+  setTimeout(()=>drawLineChart('chart-cars-trend',trendLabels,[
+    {data:carCounts,color:'#4facfe'}
+  ]),80);
+
+  // Render closing history list
+  _renderClosingList();
+}
+
+function _renderClosingList(){
+  const list=document.getElementById('closing-list');
+  if(!list)return;
+  const closings=[...(state.monthlyClosings||[])].sort((a,b)=>b.month.localeCompare(a.month));
+  if(!closings.length){
+    list.innerHTML=`<div class="empty-state" style="padding:40px;"><div class="empty-icon">📅</div><p>${t('lbl_no_closings')}</p></div>`;
+    return;
+  }
+  list.innerHTML=closings.map(c=>{
+    const profitColor=c.grossProfit>=0?'var(--success)':'var(--danger)';
+    const profitIcon=c.grossProfit>=0?'📈':'📉';
+    return`<div style="border-bottom:1px solid var(--border);padding:16px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+      <div style="flex:1;min-width:160px;">
+        <div style="font-size:14px;font-weight:700;color:var(--text);">${c.monthLabel}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px;">${t('lbl_closed_at')}: ${formatDate(c.closedAt)} • ${t('lbl_closed_by')}: ${c.closedBy||'—'}</div>
+        <div style="display:flex;gap:10px;margin-top:6px;flex-wrap:wrap;">
+          <span style="font-size:11px;background:rgba(0,212,170,.12);color:var(--success);padding:2px 8px;border-radius:20px;">🚗 ${c.carsReceived} ${t('lbl_cl_received')}</span>
+          <span style="font-size:11px;background:rgba(79,172,254,.12);color:var(--info);padding:2px 8px;border-radius:20px;">✅ ${c.carsDelivered} ${t('lbl_cl_delivered')}</span>
+          ${c.carsCarryOver>0?`<span style="font-size:11px;background:rgba(255,100,50,.12);color:#ff6432;padding:2px 8px;border-radius:20px;">⏳ ${c.carsCarryOver} ${t('lbl_cl_carryover_count')}</span>`:''}
+        </div>
+      </div>
+      <div style="text-align:center;min-width:90px;">
+        <div style="font-size:11px;color:var(--muted);">${t('lbl_cl_revenue')}</div>
+        <div style="font-size:14px;font-weight:700;color:var(--success);">${fmt(c.totalPaid)}</div>
+      </div>
+      <div style="text-align:center;min-width:90px;">
+        <div style="font-size:11px;color:var(--muted);">${t('lbl_cl_expenses')}</div>
+        <div style="font-size:14px;font-weight:700;color:var(--danger);">${fmt(c.totalExpenses)}</div>
+      </div>
+      <div style="text-align:center;min-width:90px;">
+        <div style="font-size:11px;color:var(--muted);">${profitIcon} ${t('lbl_cl_profit')}</div>
+        <div style="font-size:14px;font-weight:700;color:${profitColor};">${fmt(c.grossProfit)}</div>
+      </div>
+      <div style="text-align:center;min-width:60px;">
+        <div style="font-size:11px;color:var(--muted);">${t('lbl_cl_margin')}</div>
+        <div style="font-size:13px;font-weight:700;color:${profitColor};">${c.profitMargin.toFixed(1)}%</div>
+      </div>
+      <div style="display:flex;gap:6px;">
+        <button class="btn btn-outline btn-sm" onclick="viewClosingDetails('${c.id}')">${t('btn_view_details')}</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteClosing('${c.id}')">🗑️</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── Open Close Month Modal ───────────────────────────────────────────────────
+
+function openCloseMonthModal(){
+  const now=new Date();
+  const defMonth=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+  document.getElementById('close-month-input').value=defMonth;
+  previewCloseMonth(defMonth);
+  openModal('modal-close-month');
+}
+
+function previewCloseMonth(monthStr){
+  if(!monthStr){
+    document.getElementById('close-month-preview-content').innerHTML=`<div style="color:var(--muted);font-size:13px;">${t('lbl_select_month_first')}</div>`;
+    return;
+  }
+  const d=getMonthlyData(monthStr);
+  const alreadyClosed=state.monthlyClosings&&state.monthlyClosings.some(c=>c.month===monthStr);
+  const warn=document.getElementById('close-month-warning');
+  if(alreadyClosed){
+    warn.style.display='block';
+    warn.textContent=t('lbl_already_closed');
+    document.getElementById('btn-confirm-close-month').disabled=true;
+  } else {
+    warn.style.display='none';
+    document.getElementById('btn-confirm-close-month').disabled=false;
+  }
+  const profitColor=d.grossProfit>=0?'var(--success)':'var(--danger)';
+  document.getElementById('close-month-preview-content').innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div style="font-size:12px;"><span style="color:var(--muted);">${t('lbl_cl_cars')}:</span> <strong>${d.carsReceived}</strong></div>
+      <div style="font-size:12px;"><span style="color:var(--muted);">${t('lbl_cl_delivered')}:</span> <strong>${d.carsDelivered}</strong></div>
+      <div style="font-size:12px;"><span style="color:var(--muted);">${t('lbl_cl_carryover_count')}:</span> <strong style="color:#ff6432;">${d.carsCarryOver}</strong></div>
+      <div style="font-size:12px;"><span style="color:var(--muted);">${t('lbl_cl_revenue')}:</span> <strong style="color:var(--success);">${fmt(d.totalPaid)}</strong></div>
+      <div style="font-size:12px;"><span style="color:var(--muted);">${t('lbl_cl_expenses')}:</span> <strong style="color:var(--danger);">${fmt(d.totalExpenses)}</strong></div>
+      <div style="font-size:12px;"><span style="color:var(--muted);">${t('lbl_cl_profit')}:</span> <strong style="color:${profitColor};">${fmt(d.grossProfit)}</strong></div>
+    </div>
+    ${d.carsCarryOver>0?`<div style="margin-top:10px;font-size:11px;color:#ff6432;padding:8px;background:rgba(255,100,50,.08);border-radius:8px;">⏳ ${d.carsCarryOver} ${t('lbl_cl_carryover_note')}</div>`:''}
+  `;
+}
+
+function confirmCloseMonth(){
+  const monthStr=document.getElementById('close-month-input').value;
+  if(!monthStr){alert(t('lbl_select_month_first'));return;}
+  if(state.monthlyClosings&&state.monthlyClosings.some(c=>c.month===monthStr)){
+    alert(t('lbl_already_closed'));return;
+  }
+  const d=getMonthlyData(monthStr);
+  const session=getSession();
+  const rec={
+    id:'cl_'+Date.now(),
+    month:monthStr,
+    monthLabel:getMonthLabel(monthStr),
+    closedAt:today(),
+    closedBy:session?session.username:'admin',
+    carsReceived:d.carsReceived, carsDelivered:d.carsDelivered, carsCarryOver:d.carsCarryOver,
+    carryOverCarIds:d.carryOverCarIds, deliveredCarIds:d.deliveredCarIds, allCarIds:d.allCarIds,
+    totalEstimate:d.totalEstimate, totalPaid:d.totalPaid, totalRemaining:d.totalRemaining,
+    expenseIds:d.expenseIds, totalExpenses:d.totalExpenses, grossProfit:d.grossProfit,
+    profitMargin:d.profitMargin, byService:d.byService
+  };
+  if(!state.monthlyClosings)state.monthlyClosings=[];
+  state.monthlyClosings.push(rec);
+  saveState();
+  closeModal('modal-close-month');
+  renderMonthlyClosing();
+}
+
+// ── View Closing Details ──────────────────────────────────────────────────────
+
+function viewClosingDetails(id){
+  const rec=state.monthlyClosings&&state.monthlyClosings.find(c=>c.id===id);
+  if(!rec)return;
+  document.getElementById('closing-details-title').textContent='📊 '+rec.monthLabel;
+  const profitColor=rec.grossProfit>=0?'var(--success)':'var(--danger)';
+  // Get actual cars from state
+  const allCars=(rec.allCarIds||[]).map(cid=>state.cars.find(c=>c.id===cid)).filter(Boolean);
+  const carryOverCars=(rec.carryOverCarIds||[]).map(cid=>state.cars.find(c=>c.id===cid)).filter(Boolean);
+  const expenses=(rec.expenseIds||[]).map(eid=>state.expenses.find(e=>e.id===eid)).filter(Boolean);
+  const byService=rec.byService||{};
+
+  document.getElementById('closing-details-body').innerHTML=`
+    <!-- KPI Summary -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:16px;">
+      <div style="background:rgba(0,212,170,.1);border:1px solid rgba(0,212,170,.25);border-radius:10px;padding:12px;text-align:center;">
+        <div style="font-size:10px;color:var(--muted);">${t('lbl_cl_revenue')}</div>
+        <div style="font-size:16px;font-weight:900;color:var(--success);">${fmt(rec.totalPaid)}</div>
+      </div>
+      <div style="background:rgba(233,69,96,.1);border:1px solid rgba(233,69,96,.25);border-radius:10px;padding:12px;text-align:center;">
+        <div style="font-size:10px;color:var(--muted);">${t('lbl_cl_expenses')}</div>
+        <div style="font-size:16px;font-weight:900;color:var(--danger);">${fmt(rec.totalExpenses)}</div>
+      </div>
+      <div style="background:rgba(255,179,0,.1);border:1px solid rgba(255,179,0,.25);border-radius:10px;padding:12px;text-align:center;">
+        <div style="font-size:10px;color:var(--muted);">${t('lbl_cl_profit')}</div>
+        <div style="font-size:16px;font-weight:900;color:${profitColor};">${fmt(rec.grossProfit)}</div>
+      </div>
+      <div style="background:rgba(79,172,254,.1);border:1px solid rgba(79,172,254,.25);border-radius:10px;padding:12px;text-align:center;">
+        <div style="font-size:10px;color:var(--muted);">${t('lbl_cl_margin')}</div>
+        <div style="font-size:16px;font-weight:900;color:${profitColor};">${rec.profitMargin.toFixed(1)}%</div>
+      </div>
+      <div style="background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center;">
+        <div style="font-size:10px;color:var(--muted);">${t('lbl_cl_received')}</div>
+        <div style="font-size:16px;font-weight:900;color:var(--info);">${rec.carsReceived}</div>
+      </div>
+      <div style="background:rgba(255,100,50,.08);border:1px solid rgba(255,100,50,.2);border-radius:10px;padding:12px;text-align:center;">
+        <div style="font-size:10px;color:var(--muted);">${t('lbl_cl_carryover_count')}</div>
+        <div style="font-size:16px;font-weight:900;color:#ff6432;">${rec.carsCarryOver}</div>
+      </div>
+    </div>
+
+    <!-- Charts row -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;">
+      <div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:12px;padding:14px;">
+        <div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:8px;">${t('closing_service_dist')}</div>
+        <div style="display:flex;justify-content:center;"><canvas id="det-donut" width="150" height="150"></canvas></div>
+        <div id="det-donut-legend" style="margin-top:8px;"></div>
+      </div>
+      <div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:12px;padding:14px;">
+        <div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:8px;">📊 إيرادات / مصروفات / ربح</div>
+        <canvas id="det-bar" width="200" height="150"></canvas>
+      </div>
+    </div>
+
+    <!-- Service breakdown -->
+    ${Object.keys(byService).length?`
+    <div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:14px;">
+      <div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:10px;">${t('closing_service_dist')}</div>
+      ${Object.entries(byService).map(([svc,v])=>`
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.06);font-size:12px;">
+          <div style="display:flex;align-items:center;gap:8px;">${serviceBadge(svc)}</div>
+          <div style="display:flex;gap:16px;">
+            <span style="color:var(--muted);">${v.count} سيارة</span>
+            <strong style="color:var(--success);">${fmt(v.amount)}</strong>
+          </div>
+        </div>`).join('')}
+    </div>`:''}
+
+    <!-- Cars list -->
+    ${allCars.length?`
+    <div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:14px;">
+      <div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:10px;">🚗 ${t('th_cl_cars_list')} (${allCars.length})</div>
+      <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;font-size:12px;">
+          <thead><tr style="color:var(--muted);">
+            <th style="padding:6px;text-align:right;">اللوحة</th>
+            <th style="padding:6px;text-align:right;">المالك</th>
+            <th style="padding:6px;text-align:right;">${t('th_cl_service')}</th>
+            <th style="padding:6px;text-align:right;">${t('th_cl_amount')}</th>
+            <th style="padding:6px;text-align:right;">الحالة</th>
+          </tr></thead>
+          <tbody>
+            ${allCars.map(c=>`<tr style="border-top:1px solid rgba(255,255,255,.04);">
+              <td style="padding:6px;font-weight:700;">${c.plate}</td>
+              <td style="padding:6px;">${c.owner}</td>
+              <td style="padding:6px;">${serviceBadge(c.service||'—')}</td>
+              <td style="padding:6px;color:var(--success);">${fmt(c.paidTotal||0)}</td>
+              <td style="padding:6px;">${statusBadge(c.status)}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>`:''}
+
+    ${carryOverCars.length?`
+    <div style="background:rgba(255,100,50,.06);border:1px solid rgba(255,100,50,.2);border-radius:12px;padding:14px;margin-bottom:14px;">
+      <div style="font-size:12px;font-weight:700;color:#ff6432;margin-bottom:10px;">⏳ ${t('lbl_cl_carryover_note')} (${carryOverCars.length})</div>
+      ${carryOverCars.map(c=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid rgba(255,100,50,.1);font-size:12px;">
+        <div><strong>${c.plate}</strong> — ${c.owner}</div>
+        <div>${serviceBadge(c.service||'—')}</div>
+        <div style="color:var(--success);">${fmt(c.estimate||0)}</div>
+      </div>`).join('')}
+    </div>`:''}
+
+    <!-- Expenses breakdown -->
+    ${expenses.length?`
+    <div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:12px;padding:14px;">
+      <div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:10px;">💸 ${t('lbl_cl_expenses_breakdown')} (${expenses.length})</div>
+      ${expenses.map(e=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:12px;">
+        <div>${e.desc}</div>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <span style="font-size:10px;background:rgba(255,255,255,.08);padding:2px 6px;border-radius:10px;">${e.type}</span>
+          <strong style="color:var(--danger);">${fmt(e.amount)}</strong>
+        </div>
+      </div>`).join('')}
+      <div style="display:flex;justify-content:space-between;padding:8px 0 0;font-size:13px;font-weight:700;">
+        <span>الإجمالي</span><span style="color:var(--danger);">${fmt(rec.totalExpenses)}</span>
+      </div>
+    </div>`:''}
+  `;
+
+  // Draw charts after modal opens
+  setTimeout(()=>{
+    const donutColors=['#00d4aa','#4facfe','#ffd700','#e94560','#a29bfe','#fd79a8','#55efc4','#fdcb6e'];
+    const svcLabels=Object.keys(byService);
+    const svcData=svcLabels.map(k=>byService[k].count);
+    drawDonutChart('det-donut',svcLabels,svcData.length?svcData:[1],svcLabels.length?donutColors:['#333']);
+    const legEl=document.getElementById('det-donut-legend');
+    if(legEl)legEl.innerHTML=svcLabels.map((l,i)=>`<div style="display:flex;align-items:center;justify-content:space-between;font-size:10px;padding:2px 0;"><div style="display:flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;border-radius:50%;background:${donutColors[i%donutColors.length]};display:inline-block;"></span>${l}</div><strong>${svcData[i]}</strong></div>`).join('');
+    drawBarChart('det-bar',
+      [t('lbl_cl_revenue'),t('lbl_cl_expenses'),t('lbl_cl_profit')],
+      [{data:[rec.totalPaid,rec.totalExpenses,Math.max(0,rec.grossProfit)],color:'#00d4aa',colorEnd:'#00d4aa44'}],{}
+    );
+  },80);
+
+  openModal('modal-closing-details');
+}
+
+function deleteClosing(id){
+  if(!confirm('حذف هذا الإغلاق؟'))return;
+  state.monthlyClosings=state.monthlyClosings.filter(c=>c.id!==id);
+  saveState();
+  renderMonthlyClosing();
+}
+
+// ── Print Closing Details ─────────────────────────────────────────────────────
+function printClosingDetails(){
+  const body=document.getElementById('closing-details-body');
+  const title=document.getElementById('closing-details-title').textContent;
+  if(!body)return;
+  const w=window.open('','_blank');
+  w.document.write(`<html dir="rtl"><head><meta charset="UTF-8"><title>${title}</title>
+  <style>body{font-family:'Cairo',sans-serif;padding:30px;direction:rtl;background:#fff;color:#111;}
+  h1{color:#1a1a2e;border-bottom:3px solid #e94560;padding-bottom:10px;}
+  table{width:100%;border-collapse:collapse;}th,td{padding:8px;border:1px solid #ddd;text-align:right;}
+  th{background:#1a1a2e;color:white;}canvas{display:none;}</style></head>
+  <body><h1>${title}</h1>${body.innerHTML}</body></html>`);
+  w.document.close();
+  w.print();
+}
+
+// ── Attach month input listener ───────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded',function(){
+  const inp=document.getElementById('close-month-input');
+  if(inp)inp.addEventListener('change',function(){previewCloseMonth(this.value);});
+});
 
 // EXPORT PDF (text-based)
 function exportPDF(){
@@ -3106,7 +3816,7 @@ var LANG = {
     nav_dashboard:'لوحة التحكم', nav_cars:'السيارات في الورشة', nav_delivered:'السيارات المُسلَّمة',
     nav_alerts:'التنبيهات', nav_maintenance:'أوامر الصيانة', nav_services:'قائمة الخدمات',
     nav_invoices:'الفواتير والإيصالات', nav_expenses:'المصروفات', nav_reports:'التقارير المالية',
-    nav_customers:'العملاء', nav_tracking:'تتبع العملاء', nav_users:'إدارة المستخدمين',
+    nav_customers:'العملاء', nav_tracking:'تتبع العملاء', nav_users:'إدارة المستخدمين', nav_closing:'الإغلاق الشهري',
     sec_home:'الرئيسية', sec_cars_mgmt:'إدارة السيارات', sec_services:'الخدمات',
     sec_finance:'المالية', sec_system:'النظام',
     btn_add_car:'➕ إضافة سيارة', btn_add_order:'➕ إضافة أمر صيانة',
@@ -3170,12 +3880,29 @@ var LANG = {
     btn_send_wa:'📱 فتح واتساب وإرسال الرابط',
     trk_total_cars:'إجمالي السيارات', trk_waiting:'في الانتظار',
     trk_in_progress:'تحت الإصلاح', trk_ready:'جاهزة للتسليم',
+    closing_title:'📅 الإغلاق الشهري', btn_close_month:'🔒 إغلاق شهر',
+    modal_close_month_title:'🔒 إغلاق شهر', lbl_select_month:'اختر الشهر',
+    lbl_preview:'معاينة', lbl_select_month_first:'اختر الشهر أولاً',
+    btn_confirm_close:'🔒 تأكيد الإغلاق',
+    lbl_cl_revenue:'الإيرادات', lbl_cl_expenses:'المصروفات', lbl_cl_profit:'صافي الربح',
+    lbl_cl_cars:'السيارات', lbl_cl_margin:'هامش الربح', lbl_cl_carryover:'سيارات معلقة',
+    closing_trend_title:'📈 مقارنة الأشهر الستة الأخيرة',
+    closing_service_dist:'🍩 توزيع الخدمات', closing_cars_trend:'🚗 حركة السيارات شهرياً',
+    closing_history_title:'🗂️ سجل الإغلاقات',
+    lbl_cl_received:'مُستلَمة', lbl_cl_delivered:'مُسلَّمة', lbl_cl_carryover_count:'معلقة',
+    lbl_cl_estimate:'التقدير', lbl_cl_remaining:'المتبقي',
+    lbl_closed_by:'أُغلق بواسطة', lbl_closed_at:'تاريخ الإغلاق',
+    th_cl_cars_list:'السيارات', th_cl_service:'الخدمة', th_cl_amount:'المبلغ',
+    lbl_cl_carryover_note:'سيارات من هذا الشهر لم يُنته منها بعد:',
+    lbl_cl_expenses_breakdown:'تفاصيل المصروفات',
+    btn_view_details:'عرض التفاصيل', btn_delete_closing:'حذف الإغلاق',
+    lbl_no_closings:'لا توجد إغلاقات مسجلة', lbl_already_closed:'⚠️ هذا الشهر مُغلق بالفعل',
   },
   en: {
     nav_dashboard:'Dashboard', nav_cars:'Cars in Workshop', nav_delivered:'Delivered Cars',
     nav_alerts:'Alerts', nav_maintenance:'Maintenance Orders', nav_services:'Services List',
     nav_invoices:'Invoices & Receipts', nav_expenses:'Expenses', nav_reports:'Financial Reports',
-    nav_customers:'Customers', nav_tracking:'Customer Tracking', nav_users:'User Management',
+    nav_customers:'Customers', nav_tracking:'Customer Tracking', nav_users:'User Management', nav_closing:'Monthly Closing',
     sec_home:'Home', sec_cars_mgmt:'Cars Management', sec_services:'Services',
     sec_finance:'Finance', sec_system:'System',
     btn_add_car:'➕ Add Car', btn_add_order:'➕ Add Order',
@@ -3239,6 +3966,23 @@ var LANG = {
     btn_send_wa:'📱 Open WhatsApp & Send',
     trk_total_cars:'Total Cars', trk_waiting:'Waiting',
     trk_in_progress:'In Progress', trk_ready:'Ready for Delivery',
+    closing_title:'📅 Monthly Closing', btn_close_month:'🔒 Close Month',
+    modal_close_month_title:'🔒 Close Month', lbl_select_month:'Select Month',
+    lbl_preview:'Preview', lbl_select_month_first:'Select a month first',
+    btn_confirm_close:'🔒 Confirm Close',
+    lbl_cl_revenue:'Revenue', lbl_cl_expenses:'Expenses', lbl_cl_profit:'Net Profit',
+    lbl_cl_cars:'Cars', lbl_cl_margin:'Profit Margin', lbl_cl_carryover:'Pending Cars',
+    closing_trend_title:'📈 Last 6 Months Comparison',
+    closing_service_dist:'🍩 Service Distribution', closing_cars_trend:'🚗 Monthly Car Activity',
+    closing_history_title:'🗂️ Closing History',
+    lbl_cl_received:'Received', lbl_cl_delivered:'Delivered', lbl_cl_carryover_count:'Pending',
+    lbl_cl_estimate:'Estimate', lbl_cl_remaining:'Remaining',
+    lbl_closed_by:'Closed by', lbl_closed_at:'Closed at',
+    th_cl_cars_list:'Cars', th_cl_service:'Service', th_cl_amount:'Amount',
+    lbl_cl_carryover_note:'Cars from this month not yet completed:',
+    lbl_cl_expenses_breakdown:'Expenses Breakdown',
+    btn_view_details:'View Details', btn_delete_closing:'Delete',
+    lbl_no_closings:'No closing records yet', lbl_already_closed:'⚠️ This month is already closed',
   }
 };
 function t(key) {
@@ -3852,6 +4596,49 @@ function saveWaBotKey() {
   }, 3000);
 }
 </script>
+
+<!-- ═══ Monthly Closing Modal ═══ -->
+<div class="modal-overlay" id="modal-close-month" style="display:none;opacity:0;">
+  <div class="modal" style="max-width:460px;">
+    <div class="modal-header">
+      <div class="modal-title" data-i18n="modal_close_month_title">🔒 إغلاق شهر</div>
+      <button class="modal-close" onclick="closeModal('modal-close-month')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group" style="margin-bottom:16px;">
+        <label data-i18n="lbl_select_month">اختر الشهر</label>
+        <input type="month" id="close-month-input" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--card);color:var(--text);font-family:var(--font-main);font-size:14px;">
+      </div>
+      <div id="close-month-preview" style="background:rgba(255,255,255,.04);border-radius:12px;padding:14px;border:1px solid var(--border);">
+        <div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:10px;" data-i18n="lbl_preview">معاينة</div>
+        <div id="close-month-preview-content">
+          <div style="color:var(--muted);font-size:13px;" data-i18n="lbl_select_month_first">اختر الشهر أولاً</div>
+        </div>
+      </div>
+      <div id="close-month-warning" style="display:none;margin-top:12px;padding:10px;background:rgba(255,179,0,.1);border:1px solid rgba(255,179,0,.3);border-radius:10px;font-size:12px;color:#ffd700;"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-close-month')" data-i18n="btn_cancel">إلغاء</button>
+      <button class="btn btn-danger" id="btn-confirm-close-month" onclick="confirmCloseMonth()" data-i18n="btn_confirm_close">🔒 تأكيد الإغلاق</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ Closing Details Modal ═══ -->
+<div class="modal-overlay" id="modal-closing-details" style="display:none;opacity:0;">
+  <div class="modal" style="max-width:700px;">
+    <div class="modal-header">
+      <div class="modal-title" id="closing-details-title">📊 تفاصيل الشهر</div>
+      <button class="modal-close" onclick="closeModal('modal-closing-details')">✕</button>
+    </div>
+    <div class="modal-body" id="closing-details-body" style="max-height:75vh;overflow-y:auto;">
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-closing-details')" data-i18n="btn_close">إغلاق</button>
+      <button class="btn btn-info" onclick="printClosingDetails()" data-i18n="btn_print">🖨️ طباعة</button>
+    </div>
+  </div>
+</div>
 
 <!-- ═══ Firebase Status Modal ═══ -->
 <div class="modal-overlay" id="modal-firebase" style="display:none;opacity:0;">
