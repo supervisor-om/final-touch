@@ -881,9 +881,13 @@ label{font-size:14px;}
 
   <!-- MONTHLY CLOSING -->
   <div class="page" id="page-closing">
+    <!-- Header -->
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:10px;">
       <div style="font-size:15px;font-weight:700;color:var(--text);" data-i18n="closing_title">📅 الإغلاق الشهري</div>
-      <button class="btn btn-primary" onclick="openCloseMonthModal()" data-i18n="btn_close_month">🔒 إغلاق شهر</button>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn btn-outline btn-sm" onclick="exportClosingsCSV()">📊 تصدير Excel</button>
+        <button class="btn btn-primary" onclick="openCloseMonthModal()" data-i18n="btn_close_month">🔒 إغلاق شهر</button>
+      </div>
     </div>
 
     <!-- Current month live card -->
@@ -897,45 +901,68 @@ label{font-size:14px;}
           <div style="background:rgba(0,212,170,.1);border:1px solid rgba(0,212,170,.25);border-radius:12px;padding:14px;text-align:center;">
             <div style="font-size:11px;color:var(--muted);margin-bottom:4px;" data-i18n="lbl_cl_revenue">الإيرادات</div>
             <div style="font-size:20px;font-weight:900;color:var(--success);" id="cl-cur-revenue">0 ر.ع</div>
+            <div id="cl-cmp-revenue" style="margin-top:2px;min-height:14px;"></div>
           </div>
           <div style="background:rgba(233,69,96,.1);border:1px solid rgba(233,69,96,.25);border-radius:12px;padding:14px;text-align:center;">
             <div style="font-size:11px;color:var(--muted);margin-bottom:4px;" data-i18n="lbl_cl_expenses">المصروفات</div>
             <div style="font-size:20px;font-weight:900;color:var(--danger);" id="cl-cur-expenses">0 ر.ع</div>
+            <div id="cl-cmp-expenses" style="margin-top:2px;min-height:14px;"></div>
           </div>
           <div style="background:rgba(255,179,0,.1);border:1px solid rgba(255,179,0,.25);border-radius:12px;padding:14px;text-align:center;">
             <div style="font-size:11px;color:var(--muted);margin-bottom:4px;" data-i18n="lbl_cl_profit">صافي الربح</div>
             <div style="font-size:20px;font-weight:900;color:var(--gold);" id="cl-cur-profit">0 ر.ع</div>
+            <div id="cl-cmp-profit" style="margin-top:2px;min-height:14px;"></div>
           </div>
           <div style="background:rgba(79,172,254,.1);border:1px solid rgba(79,172,254,.25);border-radius:12px;padding:14px;text-align:center;">
             <div style="font-size:11px;color:var(--muted);margin-bottom:4px;" data-i18n="lbl_cl_cars">السيارات</div>
             <div style="font-size:20px;font-weight:900;color:var(--info);" id="cl-cur-cars">0</div>
+            <div id="cl-cmp-cars" style="margin-top:2px;min-height:14px;"></div>
           </div>
           <div style="background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center;">
             <div style="font-size:11px;color:var(--muted);margin-bottom:4px;" data-i18n="lbl_cl_margin">هامش الربح</div>
             <div style="font-size:20px;font-weight:900;color:var(--text);" id="cl-cur-margin">0%</div>
+            <div id="cl-cmp-margin" style="margin-top:2px;min-height:14px;"></div>
           </div>
           <div style="background:rgba(255,100,50,.08);border:1px solid rgba(255,100,50,.2);border-radius:12px;padding:14px;text-align:center;">
             <div style="font-size:11px;color:var(--muted);margin-bottom:4px;" data-i18n="lbl_cl_carryover">سيارات معلقة</div>
             <div style="font-size:20px;font-weight:900;color:#ff6432;" id="cl-cur-carryover">0</div>
+            <div id="cl-cmp-prev" style="margin-top:2px;font-size:10px;color:var(--muted);min-height:14px;"></div>
           </div>
         </div>
-        <!-- Current month mini chart -->
         <div style="display:flex;justify-content:center;">
           <canvas id="chart-current-bar" width="520" height="160" style="max-width:100%;border-radius:10px;"></canvas>
         </div>
       </div>
     </div>
 
-    <!-- 6-month trend chart -->
+    <!-- Yearly summary card -->
     <div class="card" style="margin-bottom:18px;">
       <div class="card-header">
-        <div class="card-title" data-i18n="closing_trend_title">📈 مقارنة الأشهر الستة الأخيرة</div>
+        <div class="card-title">📆 الملخص السنوي</div>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <label style="font-size:12px;color:var(--muted);">السنة:</label>
+          <input type="number" id="closing-year-select" min="2020" max="2099" style="width:72px;padding:4px 8px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--text);font-family:var(--font-main);font-size:13px;text-align:center;" onchange="renderYearlySummary()">
+        </div>
+      </div>
+      <div class="card-body" id="yearly-summary-body">
+        <div style="color:var(--muted);font-size:13px;text-align:center;padding:20px;">جارٍ التحميل...</div>
+      </div>
+    </div>
+
+    <!-- Trend chart with range selector -->
+    <div class="card" style="margin-bottom:18px;">
+      <div class="card-header">
+        <div class="card-title" data-i18n="closing_trend_title">📈 مقارنة الأشهر الأخيرة</div>
+        <div style="display:flex;gap:4px;">
+          <button class="btn btn-sm closing-range-btn" data-range="3" onclick="setClosingRange(3)" style="padding:4px 10px;border-radius:8px;border:1px solid var(--border);background:rgba(255,255,255,.07);color:var(--muted);cursor:pointer;font-family:var(--font-main);font-size:12px;">3</button>
+          <button class="btn btn-sm closing-range-btn" data-range="6" onclick="setClosingRange(6)" style="padding:4px 10px;border-radius:8px;border:1px solid var(--primary);background:var(--primary);color:#fff;cursor:pointer;font-family:var(--font-main);font-size:12px;">6</button>
+          <button class="btn btn-sm closing-range-btn" data-range="12" onclick="setClosingRange(12)" style="padding:4px 10px;border-radius:8px;border:1px solid var(--border);background:rgba(255,255,255,.07);color:var(--muted);cursor:pointer;font-family:var(--font-main);font-size:12px;">12</button>
+        </div>
       </div>
       <div class="card-body">
         <div style="overflow-x:auto;">
           <canvas id="chart-trend-bar" width="660" height="240" style="min-width:500px;max-width:100%;border-radius:10px;"></canvas>
         </div>
-        <!-- Legend -->
         <div style="display:flex;justify-content:center;gap:20px;margin-top:12px;flex-wrap:wrap;">
           <div style="display:flex;align-items:center;gap:6px;font-size:12px;"><span style="width:12px;height:12px;border-radius:3px;background:#00d4aa;display:inline-block;"></span><span data-i18n="lbl_cl_revenue">الإيرادات</span></div>
           <div style="display:flex;align-items:center;gap:6px;font-size:12px;"><span style="width:12px;height:12px;border-radius:3px;background:#e94560;display:inline-block;"></span><span data-i18n="lbl_cl_expenses">المصروفات</span></div>
@@ -961,7 +988,7 @@ label{font-size:14px;}
       </div>
     </div>
 
-    <!-- Closed months list -->
+    <!-- Closed months history -->
     <div class="card">
       <div class="card-header">
         <div class="card-title" data-i18n="closing_history_title">🗂️ سجل الإغلاقات</div>
@@ -2474,6 +2501,89 @@ function renderCustomers(){
 // MONTHLY CLOSING SYSTEM
 // ═══════════════════════════════════════════════════
 
+// ── Monthly Closing — Config & Helpers ───────────────────────────────────────
+let _closingChartRange = 6; // 3 | 6 | 12
+
+function setClosingRange(n){
+  _closingChartRange = n;
+  document.querySelectorAll('.closing-range-btn').forEach(b=>{
+    b.style.background = parseInt(b.dataset.range)===n ? 'var(--primary)' : 'rgba(255,255,255,.07)';
+    b.style.color = parseInt(b.dataset.range)===n ? '#fff' : 'var(--muted)';
+  });
+  // Re-render only charts, not entire page
+  const months = getLastNMonths(_closingChartRange, true);
+  const labels = months.map(m=>{
+    const idx=parseInt(m.split('-')[1])-1;
+    const ar=['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+    const en=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    return currentLang==='ar'?ar[idx]:en[idx];
+  });
+  const trendRevenue=months.map(m=>getMonthlyData(m).totalPaid);
+  const trendExpenses=months.map(m=>getMonthlyData(m).totalExpenses);
+  const trendProfit=months.map(m=>Math.max(0,getMonthlyData(m).grossProfit));
+  const carCounts=months.map(m=>getMonthlyData(m).carsReceived);
+  // Resize canvas width to fit new range
+  const canvas=document.getElementById('chart-trend-bar');
+  if(canvas){canvas.width=Math.max(400,n*80);canvas.style.minWidth=Math.max(400,n*80)+'px';}
+  setTimeout(()=>{
+    drawBarChart('chart-trend-bar',labels,[
+      {data:trendRevenue,color:'#00d4aa',colorEnd:'#00d4aa33'},
+      {data:trendExpenses,color:'#e94560',colorEnd:'#e9456033'},
+      {data:trendProfit,color:'#ffd700',colorEnd:'#ffd70033'}
+    ],{});
+    drawLineChart('chart-cars-trend',labels,[{data:carCounts,color:'#4facfe'}]);
+  },30);
+}
+
+// Returns {badge: HTML string} comparing current to previous value
+function calcChange(cur, prev){
+  if(!prev||prev===0)return{badge:''};
+  const pct=((cur-prev)/Math.abs(prev))*100;
+  const abs=Math.abs(pct);
+  if(abs<0.5)return{badge:`<span style="font-size:10px;color:var(--muted);">→ 0%</span>`};
+  const up=cur>=prev;
+  const color=up?'var(--success)':'var(--danger)';
+  const arrow=up?'↑':'↓';
+  return{badge:`<span style="font-size:10px;color:${color};font-weight:700;">${arrow}${abs.toFixed(1)}%</span>`};
+}
+
+// Re-calculate and update a closing record in-place
+function recalcClosing(id){
+  const rec=state.monthlyClosings&&state.monthlyClosings.find(c=>c.id===id);
+  if(!rec)return;
+  if(!confirm(`إعادة حساب إغلاق ${rec.monthLabel}؟ سيتم تحديث جميع الأرقام من البيانات الحالية.`))return;
+  const d=getMonthlyData(rec.month);
+  Object.assign(rec,{
+    carsReceived:d.carsReceived, carsDelivered:d.carsDelivered, carsCarryOver:d.carsCarryOver,
+    carryOverCarIds:d.carryOverCarIds, deliveredCarIds:d.deliveredCarIds, allCarIds:d.allCarIds,
+    totalEstimate:d.totalEstimate, totalPaid:d.totalPaid, totalRemaining:d.totalRemaining,
+    expenseIds:d.expenseIds, totalExpenses:d.totalExpenses, grossProfit:d.grossProfit,
+    profitMargin:d.profitMargin, byService:d.byService
+  });
+  saveState();
+  renderMonthlyClosing();
+}
+
+// Calculate yearly totals
+function getYearlyData(year){
+  const months=[];
+  for(let m=1;m<=12;m++)months.push(year+'-'+String(m).padStart(2,'0'));
+  const data=months.map(m=>getMonthlyData(m));
+  const totalPaid=data.reduce((s,d)=>s+d.totalPaid,0);
+  const totalExpenses=data.reduce((s,d)=>s+d.totalExpenses,0);
+  const grossProfit=totalPaid-totalExpenses;
+  const carsReceived=data.reduce((s,d)=>s+d.carsReceived,0);
+  // Best & worst months
+  let bestMonth=null,bestProfit=-Infinity,worstMonth=null,worstProfit=Infinity;
+  data.forEach((d,i)=>{
+    if(d.carsReceived>0||d.totalPaid>0){
+      if(d.grossProfit>bestProfit){bestProfit=d.grossProfit;bestMonth=months[i];}
+      if(d.grossProfit<worstProfit){worstProfit=d.grossProfit;worstMonth=months[i];}
+    }
+  });
+  return{totalPaid,totalExpenses,grossProfit,carsReceived,bestMonth,worstMonth,bestProfit,worstProfit};
+}
+
 // Returns all stats for a given month string "YYYY-MM"
 // Revenue is attributed to dateIn (registration month), NOT dateOut
 function getMonthlyData(monthStr){
@@ -2705,6 +2815,11 @@ function renderMonthlyClosing(){
   const curMonth=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
   const data=getMonthlyData(curMonth);
 
+  // Compute previous month for comparison
+  const prevDate=new Date(now.getFullYear(),now.getMonth()-1,1);
+  const prevMonth=prevDate.getFullYear()+'-'+String(prevDate.getMonth()+1).padStart(2,'0');
+  const prev=getMonthlyData(prevMonth);
+
   // Update current month card
   document.getElementById('closing-current-title').textContent='📊 '+getMonthLabel(curMonth);
   document.getElementById('closing-current-subtitle').textContent=t('lbl_cl_received')+': '+data.carsReceived+' | '+t('lbl_cl_delivered')+': '+data.carsDelivered+' | '+t('lbl_cl_carryover_count')+': '+data.carsCarryOver;
@@ -2717,51 +2832,37 @@ function renderMonthlyClosing(){
   document.getElementById('cl-cur-margin').style.color=data.profitMargin>=0?'var(--success)':'var(--danger)';
   document.getElementById('cl-cur-carryover').textContent=data.carsCarryOver;
 
-  // Current month mini bar chart (revenue vs expenses vs profit)
+  // Comparison badges vs previous month
+  const setEl=(id,html)=>{const el=document.getElementById(id);if(el)el.innerHTML=html;};
+  setEl('cl-cmp-revenue',calcChange(data.totalPaid,prev.totalPaid).badge);
+  // For expenses: going up is bad, going down is good → invert colors
+  const expPct=calcChange(data.totalExpenses,prev.totalExpenses);
+  const expBadge=prev.totalExpenses>0?`<span style="font-size:10px;color:${data.totalExpenses<=prev.totalExpenses?'var(--success)':'var(--danger)'};font-weight:700;">${data.totalExpenses<=prev.totalExpenses?'↓':'↑'}${Math.abs(((data.totalExpenses-prev.totalExpenses)/prev.totalExpenses)*100).toFixed(1)}%</span>`:'';
+  setEl('cl-cmp-expenses',expBadge);
+  setEl('cl-cmp-profit',calcChange(data.grossProfit,prev.grossProfit).badge);
+  setEl('cl-cmp-cars',calcChange(data.carsReceived,prev.carsReceived).badge);
+  setEl('cl-cmp-margin',calcChange(data.profitMargin,prev.profitMargin).badge);
+  setEl('cl-cmp-prev',prev.carsReceived>0||prev.totalPaid>0?`vs. ${getMonthLabel(prevMonth)}`:'' );
+
+  // Current month mini bar chart
   setTimeout(()=>{
     drawBarChart('chart-current-bar',
       [t('lbl_cl_revenue'),t('lbl_cl_expenses'),t('lbl_cl_profit')],
-      [{data:[data.totalPaid,data.totalExpenses,Math.max(0,data.grossProfit)],color:'#00d4aa',colorEnd:'#00d4aa44'}],
-      {}
+      [{data:[data.totalPaid,data.totalExpenses,Math.max(0,data.grossProfit)],color:'#00d4aa',colorEnd:'#00d4aa44'}],{}
     );
-    const canvas=document.getElementById('chart-current-bar');
-    if(canvas){
-      const ctx=canvas.getContext('2d');
-      if(data.grossProfit<0){
-        // Draw loss bar in red
-        const W=canvas.width,H=canvas.height;
-        const pad={top:20,right:20,bottom:40,left:70};
-        const chartH=H-pad.top-pad.bottom;
-        const maxV=Math.max(data.totalPaid,data.totalExpenses,1);
-        const barH=Math.abs(data.grossProfit)/maxV*chartH;
-        const bw=Math.min((W-pad.left-pad.right)/3*0.7,32);
-        const x=pad.left+(W-pad.left-pad.right)/3*2+(W-pad.left-pad.right)/3*0.15;
-        const y=pad.top;
-        const grad=ctx.createLinearGradient(0,y,0,y+barH);
-        grad.addColorStop(0,'#e94560');grad.addColorStop(1,'#e9456044');
-        ctx.fillStyle=grad;
-        const r=4;
-        ctx.beginPath();
-        ctx.moveTo(x+r,y);ctx.lineTo(x+bw-r,y);
-        ctx.quadraticCurveTo(x+bw,y,x+bw,y+r);
-        ctx.lineTo(x+bw,y+barH);ctx.lineTo(x,y+barH);
-        ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);
-        ctx.closePath();ctx.fill();
-      }
-    }
   },50);
 
-  // 6-month trend chart
-  const last6=getLastNMonths(6,true);
-  const trendLabels=last6.map(m=>{
-    const parts=m.split('-');
-    const monthNames=['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
-    const monthNamesEn=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-    return currentLang==='ar'?monthNames[parseInt(parts[1])-1]:monthNamesEn[parseInt(parts[1])-1];
+  // Trend chart using _closingChartRange
+  const trendMonths=getLastNMonths(_closingChartRange,true);
+  const trendLabels=trendMonths.map(m=>{
+    const idx=parseInt(m.split('-')[1])-1;
+    const ar=['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+    const en=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    return currentLang==='ar'?ar[idx]:en[idx];
   });
-  const trendRevenue=last6.map(m=>getMonthlyData(m).totalPaid);
-  const trendExpenses=last6.map(m=>getMonthlyData(m).totalExpenses);
-  const trendProfit=last6.map(m=>Math.max(0,getMonthlyData(m).grossProfit));
+  const trendRevenue=trendMonths.map(m=>getMonthlyData(m).totalPaid);
+  const trendExpenses=trendMonths.map(m=>getMonthlyData(m).totalExpenses);
+  const trendProfit=trendMonths.map(m=>Math.max(0,getMonthlyData(m).grossProfit));
   setTimeout(()=>drawBarChart('chart-trend-bar',trendLabels,[
     {data:trendRevenue,color:'#00d4aa',colorEnd:'#00d4aa33'},
     {data:trendExpenses,color:'#e94560',colorEnd:'#e9456033'},
@@ -2773,10 +2874,7 @@ function renderMonthlyClosing(){
   const svcMap={};
   last3.forEach(m=>{
     const d=getMonthlyData(m);
-    Object.entries(d.byService).forEach(([k,v])=>{
-      if(!svcMap[k])svcMap[k]=0;
-      svcMap[k]+=v.count;
-    });
+    Object.entries(d.byService).forEach(([k,v])=>{if(!svcMap[k])svcMap[k]=0;svcMap[k]+=v.count;});
   });
   const svcLabels=Object.keys(svcMap);
   const svcData=svcLabels.map(k=>svcMap[k]);
@@ -2795,13 +2893,55 @@ function renderMonthlyClosing(){
   },70);
 
   // Cars trend line chart
-  const carCounts=last6.map(m=>getMonthlyData(m).carsReceived);
-  setTimeout(()=>drawLineChart('chart-cars-trend',trendLabels,[
-    {data:carCounts,color:'#4facfe'}
-  ]),80);
+  const carCounts=trendMonths.map(m=>getMonthlyData(m).carsReceived);
+  setTimeout(()=>drawLineChart('chart-cars-trend',trendLabels,[{data:carCounts,color:'#4facfe'}]),80);
+
+  // Yearly summary
+  renderYearlySummary();
 
   // Render closing history list
   _renderClosingList();
+}
+
+function renderYearlySummary(){
+  const el=document.getElementById('yearly-summary-body');
+  if(!el)return;
+  const yrInput=document.getElementById('closing-year-select');
+  const year=yrInput?parseInt(yrInput.value)||new Date().getFullYear():new Date().getFullYear();
+  if(yrInput&&!yrInput.value)yrInput.value=year;
+  const y=getYearlyData(String(year));
+  const profitColor=y.grossProfit>=0?'var(--success)':'var(--danger)';
+  el.innerHTML=`
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:14px;">
+      <div style="background:rgba(0,212,170,.08);border:1px solid rgba(0,212,170,.2);border-radius:10px;padding:12px;text-align:center;">
+        <div style="font-size:10px;color:var(--muted);">💰 إجمالي الإيرادات</div>
+        <div style="font-size:18px;font-weight:900;color:var(--success);">${fmt(y.totalPaid)}</div>
+      </div>
+      <div style="background:rgba(233,69,96,.08);border:1px solid rgba(233,69,96,.2);border-radius:10px;padding:12px;text-align:center;">
+        <div style="font-size:10px;color:var(--muted);">💸 إجمالي المصروفات</div>
+        <div style="font-size:18px;font-weight:900;color:var(--danger);">${fmt(y.totalExpenses)}</div>
+      </div>
+      <div style="background:rgba(255,179,0,.08);border:1px solid rgba(255,179,0,.2);border-radius:10px;padding:12px;text-align:center;">
+        <div style="font-size:10px;color:var(--muted);">📈 صافي الربح السنوي</div>
+        <div style="font-size:18px;font-weight:900;color:${profitColor};">${fmt(y.grossProfit)}</div>
+      </div>
+      <div style="background:rgba(79,172,254,.08);border:1px solid rgba(79,172,254,.2);border-radius:10px;padding:12px;text-align:center;">
+        <div style="font-size:10px;color:var(--muted);">🚗 سيارات مستلمة</div>
+        <div style="font-size:18px;font-weight:900;color:var(--info);">${y.carsReceived}</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;">
+      ${y.bestMonth?`<div style="flex:1;min-width:140px;background:rgba(0,212,170,.06);border:1px solid rgba(0,212,170,.15);border-radius:10px;padding:10px 14px;">
+        <div style="font-size:10px;color:var(--muted);">🏆 أفضل شهر</div>
+        <div style="font-size:13px;font-weight:700;color:var(--success);margin-top:2px;">${getMonthLabel(y.bestMonth)}</div>
+        <div style="font-size:11px;color:var(--muted);">${fmt(y.bestProfit)}</div>
+      </div>`:''}
+      ${y.worstMonth&&y.worstMonth!==y.bestMonth?`<div style="flex:1;min-width:140px;background:rgba(233,69,96,.06);border:1px solid rgba(233,69,96,.15);border-radius:10px;padding:10px 14px;">
+        <div style="font-size:10px;color:var(--muted);">📉 أضعف شهر</div>
+        <div style="font-size:13px;font-weight:700;color:var(--danger);margin-top:2px;">${getMonthLabel(y.worstMonth)}</div>
+        <div style="font-size:11px;color:var(--muted);">${fmt(y.worstProfit)}</div>
+      </div>`:''}
+    </div>`;
 }
 
 function _renderClosingList(){
@@ -2819,6 +2959,7 @@ function _renderClosingList(){
       <div style="flex:1;min-width:160px;">
         <div style="font-size:14px;font-weight:700;color:var(--text);">${c.monthLabel}</div>
         <div style="font-size:11px;color:var(--muted);margin-top:2px;">${t('lbl_closed_at')}: ${formatDate(c.closedAt)} • ${t('lbl_closed_by')}: ${c.closedBy||'—'}</div>
+        ${c.notes?`<div style="font-size:11px;color:var(--info);margin-top:4px;background:rgba(79,172,254,.08);padding:4px 8px;border-radius:8px;">📝 ${c.notes}</div>`:''}
         <div style="display:flex;gap:10px;margin-top:6px;flex-wrap:wrap;">
           <span style="font-size:11px;background:rgba(0,212,170,.12);color:var(--success);padding:2px 8px;border-radius:20px;">🚗 ${c.carsReceived} ${t('lbl_cl_received')}</span>
           <span style="font-size:11px;background:rgba(79,172,254,.12);color:var(--info);padding:2px 8px;border-radius:20px;">✅ ${c.carsDelivered} ${t('lbl_cl_delivered')}</span>
@@ -2841,8 +2982,9 @@ function _renderClosingList(){
         <div style="font-size:11px;color:var(--muted);">${t('lbl_cl_margin')}</div>
         <div style="font-size:13px;font-weight:700;color:${profitColor};">${c.profitMargin.toFixed(1)}%</div>
       </div>
-      <div style="display:flex;gap:6px;">
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
         <button class="btn btn-outline btn-sm" onclick="viewClosingDetails('${c.id}')">${t('btn_view_details')}</button>
+        <button class="btn btn-outline btn-sm" onclick="recalcClosing('${c.id}')" title="إعادة الحساب">🔄</button>
         <button class="btn btn-danger btn-sm" onclick="deleteClosing('${c.id}')">🗑️</button>
       </div>
     </div>`;
@@ -2855,6 +2997,8 @@ function openCloseMonthModal(){
   const now=new Date();
   const defMonth=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
   document.getElementById('close-month-input').value=defMonth;
+  const notesEl=document.getElementById('close-month-notes');
+  if(notesEl)notesEl.value='';
   previewCloseMonth(defMonth);
   openModal('modal-close-month');
 }
@@ -2897,12 +3041,14 @@ function confirmCloseMonth(){
   }
   const d=getMonthlyData(monthStr);
   const session=getSession();
+  const notes=(document.getElementById('close-month-notes')?.value||'').trim();
   const rec={
     id:'cl_'+Date.now(),
     month:monthStr,
     monthLabel:getMonthLabel(monthStr),
     closedAt:today(),
     closedBy:session?session.username:'admin',
+    notes,
     carsReceived:d.carsReceived, carsDelivered:d.carsDelivered, carsCarryOver:d.carsCarryOver,
     carryOverCarIds:d.carryOverCarIds, deliveredCarIds:d.deliveredCarIds, allCarIds:d.allCarIds,
     totalEstimate:d.totalEstimate, totalPaid:d.totalPaid, totalRemaining:d.totalRemaining,
@@ -2923,136 +3069,193 @@ function viewClosingDetails(id){
   if(!rec)return;
   document.getElementById('closing-details-title').textContent='📊 '+rec.monthLabel;
   const profitColor=rec.grossProfit>=0?'var(--success)':'var(--danger)';
-  // Get actual cars from state
   const allCars=(rec.allCarIds||[]).map(cid=>state.cars.find(c=>c.id===cid)).filter(Boolean);
   const carryOverCars=(rec.carryOverCarIds||[]).map(cid=>state.cars.find(c=>c.id===cid)).filter(Boolean);
   const expenses=(rec.expenseIds||[]).map(eid=>state.expenses.find(e=>e.id===eid)).filter(Boolean);
   const byService=rec.byService||{};
+  const donutColors=['#00d4aa','#4facfe','#ffd700','#e94560','#a29bfe','#fd79a8','#55efc4','#fdcb6e'];
 
   document.getElementById('closing-details-body').innerHTML=`
-    <!-- KPI Summary -->
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:16px;">
-      <div style="background:rgba(0,212,170,.1);border:1px solid rgba(0,212,170,.25);border-radius:10px;padding:12px;text-align:center;">
+    <!-- KPI row (always visible) -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:8px;margin-bottom:14px;">
+      <div style="background:rgba(0,212,170,.1);border:1px solid rgba(0,212,170,.25);border-radius:10px;padding:10px;text-align:center;">
         <div style="font-size:10px;color:var(--muted);">${t('lbl_cl_revenue')}</div>
-        <div style="font-size:16px;font-weight:900;color:var(--success);">${fmt(rec.totalPaid)}</div>
+        <div style="font-size:15px;font-weight:900;color:var(--success);">${fmt(rec.totalPaid)}</div>
       </div>
-      <div style="background:rgba(233,69,96,.1);border:1px solid rgba(233,69,96,.25);border-radius:10px;padding:12px;text-align:center;">
+      <div style="background:rgba(233,69,96,.1);border:1px solid rgba(233,69,96,.25);border-radius:10px;padding:10px;text-align:center;">
         <div style="font-size:10px;color:var(--muted);">${t('lbl_cl_expenses')}</div>
-        <div style="font-size:16px;font-weight:900;color:var(--danger);">${fmt(rec.totalExpenses)}</div>
+        <div style="font-size:15px;font-weight:900;color:var(--danger);">${fmt(rec.totalExpenses)}</div>
       </div>
-      <div style="background:rgba(255,179,0,.1);border:1px solid rgba(255,179,0,.25);border-radius:10px;padding:12px;text-align:center;">
+      <div style="background:rgba(255,179,0,.1);border:1px solid rgba(255,179,0,.25);border-radius:10px;padding:10px;text-align:center;">
         <div style="font-size:10px;color:var(--muted);">${t('lbl_cl_profit')}</div>
-        <div style="font-size:16px;font-weight:900;color:${profitColor};">${fmt(rec.grossProfit)}</div>
+        <div style="font-size:15px;font-weight:900;color:${profitColor};">${fmt(rec.grossProfit)}</div>
       </div>
-      <div style="background:rgba(79,172,254,.1);border:1px solid rgba(79,172,254,.25);border-radius:10px;padding:12px;text-align:center;">
+      <div style="background:rgba(79,172,254,.1);border:1px solid rgba(79,172,254,.25);border-radius:10px;padding:10px;text-align:center;">
         <div style="font-size:10px;color:var(--muted);">${t('lbl_cl_margin')}</div>
-        <div style="font-size:16px;font-weight:900;color:${profitColor};">${rec.profitMargin.toFixed(1)}%</div>
+        <div style="font-size:15px;font-weight:900;color:${profitColor};">${rec.profitMargin.toFixed(1)}%</div>
       </div>
-      <div style="background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center;">
+      <div style="background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:10px;padding:10px;text-align:center;">
         <div style="font-size:10px;color:var(--muted);">${t('lbl_cl_received')}</div>
-        <div style="font-size:16px;font-weight:900;color:var(--info);">${rec.carsReceived}</div>
+        <div style="font-size:15px;font-weight:900;color:var(--info);">${rec.carsReceived}</div>
       </div>
-      <div style="background:rgba(255,100,50,.08);border:1px solid rgba(255,100,50,.2);border-radius:10px;padding:12px;text-align:center;">
+      <div style="background:rgba(255,100,50,.08);border:1px solid rgba(255,100,50,.2);border-radius:10px;padding:10px;text-align:center;">
         <div style="font-size:10px;color:var(--muted);">${t('lbl_cl_carryover_count')}</div>
-        <div style="font-size:16px;font-weight:900;color:#ff6432;">${rec.carsCarryOver}</div>
+        <div style="font-size:15px;font-weight:900;color:#ff6432;">${rec.carsCarryOver}</div>
       </div>
     </div>
 
-    <!-- Charts row -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;">
-      <div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:12px;padding:14px;">
-        <div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:8px;">${t('closing_service_dist')}</div>
-        <div style="display:flex;justify-content:center;"><canvas id="det-donut" width="150" height="150"></canvas></div>
-        <div id="det-donut-legend" style="margin-top:8px;"></div>
-      </div>
-      <div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:12px;padding:14px;">
-        <div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:8px;">📊 إيرادات / مصروفات / ربح</div>
-        <canvas id="det-bar" width="200" height="150"></canvas>
+    ${rec.notes?`<div style="background:rgba(79,172,254,.08);border:1px solid rgba(79,172,254,.2);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:13px;">📝 ${rec.notes}</div>`:''}
+
+    <!-- 4 Tabs -->
+    <div class="tabs" id="cd-tabs" style="margin-bottom:0;">
+      <button class="tab active" onclick="switchClosingTab('summary',this)">📊 الملخص</button>
+      <button class="tab" onclick="switchClosingTab('cars',this)">🚗 السيارات (${allCars.length})</button>
+      <button class="tab" onclick="switchClosingTab('expenses',this)">💸 المصروفات (${expenses.length})</button>
+      <button class="tab" onclick="switchClosingTab('services',this)">🔧 الخدمات</button>
+    </div>
+
+    <!-- Tab: Summary -->
+    <div id="cd-tab-summary" style="padding-top:14px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:12px;padding:14px;">
+          <div style="font-size:11px;font-weight:700;color:var(--muted);margin-bottom:8px;">${t('closing_service_dist')}</div>
+          <div style="display:flex;justify-content:center;"><canvas id="det-donut" width="150" height="150"></canvas></div>
+          <div id="det-donut-legend" style="margin-top:8px;"></div>
+        </div>
+        <div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:12px;padding:14px;">
+          <div style="font-size:11px;font-weight:700;color:var(--muted);margin-bottom:8px;">📊 إيرادات / مصروفات / ربح</div>
+          <canvas id="det-bar" width="200" height="150"></canvas>
+        </div>
       </div>
     </div>
 
-    <!-- Service breakdown -->
-    ${Object.keys(byService).length?`
-    <div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:14px;">
-      <div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:10px;">${t('closing_service_dist')}</div>
-      ${Object.entries(byService).map(([svc,v])=>`
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.06);font-size:12px;">
-          <div style="display:flex;align-items:center;gap:8px;">${serviceBadge(svc)}</div>
-          <div style="display:flex;gap:16px;">
-            <span style="color:var(--muted);">${v.count} سيارة</span>
-            <strong style="color:var(--success);">${fmt(v.amount)}</strong>
-          </div>
-        </div>`).join('')}
-    </div>`:''}
-
-    <!-- Cars list -->
-    ${allCars.length?`
-    <div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:14px;">
-      <div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:10px;">🚗 ${t('th_cl_cars_list')} (${allCars.length})</div>
-      <div style="overflow-x:auto;">
+    <!-- Tab: Cars -->
+    <div id="cd-tab-cars" style="display:none;padding-top:14px;">
+      ${allCars.length?`
+      <div style="overflow-x:auto;margin-bottom:16px;">
         <table style="width:100%;border-collapse:collapse;font-size:12px;">
-          <thead><tr style="color:var(--muted);">
-            <th style="padding:6px;text-align:right;">اللوحة</th>
-            <th style="padding:6px;text-align:right;">المالك</th>
-            <th style="padding:6px;text-align:right;">${t('th_cl_service')}</th>
-            <th style="padding:6px;text-align:right;">${t('th_cl_amount')}</th>
-            <th style="padding:6px;text-align:right;">الحالة</th>
+          <thead><tr style="background:rgba(255,255,255,.05);">
+            <th style="padding:8px 6px;text-align:right;color:var(--muted);">اللوحة</th>
+            <th style="padding:8px 6px;text-align:right;color:var(--muted);">المالك</th>
+            <th style="padding:8px 6px;text-align:right;color:var(--muted);">${t('th_cl_service')}</th>
+            <th style="padding:8px 6px;text-align:right;color:var(--muted);">${t('th_cl_amount')}</th>
+            <th style="padding:8px 6px;text-align:right;color:var(--muted);">الحالة</th>
           </tr></thead>
           <tbody>
-            ${allCars.map(c=>`<tr style="border-top:1px solid rgba(255,255,255,.04);">
-              <td style="padding:6px;font-weight:700;">${c.plate}</td>
-              <td style="padding:6px;">${c.owner}</td>
-              <td style="padding:6px;">${serviceBadge(c.service||'—')}</td>
-              <td style="padding:6px;color:var(--success);">${fmt(c.paidTotal||0)}</td>
-              <td style="padding:6px;">${statusBadge(c.status)}</td>
+            ${allCars.map(c=>`<tr style="border-top:1px solid rgba(255,255,255,.05);">
+              <td style="padding:7px 6px;font-weight:700;">${c.plate}</td>
+              <td style="padding:7px 6px;">${c.owner}</td>
+              <td style="padding:7px 6px;">${serviceBadge(c.service||'—')}</td>
+              <td style="padding:7px 6px;color:var(--success);font-weight:700;">${fmt(c.paidTotal||0)}</td>
+              <td style="padding:7px 6px;">${statusBadge(c.status)}</td>
             </tr>`).join('')}
           </tbody>
         </table>
-      </div>
-    </div>`:''}
+      </div>`:'<div class="empty-state"><div class="empty-icon">🚗</div><p>لا توجد سيارات</p></div>'}
+      ${carryOverCars.length?`
+      <div style="background:rgba(255,100,50,.06);border:1px solid rgba(255,100,50,.2);border-radius:12px;padding:12px;">
+        <div style="font-size:12px;font-weight:700;color:#ff6432;margin-bottom:10px;">⏳ ${t('lbl_cl_carryover_note')} (${carryOverCars.length})</div>
+        ${carryOverCars.map(c=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid rgba(255,100,50,.1);font-size:12px;">
+          <div><strong>${c.plate}</strong> — ${c.owner}</div>
+          <div>${serviceBadge(c.service||'—')}</div>
+          <div style="color:var(--muted);">${fmt(c.estimate||0)}</div>
+        </div>`).join('')}
+      </div>`:''}
+    </div>
 
-    ${carryOverCars.length?`
-    <div style="background:rgba(255,100,50,.06);border:1px solid rgba(255,100,50,.2);border-radius:12px;padding:14px;margin-bottom:14px;">
-      <div style="font-size:12px;font-weight:700;color:#ff6432;margin-bottom:10px;">⏳ ${t('lbl_cl_carryover_note')} (${carryOverCars.length})</div>
-      ${carryOverCars.map(c=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid rgba(255,100,50,.1);font-size:12px;">
-        <div><strong>${c.plate}</strong> — ${c.owner}</div>
-        <div>${serviceBadge(c.service||'—')}</div>
-        <div style="color:var(--success);">${fmt(c.estimate||0)}</div>
-      </div>`).join('')}
-    </div>`:''}
+    <!-- Tab: Expenses -->
+    <div id="cd-tab-expenses" style="display:none;padding-top:14px;">
+      ${expenses.length?`
+      <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;font-size:12px;">
+          <thead><tr style="background:rgba(255,255,255,.05);">
+            <th style="padding:8px 6px;text-align:right;color:var(--muted);">التاريخ</th>
+            <th style="padding:8px 6px;text-align:right;color:var(--muted);">البيان</th>
+            <th style="padding:8px 6px;text-align:right;color:var(--muted);">النوع</th>
+            <th style="padding:8px 6px;text-align:right;color:var(--muted);">${t('th_cl_amount')}</th>
+          </tr></thead>
+          <tbody>
+            ${expenses.map(e=>`<tr style="border-top:1px solid rgba(255,255,255,.05);">
+              <td style="padding:7px 6px;">${formatDate(e.date)}</td>
+              <td style="padding:7px 6px;">${e.desc}</td>
+              <td style="padding:7px 6px;"><span class="badge badge-maint">${e.type}</span></td>
+              <td style="padding:7px 6px;color:var(--danger);font-weight:700;">${fmt(e.amount)}</td>
+            </tr>`).join('')}
+            <tr style="border-top:2px solid rgba(255,255,255,.1);">
+              <td colspan="3" style="padding:7px 6px;font-weight:700;">الإجمالي</td>
+              <td style="padding:7px 6px;color:var(--danger);font-weight:900;">${fmt(rec.totalExpenses)}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>`:'<div class="empty-state"><div class="empty-icon">💸</div><p>لا توجد مصروفات</p></div>'}
+    </div>
 
-    <!-- Expenses breakdown -->
-    ${expenses.length?`
-    <div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:12px;padding:14px;">
-      <div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:10px;">💸 ${t('lbl_cl_expenses_breakdown')} (${expenses.length})</div>
-      ${expenses.map(e=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:12px;">
-        <div>${e.desc}</div>
-        <div style="display:flex;gap:10px;align-items:center;">
-          <span style="font-size:10px;background:rgba(255,255,255,.08);padding:2px 6px;border-radius:10px;">${e.type}</span>
-          <strong style="color:var(--danger);">${fmt(e.amount)}</strong>
-        </div>
-      </div>`).join('')}
-      <div style="display:flex;justify-content:space-between;padding:8px 0 0;font-size:13px;font-weight:700;">
-        <span>الإجمالي</span><span style="color:var(--danger);">${fmt(rec.totalExpenses)}</span>
+    <!-- Tab: Services -->
+    <div id="cd-tab-services" style="display:none;padding-top:14px;">
+      ${Object.keys(byService).length?`
+      <div style="overflow-x:auto;margin-bottom:16px;">
+        <table style="width:100%;border-collapse:collapse;font-size:12px;">
+          <thead><tr style="background:rgba(255,255,255,.05);">
+            <th style="padding:8px 6px;text-align:right;color:var(--muted);">الخدمة</th>
+            <th style="padding:8px 6px;text-align:center;color:var(--muted);">العدد</th>
+            <th style="padding:8px 6px;text-align:right;color:var(--muted);">المحصّل</th>
+            <th style="padding:8px 6px;text-align:center;color:var(--muted);">النسبة</th>
+          </tr></thead>
+          <tbody>
+            ${(()=>{
+              const total=Object.values(byService).reduce((s,v)=>s+v.count,0)||1;
+              return Object.entries(byService).map(([svc,v])=>`<tr style="border-top:1px solid rgba(255,255,255,.05);">
+                <td style="padding:7px 6px;">${serviceBadge(svc)}</td>
+                <td style="padding:7px 6px;text-align:center;font-weight:700;">${v.count}</td>
+                <td style="padding:7px 6px;color:var(--success);font-weight:700;">${fmt(v.amount)}</td>
+                <td style="padding:7px 6px;text-align:center;">
+                  <div style="background:rgba(255,255,255,.08);border-radius:20px;height:6px;overflow:hidden;">
+                    <div style="background:var(--primary);height:100%;width:${Math.round(v.count/total*100)}%;"></div>
+                  </div>
+                  <span style="font-size:10px;color:var(--muted);">${Math.round(v.count/total*100)}%</span>
+                </td>
+              </tr>`).join('');
+            })()}
+          </tbody>
+        </table>
       </div>
-    </div>`:''}
+      <div style="display:flex;justify-content:center;margin-top:10px;">
+        <canvas id="det-svc-donut" width="180" height="180"></canvas>
+      </div>`:'<div class="empty-state"><div class="empty-icon">🔧</div><p>لا توجد خدمات</p></div>'}
+    </div>
   `;
 
-  // Draw charts after modal opens
   setTimeout(()=>{
-    const donutColors=['#00d4aa','#4facfe','#ffd700','#e94560','#a29bfe','#fd79a8','#55efc4','#fdcb6e'];
     const svcLabels=Object.keys(byService);
     const svcData=svcLabels.map(k=>byService[k].count);
     drawDonutChart('det-donut',svcLabels,svcData.length?svcData:[1],svcLabels.length?donutColors:['#333']);
     const legEl=document.getElementById('det-donut-legend');
     if(legEl)legEl.innerHTML=svcLabels.map((l,i)=>`<div style="display:flex;align-items:center;justify-content:space-between;font-size:10px;padding:2px 0;"><div style="display:flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;border-radius:50%;background:${donutColors[i%donutColors.length]};display:inline-block;"></span>${l}</div><strong>${svcData[i]}</strong></div>`).join('');
-    drawBarChart('det-bar',
-      [t('lbl_cl_revenue'),t('lbl_cl_expenses'),t('lbl_cl_profit')],
-      [{data:[rec.totalPaid,rec.totalExpenses,Math.max(0,rec.grossProfit)],color:'#00d4aa',colorEnd:'#00d4aa44'}],{}
-    );
+    drawBarChart('det-bar',[t('lbl_cl_revenue'),t('lbl_cl_expenses'),t('lbl_cl_profit')],
+      [{data:[rec.totalPaid,rec.totalExpenses,Math.max(0,rec.grossProfit)],color:'#00d4aa',colorEnd:'#00d4aa44'}],{});
   },80);
 
   openModal('modal-closing-details');
+}
+
+function switchClosingTab(tab, btn){
+  ['summary','cars','expenses','services'].forEach(name=>{
+    const el=document.getElementById('cd-tab-'+name);
+    if(el)el.style.display=name===tab?'block':'none';
+  });
+  document.querySelectorAll('#cd-tabs .tab').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  // Draw services donut when that tab is shown
+  if(tab==='services'){
+    const rec=state.monthlyClosings&&state.monthlyClosings.find(c=>document.getElementById('closing-details-title').textContent.includes(c.monthLabel));
+    if(rec){
+      const byService=rec.byService||{};
+      const donutColors=['#00d4aa','#4facfe','#ffd700','#e94560','#a29bfe','#fd79a8','#55efc4','#fdcb6e'];
+      const svcLabels=Object.keys(byService);
+      const svcData=svcLabels.map(k=>byService[k].count);
+      setTimeout(()=>drawDonutChart('det-svc-donut',svcLabels,svcData.length?svcData:[1],donutColors),30);
+    }
+  }
 }
 
 function deleteClosing(id){
@@ -3060,6 +3263,40 @@ function deleteClosing(id){
   state.monthlyClosings=state.monthlyClosings.filter(c=>c.id!==id);
   saveState();
   renderMonthlyClosing();
+}
+
+// ── Export Closings CSV ───────────────────────────────────────────────────────
+function exportClosingsCSV(){
+  const closings=(state.monthlyClosings||[]).slice().sort((a,b)=>a.month.localeCompare(b.month));
+  if(!closings.length){alert('لا توجد سجلات إغلاق للتصدير');return;}
+
+  const headers=['الشهر','الإيرادات (ر.ع)','المصروفات (ر.ع)','صافي الربح (ر.ع)','هامش الربح %','السيارات المستلمة','السيارات المسلمة','السيارات المعلقة','أغلق بواسطة','الملاحظات'];
+
+  const rows=closings.map(c=>[
+    c.monthLabel||c.month,
+    (c.totalPaid||0).toFixed(3),
+    (c.totalExpenses||0).toFixed(3),
+    (c.grossProfit||0).toFixed(3),
+    (c.profitMargin||0).toFixed(1)+'%',
+    c.carsReceived||0,
+    c.carsDelivered||0,
+    c.carsCarryOver||0,
+    c.closedBy||'',
+    (c.notes||'').replace(/,/g,' ')
+  ]);
+
+  const BOM='\uFEFF';
+  const csvContent=BOM+[headers,...rows].map(row=>row.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\r\n');
+
+  const blob=new Blob([csvContent],{type:'text/csv;charset=utf-8;'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download='إغلاق_شهري_'+(new Date().toISOString().slice(0,10))+'.csv';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 }
 
 // ── Print Closing Details ─────────────────────────────────────────────────────
@@ -4142,6 +4379,19 @@ var LANG = {
     exp_total_lbl:'الإجمالي الكلي', exp_month_lbl:'هذا الشهر', exp_avg_lbl:'متوسط الفاتورة',
     exp_search_ph:'بحث في المصروفات...', exp_no_receipt:'—', exp_no_notes:'—',
     exp_filter_clear:'مسح الفلتر', exp_edit_title:'✏️ تعديل المصروف',
+    // Closing improvements
+    btn_export_closings:'📊 تصدير Excel', btn_recalc_closing:'🔄 إعادة الحساب',
+    recalc_confirm:'هل تريد إعادة حساب هذا الإغلاق بناءً على البيانات الحالية؟ سيتم تحديث الأرقام.',
+    lbl_closing_notes:'ملاحظات الإغلاق (اختياري)', lbl_notes_display:'📝',
+    closing_trend_range:'نطاق الرسم البياني:', range_3m:'3 أشهر', range_6m:'6 أشهر', range_12m:'12 شهر',
+    yearly_summary_title:'📅 ملخص سنوي', lbl_year_select:'السنة:',
+    lbl_yearly_revenue:'إجمالي الإيرادات', lbl_yearly_expenses:'إجمالي المصروفات',
+    lbl_yearly_profit:'صافي الربح', lbl_yearly_cars:'إجمالي السيارات',
+    lbl_best_month:'أفضل شهر', lbl_worst_month:'أسوأ شهر',
+    cd_tab_summary:'📊 الملخص', cd_tab_cars:'🚗 السيارات',
+    cd_tab_expenses:'💸 المصروفات', cd_tab_services:'🔧 الخدمات',
+    lbl_cd_carry_over:'سيارات معلقة', lbl_cd_no_expenses:'لا توجد مصروفات في هذا الشهر',
+    lbl_cd_no_services:'لا توجد خدمات مسجلة',
   },
   en: {
     nav_dashboard:'Dashboard', nav_cars:'Cars in Workshop', nav_delivered:'Delivered Cars',
@@ -4232,6 +4482,19 @@ var LANG = {
     exp_total_lbl:'Total', exp_month_lbl:'This Month', exp_avg_lbl:'Avg. per Entry',
     exp_search_ph:'Search expenses...', exp_no_receipt:'—', exp_no_notes:'—',
     exp_filter_clear:'Clear Filter', exp_edit_title:'✏️ Edit Expense',
+    // Closing improvements
+    btn_export_closings:'📊 Export Excel', btn_recalc_closing:'🔄 Recalculate',
+    recalc_confirm:'Recalculate this closing based on current data? Numbers will be updated.',
+    lbl_closing_notes:'Closing Notes (optional)', lbl_notes_display:'📝',
+    closing_trend_range:'Chart Range:', range_3m:'3 Months', range_6m:'6 Months', range_12m:'12 Months',
+    yearly_summary_title:'📅 Yearly Summary', lbl_year_select:'Year:',
+    lbl_yearly_revenue:'Total Revenue', lbl_yearly_expenses:'Total Expenses',
+    lbl_yearly_profit:'Net Profit', lbl_yearly_cars:'Total Cars',
+    lbl_best_month:'Best Month', lbl_worst_month:'Worst Month',
+    cd_tab_summary:'📊 Summary', cd_tab_cars:'🚗 Cars',
+    cd_tab_expenses:'💸 Expenses', cd_tab_services:'🔧 Services',
+    lbl_cd_carry_over:'Pending Cars', lbl_cd_no_expenses:'No expenses for this month',
+    lbl_cd_no_services:'No services recorded',
   }
 };
 function t(key) {
@@ -4882,6 +5145,10 @@ function saveWaBotKey() {
         </div>
       </div>
       <div id="close-month-warning" style="display:none;margin-top:12px;padding:10px;background:rgba(255,179,0,.1);border:1px solid rgba(255,179,0,.3);border-radius:10px;font-size:12px;color:#ffd700;"></div>
+      <div class="form-group" style="margin-top:14px;">
+        <label style="font-size:12px;color:var(--muted);">📝 ملاحظة على هذا الشهر (اختياري)</label>
+        <textarea id="close-month-notes" placeholder="مثال: شهر جيد، أضفنا ميكانيكي جديد، موسم ذروة..." style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--card);color:var(--text);font-family:var(--font-main);font-size:13px;height:70px;resize:vertical;margin-top:6px;box-sizing:border-box;"></textarea>
+      </div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-outline" onclick="closeModal('modal-close-month')" data-i18n="btn_cancel">إلغاء</button>
