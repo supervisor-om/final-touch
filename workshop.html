@@ -798,20 +798,56 @@ label{font-size:14px;}
 
   <!-- EXPENSES -->
   <div class="page" id="page-expenses">
-    <div style="display:flex;justify-content:flex-end;margin-bottom:14px;">
-      <button class="btn btn-primary" onclick="openModal('modal-add-expense')" data-i18n="btn_add_expense">➕ إضافة مصروف</button>
+    <!-- Header row -->
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px;">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;flex:1;">
+        <input type="text" id="exp-search" placeholder="🔍 بحث في المصروفات..." oninput="renderExpensesTable()" style="padding:8px 14px;border-radius:10px;border:1px solid var(--border);background:var(--card);color:var(--text);font-family:var(--font-main);font-size:13px;min-width:160px;flex:1;">
+        <select id="exp-filter-type" onchange="renderExpensesTable()" style="padding:8px 12px;border-radius:10px;border:1px solid var(--border);background:var(--card);color:var(--text);font-family:var(--font-main);font-size:13px;">
+          <option value="">جميع الأنواع</option>
+          <option value="قطع غيار">قطع الغيار</option>
+          <option value="مرافق">مرافق وتشغيل</option>
+          <option value="رواتب">رواتب وعمالة</option>
+          <option value="إيجار">إيجار</option>
+          <option value="أدوات">أدوات ومعدات</option>
+          <option value="أخرى">أخرى</option>
+        </select>
+        <input type="month" id="exp-filter-month" onchange="renderExpensesTable()" style="padding:8px 12px;border-radius:10px;border:1px solid var(--border);background:var(--card);color:var(--text);font-family:var(--font-main);font-size:13px;">
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-outline btn-sm" onclick="exportExpensesPDF()">📄 تصدير PDF</button>
+        <button class="btn btn-primary" onclick="openAddExpenseModal()">➕ إضافة مصروف</button>
+      </div>
     </div>
-    <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);">
+
+    <!-- Stat cards -->
+    <div class="stats-grid" style="grid-template-columns:repeat(auto-fit,minmax(140px,1fr));margin-bottom:16px;">
+      <div class="stat-card red"><span class="stat-icon">💰</span><div class="stat-value" id="exp-total">0 ر.ع</div><div class="stat-label">الإجمالي الكلي</div></div>
+      <div class="stat-card gold"><span class="stat-icon">📅</span><div class="stat-value" id="exp-this-month">0 ر.ع</div><div class="stat-label">هذا الشهر</div></div>
+      <div class="stat-card blue"><span class="stat-icon">📊</span><div class="stat-value" id="exp-avg">0 ر.ع</div><div class="stat-label">متوسط الفاتورة</div></div>
       <div class="stat-card red"><span class="stat-icon">🔧</span><div class="stat-value" id="exp-parts">0 ر.ع</div><div class="stat-label" data-i18n="lbl_spare_parts">قطع الغيار</div></div>
       <div class="stat-card gold"><span class="stat-icon">💡</span><div class="stat-value" id="exp-util">0 ر.ع</div><div class="stat-label" data-i18n="lbl_utilities">المرافق والتشغيل</div></div>
       <div class="stat-card blue"><span class="stat-icon">👷</span><div class="stat-value" id="exp-labor">0 ر.ع</div><div class="stat-label" data-i18n="lbl_labor_sal">الرواتب والعمالة</div></div>
     </div>
+
+    <!-- Expenses table -->
     <div class="card">
-      <div class="card-header"><div class="card-title" data-i18n="card_expenses_log">💸 سجل المصروفات</div></div>
+      <div class="card-header">
+        <div class="card-title" data-i18n="card_expenses_log">💸 سجل المصروفات</div>
+        <div id="exp-filter-info" style="font-size:12px;color:var(--muted);"></div>
+      </div>
       <div class="card-body" style="padding:0;">
         <div class="table-wrap">
-          <table><thead><tr><th data-i18n="th_date">التاريخ</th><th data-i18n="th_statement">البيان</th><th data-i18n="th_type">النوع</th><th data-i18n="th_amount">المبلغ</th><th data-i18n="th_actions">إجراءات</th></tr></thead>
-          <tbody id="expenses-table-body"></tbody></table>
+          <table>
+            <thead><tr>
+              <th data-i18n="th_date">التاريخ</th>
+              <th data-i18n="th_statement">البيان / الملاحظات</th>
+              <th data-i18n="th_type">النوع</th>
+              <th data-i18n="th_amount">المبلغ</th>
+              <th>الفاتورة</th>
+              <th data-i18n="th_actions">إجراءات</th>
+            </tr></thead>
+            <tbody id="expenses-table-body"></tbody>
+          </table>
         </div>
       </div>
     </div>
@@ -1329,28 +1365,47 @@ label{font-size:14px;}
 
 <!-- Add Expense -->
 <div class="modal-overlay" id="modal-add-expense">
-  <div class="modal">
-    <div class="modal-header"><div class="modal-title" data-i18n="modal_add_expense">💸 إضافة مصروف</div><button class="modal-close" onclick="closeModal('modal-add-expense')">✕</button></div>
+  <div class="modal" style="max-width:520px;">
+    <div class="modal-header">
+      <div class="modal-title" id="exp-modal-title">💸 إضافة مصروف</div>
+      <button class="modal-close" onclick="closeModal('modal-add-expense')">✕</button>
+    </div>
     <div class="modal-body">
+      <input type="hidden" id="exp-editing-id">
       <div class="form-grid">
-        <div class="form-group"><label data-i18n="lbl_statement_req">البيان *</label><input type="text" id="exp-desc" placeholder="مثال: شراء زيت محرك"></div>
-        <div class="form-group"><label data-i18n="th_type">النوع</label>
+        <div class="form-group full"><label>البيان *</label><input type="text" id="exp-desc" placeholder="مثال: شراء زيت محرك، فاتورة كهرباء..."></div>
+        <div class="form-group"><label>النوع</label>
           <select id="exp-type">
-            <option value="قطع غيار">قطع الغيار</option>
-            <option value="مرافق">مرافق وتشغيل</option>
-            <option value="رواتب">رواتب وعمالة</option>
-            <option value="إيجار">إيجار</option>
-            <option value="أدوات">أدوات ومعدات</option>
-            <option value="أخرى">أخرى</option>
+            <option value="قطع غيار">🔧 قطع الغيار</option>
+            <option value="مرافق">💡 مرافق وتشغيل</option>
+            <option value="رواتب">👷 رواتب وعمالة</option>
+            <option value="إيجار">🏠 إيجار</option>
+            <option value="أدوات">🛠️ أدوات ومعدات</option>
+            <option value="أخرى">📦 أخرى</option>
           </select>
         </div>
-        <div class="form-group"><label data-i18n="lbl_amount_omr">المبلغ (ر.ع)</label><input type="number" id="exp-amount" placeholder="0.000" step="0.001"></div>
-        <div class="form-group"><label data-i18n="lbl_exp_date">التاريخ</label><input type="date" id="exp-date"></div>
+        <div class="form-group"><label>المبلغ (ر.ع) *</label><input type="number" id="exp-amount" placeholder="0.000" step="0.001" min="0"></div>
+        <div class="form-group"><label>التاريخ</label><input type="date" id="exp-date"></div>
+        <div class="form-group full"><label>ملاحظات</label><textarea id="exp-notes" placeholder="أي تفاصيل إضافية..." style="height:70px;resize:vertical;"></textarea></div>
+        <div class="form-group full">
+          <label>صورة الفاتورة / الإيصال</label>
+          <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+            <label style="cursor:pointer;background:rgba(255,255,255,.07);border:1px dashed rgba(255,255,255,.2);border-radius:10px;padding:10px 18px;font-size:13px;display:flex;align-items:center;gap:8px;transition:all .2s;" onmouseover="this.style.background='rgba(255,255,255,.12)'" onmouseout="this.style.background='rgba(255,255,255,.07)'">
+              📎 اختر صورة
+              <input type="file" id="exp-receipt-file" accept="image/*" style="display:none;" onchange="previewExpenseReceipt(this)">
+            </label>
+            <div id="exp-receipt-preview" style="display:none;">
+              <img id="exp-receipt-img" src="" style="width:80px;height:60px;object-fit:cover;border-radius:8px;border:1px solid var(--border);cursor:pointer;" onclick="viewReceipt(this.src)">
+              <button onclick="clearExpenseReceipt()" style="display:block;font-size:10px;color:var(--danger);background:none;border:none;cursor:pointer;margin-top:2px;">✕ إزالة</button>
+            </div>
+            <div id="exp-receipt-none" style="font-size:12px;color:var(--muted);">لا توجد صورة</div>
+          </div>
+        </div>
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn btn-outline" onclick="closeModal('modal-add-expense')" data-i18n="btn_cancel">إلغاء</button>
-      <button class="btn btn-primary" onclick="addExpense()" data-i18n="btn_save">✓ حفظ</button>
+      <button class="btn btn-outline" onclick="closeModal('modal-add-expense')">إلغاء</button>
+      <button class="btn btn-primary" onclick="saveExpenseForm()">💾 حفظ</button>
     </div>
   </div>
 </div>
@@ -1703,19 +1758,109 @@ function saveService(){
 }
 
 // ADD EXPENSE
-function addExpense(){
+// ── Expense Receipts (stored separately to avoid bloating state) ─────────────
+const EXP_RECEIPTS_KEY='ft_exp_receipts';
+function loadExpReceipts(){try{return JSON.parse(localStorage.getItem(EXP_RECEIPTS_KEY))||{};}catch(e){return {};}}
+function saveExpReceipts(r){try{localStorage.setItem(EXP_RECEIPTS_KEY,JSON.stringify(r));}catch(e){alert('مساحة التخزين ممتلئة.');}}
+function getExpReceipt(id){return loadExpReceipts()[id]||null;}
+function setExpReceipt(id,src){const r=loadExpReceipts();if(src)r[id]=src;else delete r[id];saveExpReceipts(r);}
+
+function openAddExpenseModal(){
+  document.getElementById('exp-editing-id').value='';
+  document.getElementById('exp-modal-title').textContent='💸 إضافة مصروف';
+  ['exp-desc','exp-amount','exp-notes'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('exp-type').value='قطع غيار';
+  document.getElementById('exp-date').value=today();
+  document.getElementById('exp-receipt-preview').style.display='none';
+  document.getElementById('exp-receipt-none').style.display='';
+  document.getElementById('exp-receipt-file').value='';
+  openModal('modal-add-expense');
+}
+
+function editExpense(id){
+  const e=state.expenses.find(x=>x.id===id);
+  if(!e)return;
+  document.getElementById('exp-editing-id').value=id;
+  document.getElementById('exp-modal-title').textContent='✏️ تعديل المصروف';
+  document.getElementById('exp-desc').value=e.desc||'';
+  document.getElementById('exp-type').value=e.type||'قطع غيار';
+  document.getElementById('exp-amount').value=e.amount||'';
+  document.getElementById('exp-date').value=e.date||today();
+  document.getElementById('exp-notes').value=e.notes||'';
+  // receipt
+  const receipt=getExpReceipt(id);
+  if(receipt){
+    document.getElementById('exp-receipt-img').src=receipt;
+    document.getElementById('exp-receipt-preview').style.display='flex';
+    document.getElementById('exp-receipt-none').style.display='none';
+  } else {
+    document.getElementById('exp-receipt-preview').style.display='none';
+    document.getElementById('exp-receipt-none').style.display='';
+  }
+  document.getElementById('exp-receipt-file').value='';
+  openModal('modal-add-expense');
+}
+
+function saveExpenseForm(){
   const desc=document.getElementById('exp-desc').value.trim();
   const amount=parseFloat(document.getElementById('exp-amount').value)||0;
-  if(!desc||!amount)return;
-  state.expenses.push({id:genId(),desc,type:document.getElementById('exp-type').value,amount,date:document.getElementById('exp-date').value||today()});
-  saveState();closeModal('modal-add-expense');
-  ['exp-desc','exp-amount'].forEach(id=>{document.getElementById(id).value='';});
-  renderAll();
+  if(!desc){alert('يرجى إدخال البيان');return;}
+  if(!amount){alert('يرجى إدخال المبلغ');return;}
+  const type=document.getElementById('exp-type').value;
+  const date=document.getElementById('exp-date').value||today();
+  const notes=document.getElementById('exp-notes').value.trim();
+  const editingId=document.getElementById('exp-editing-id').value;
+
+  // Handle receipt image
+  const imgEl=document.getElementById('exp-receipt-img');
+  const newReceipt=(imgEl&&imgEl.src&&imgEl.src.startsWith('data:'))?imgEl.src:null;
+
+  if(editingId){
+    // Edit existing
+    const idx=state.expenses.findIndex(e=>e.id===editingId);
+    if(idx>=0){state.expenses[idx]={...state.expenses[idx],desc,type,amount,date,notes};}
+    if(newReceipt)setExpReceipt(editingId,newReceipt);
+    else if(!document.getElementById('exp-receipt-preview').style.display||document.getElementById('exp-receipt-preview').style.display==='none'){
+      // user removed receipt
+      setExpReceipt(editingId,null);
+    }
+  } else {
+    // New expense
+    const id=genId();
+    state.expenses.push({id,desc,type,amount,date,notes});
+    if(newReceipt)setExpReceipt(id,newReceipt);
+  }
+  saveState();
+  closeModal('modal-add-expense');
+  renderExpensesTable();
+}
+
+function previewExpenseReceipt(input){
+  const file=input.files[0];
+  if(!file)return;
+  compressImage(file).then(src=>{
+    document.getElementById('exp-receipt-img').src=src;
+    document.getElementById('exp-receipt-preview').style.display='flex';
+    document.getElementById('exp-receipt-none').style.display='none';
+  });
+}
+
+function clearExpenseReceipt(){
+  document.getElementById('exp-receipt-img').src='';
+  document.getElementById('exp-receipt-preview').style.display='none';
+  document.getElementById('exp-receipt-none').style.display='';
+  document.getElementById('exp-receipt-file').value='';
+}
+
+function viewReceipt(src){
+  document.getElementById('receipt-view-img').src=src;
+  document.getElementById('receipt-download-link').href=src;
+  openModal('modal-receipt-view');
 }
 
 // DELETE
 function deleteCar(id){const _dc=getSession();if(!_dc||_dc.role!=='admin'){alert('🔒 حذف السيارات للمسؤول فقط');return;}if(!confirm('هل تريد حذف هذه السيارة؟'))return;state.cars=state.cars.filter(c=>c.id!==id);saveState();renderAll();}
-function deleteExpense(id){if(!confirm('حذف المصروف؟'))return;state.expenses=state.expenses.filter(e=>e.id!==id);saveState();renderAll();}
+function deleteExpense(id){if(!confirm('حذف المصروف؟'))return;state.expenses=state.expenses.filter(e=>e.id!==id);setExpReceipt(id,null);saveState();renderExpensesTable();}
 function deleteService(id){if(!confirm('حذف الخدمة؟'))return;state.services=state.services.filter(s=>s.id!==id);saveState();renderAll();}
 function deleteOrder(id){if(!confirm('حذف الأمر؟'))return;state.orders=state.orders.filter(o=>o.id!==id);saveState();renderAll();}
 
@@ -2137,19 +2282,115 @@ function renderInvoicesTable(){
 }
 
 function renderExpensesTable(){
+  const search=(document.getElementById('exp-search')?.value||'').toLowerCase();
+  const fType=document.getElementById('exp-filter-type')?.value||'';
+  const fMonth=document.getElementById('exp-filter-month')?.value||'';
+
+  // Apply filters
+  let filtered=[...state.expenses].sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  if(search)filtered=filtered.filter(e=>(e.desc||'').toLowerCase().includes(search)||(e.notes||'').toLowerCase().includes(search));
+  if(fType)filtered=filtered.filter(e=>e.type===fType);
+  if(fMonth)filtered=filtered.filter(e=>(e.date||'').startsWith(fMonth));
+
+  // Filter info
+  const info=document.getElementById('exp-filter-info');
+  if(info){
+    if(search||fType||fMonth){
+      info.textContent=`${filtered.length} من أصل ${state.expenses.length}`;
+      info.style.color='var(--info)';
+    } else {
+      info.textContent=`${state.expenses.length} سجل`;
+      info.style.color='var(--muted)';
+    }
+  }
+
+  // Table
   const tbody=document.getElementById('expenses-table-body');
-  tbody.innerHTML=state.expenses.length?state.expenses.map(e=>`<tr>
-    <td>${formatDate(e.date)}</td><td>${e.desc}</td>
-    <td><span class="badge badge-maint">${e.type}</span></td>
-    <td><strong style="color:var(--danger);">${fmt(e.amount)}</strong></td>
-    <td><button class="btn btn-danger btn-sm" onclick="deleteExpense('${e.id}')">🗑️</button></td>
-  </tr>`).join(''):'<tr><td colspan="5"><div class="empty-state"><div class="empty-icon">💸</div><p>لا توجد مصروفات</p></div></td></tr>';
-  const parts=state.expenses.filter(e=>e.type==='قطع غيار').reduce((s,e)=>s+e.amount,0);
-  const util=state.expenses.filter(e=>['مرافق','إيجار','أدوات'].includes(e.type)).reduce((s,e)=>s+e.amount,0);
-  const labor=state.expenses.filter(e=>e.type==='رواتب').reduce((s,e)=>s+e.amount,0);
-  document.getElementById('exp-parts').textContent=fmt(parts);
-  document.getElementById('exp-util').textContent=fmt(util);
-  document.getElementById('exp-labor').textContent=fmt(labor);
+  if(!tbody)return;
+  if(!filtered.length){
+    tbody.innerHTML=`<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">💸</div><p>${state.expenses.length?'لا توجد نتائج للفلتر':'لا توجد مصروفات'}</p>${state.expenses.length&&(search||fType||fMonth)?`<button class="btn btn-outline btn-sm" onclick="clearExpFilters()">مسح الفلتر</button>`:''}</div></td></tr>`;
+  } else {
+    const receipts=loadExpReceipts();
+    tbody.innerHTML=filtered.map(e=>{
+      const receipt=receipts[e.id];
+      const typeEmoji={قطع:'🔧','مرافق':'💡','رواتب':'👷','إيجار':'🏠','أدوات':'🛠️','أخرى':'📦'};
+      const emoji=Object.keys(typeEmoji).find(k=>e.type.startsWith(k));
+      return`<tr>
+        <td style="white-space:nowrap;font-size:12px;">${formatDate(e.date)}</td>
+        <td>
+          <div style="font-weight:600;">${e.desc}</div>
+          ${e.notes?`<div style="font-size:11px;color:var(--muted);margin-top:2px;">📝 ${e.notes}</div>`:''}
+        </td>
+        <td><span class="badge badge-maint">${typeEmoji[emoji]||'📦'} ${e.type}</span></td>
+        <td><strong style="color:var(--danger);white-space:nowrap;">${fmt(e.amount)}</strong></td>
+        <td style="text-align:center;">${receipt?`<img src="${receipt}" style="width:44px;height:34px;object-fit:cover;border-radius:6px;cursor:pointer;border:1px solid var(--border);" onclick="viewReceipt('${receipt}')" title="عرض الفاتورة">`:
+        `<span style="font-size:11px;color:var(--muted);">—</span>`}</td>
+        <td>
+          <div style="display:flex;gap:5px;">
+            <button class="btn btn-outline btn-sm" onclick="editExpense('${e.id}')">✏️</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteExpense('${e.id}')">🗑️</button>
+          </div>
+        </td>
+      </tr>`;
+    }).join('');
+  }
+
+  // Update stats (always from ALL expenses, not filtered)
+  const all=state.expenses;
+  const now=new Date();
+  const curMonth=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+  const total=all.reduce((s,e)=>s+e.amount,0);
+  const thisMonth=all.filter(e=>(e.date||'').startsWith(curMonth)).reduce((s,e)=>s+e.amount,0);
+  const avg=all.length?total/all.length:0;
+  const parts=all.filter(e=>e.type==='قطع غيار').reduce((s,e)=>s+e.amount,0);
+  const util=all.filter(e=>['مرافق','إيجار','أدوات'].includes(e.type)).reduce((s,e)=>s+e.amount,0);
+  const labor=all.filter(e=>e.type==='رواتب').reduce((s,e)=>s+e.amount,0);
+
+  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+  set('exp-total',fmt(total));
+  set('exp-this-month',fmt(thisMonth));
+  set('exp-avg',fmt(avg));
+  set('exp-parts',fmt(parts));
+  set('exp-util',fmt(util));
+  set('exp-labor',fmt(labor));
+}
+
+function clearExpFilters(){
+  ['exp-search','exp-filter-type','exp-filter-month'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el)el.value='';
+  });
+  renderExpensesTable();
+}
+
+function exportExpensesPDF(){
+  const fMonth=document.getElementById('exp-filter-month')?.value||'';
+  const fType=document.getElementById('exp-filter-type')?.value||'';
+  let filtered=[...state.expenses].sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  if(fMonth)filtered=filtered.filter(e=>(e.date||'').startsWith(fMonth));
+  if(fType)filtered=filtered.filter(e=>e.type===fType);
+  const total=filtered.reduce((s,e)=>s+e.amount,0);
+  const title=fMonth?`المصروفات — ${fMonth}`:'سجل المصروفات الكامل';
+  const w=window.open('','_blank');
+  w.document.write(`<html dir="rtl"><head><meta charset="UTF-8">
+  <style>body{font-family:'Cairo',sans-serif;padding:30px;direction:rtl;color:#111;}
+  h1{color:#1a1a2e;border-bottom:3px solid #e94560;padding-bottom:10px;margin-bottom:6px;}
+  p{color:#555;font-size:13px;margin-bottom:20px;}
+  table{width:100%;border-collapse:collapse;margin-bottom:20px;}
+  th{background:#1a1a2e;color:white;padding:9px 10px;text-align:right;font-size:13px;}
+  td{padding:8px 10px;border:1px solid #ddd;font-size:13px;}
+  tr:nth-child(even)td{background:#f9f9f9;}
+  .total{font-weight:900;font-size:15px;color:#e94560;}
+  .badge{background:#eee;padding:2px 8px;border-radius:12px;font-size:11px;}
+  </style></head><body>
+  <h1>💸 ${title}</h1>
+  <p>تاريخ التقرير: ${new Date().toLocaleDateString('ar-SA')} — عدد السجلات: ${filtered.length}</p>
+  <table><tr><th>التاريخ</th><th>البيان</th><th>النوع</th><th>المبلغ</th><th>ملاحظات</th></tr>
+  ${filtered.map(e=>`<tr><td>${e.date}</td><td>${e.desc}</td><td><span class="badge">${e.type}</span></td><td style="color:red;font-weight:700;">${e.amount.toFixed(3)} ر.ع</td><td style="font-size:12px;color:#555;">${e.notes||'—'}</td></tr>`).join('')}
+  <tr><td colspan="3" style="text-align:center;font-weight:700;">الإجمالي</td><td class="total">${total.toFixed(3)} ر.ع</td><td></td></tr>
+  </table></body></html>`);
+  w.document.close();
+  w.print();
 }
 
 function renderReports(){
@@ -3897,6 +4138,10 @@ var LANG = {
     lbl_cl_expenses_breakdown:'تفاصيل المصروفات',
     btn_view_details:'عرض التفاصيل', btn_delete_closing:'حذف الإغلاق',
     lbl_no_closings:'لا توجد إغلاقات مسجلة', lbl_already_closed:'⚠️ هذا الشهر مُغلق بالفعل',
+    exp_all_types:'جميع الأنواع', exp_notes_lbl:'ملاحظات', exp_receipt_lbl:'الفاتورة',
+    exp_total_lbl:'الإجمالي الكلي', exp_month_lbl:'هذا الشهر', exp_avg_lbl:'متوسط الفاتورة',
+    exp_search_ph:'بحث في المصروفات...', exp_no_receipt:'—', exp_no_notes:'—',
+    exp_filter_clear:'مسح الفلتر', exp_edit_title:'✏️ تعديل المصروف',
   },
   en: {
     nav_dashboard:'Dashboard', nav_cars:'Cars in Workshop', nav_delivered:'Delivered Cars',
@@ -3983,6 +4228,10 @@ var LANG = {
     lbl_cl_expenses_breakdown:'Expenses Breakdown',
     btn_view_details:'View Details', btn_delete_closing:'Delete',
     lbl_no_closings:'No closing records yet', lbl_already_closed:'⚠️ This month is already closed',
+    exp_all_types:'All Types', exp_notes_lbl:'Notes', exp_receipt_lbl:'Receipt',
+    exp_total_lbl:'Total', exp_month_lbl:'This Month', exp_avg_lbl:'Avg. per Entry',
+    exp_search_ph:'Search expenses...', exp_no_receipt:'—', exp_no_notes:'—',
+    exp_filter_clear:'Clear Filter', exp_edit_title:'✏️ Edit Expense',
   }
 };
 function t(key) {
@@ -4596,6 +4845,23 @@ function saveWaBotKey() {
   }, 3000);
 }
 </script>
+
+<!-- ═══ Receipt Viewer Modal ═══ -->
+<div class="modal-overlay" id="modal-receipt-view" style="display:none;opacity:0;" onclick="if(event.target===this)closeModal('modal-receipt-view')">
+  <div class="modal" style="max-width:600px;">
+    <div class="modal-header">
+      <div class="modal-title">🧾 صورة الفاتورة</div>
+      <button class="modal-close" onclick="closeModal('modal-receipt-view')">✕</button>
+    </div>
+    <div class="modal-body" style="text-align:center;">
+      <img id="receipt-view-img" src="" style="max-width:100%;max-height:70vh;border-radius:12px;object-fit:contain;">
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-receipt-view')">إغلاق</button>
+      <a id="receipt-download-link" download="فاتورة.jpg" class="btn btn-primary">⬇️ تحميل</a>
+    </div>
+  </div>
+</div>
 
 <!-- ═══ Monthly Closing Modal ═══ -->
 <div class="modal-overlay" id="modal-close-month" style="display:none;opacity:0;">
