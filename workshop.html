@@ -750,7 +750,18 @@ label{font-size:14px;}
   <!-- DELIVERED -->
   <div class="page" id="page-delivered">
     <div class="card">
-      <div class="card-header"><div class="card-title"><span data-i18n="card_delivered">✅ السيارات المُسلَّمة</span> (<span id="delivered-count">0</span>)</div></div>
+      <div class="card-header" style="flex-wrap:wrap;gap:8px;">
+        <div class="card-title"><span data-i18n="card_delivered">✅ السيارات المُسلَّمة</span> (<span id="delivered-count">0</span>)</div>
+      </div>
+      <!-- Filter Row -->
+      <div style="padding:12px 16px;display:flex;gap:8px;flex-wrap:wrap;border-bottom:1px solid var(--border);align-items:center;">
+        <input type="text" id="del-search" placeholder="🔍 بحث باسم أو لوحة..." oninput="renderDeliveredTable()" style="padding:8px 12px;border-radius:10px;border:1px solid var(--border);background:var(--card);color:var(--text);font-family:var(--font-main);font-size:13px;min-width:160px;flex:1;">
+        <select id="del-filter-service" onchange="renderDeliveredTable()" style="padding:8px 10px;border-radius:10px;border:1px solid var(--border);background:var(--card);color:var(--text);font-family:var(--font-main);font-size:13px;">
+          <option value="">جميع الخدمات</option>
+        </select>
+        <input type="month" id="del-filter-month" onchange="renderDeliveredTable()" style="padding:8px 10px;border-radius:10px;border:1px solid var(--border);background:var(--card);color:var(--text);font-family:var(--font-main);font-size:13px;">
+        <button class="btn btn-outline btn-sm" onclick="clearDeliveredFilters()">✕ مسح</button>
+      </div>
       <div class="card-body" style="padding:0;">
         <div class="table-wrap">
           <table><thead><tr><th data-i18n="th_plate">اللوحة</th><th data-i18n="th_owner">المالك</th><th data-i18n="th_car">السيارة</th><th data-i18n="th_service">الخدمة</th><th data-i18n="th_amount">المبلغ</th><th data-i18n="th_paid">المدفوع</th><th data-i18n="th_entry_date">تاريخ الدخول</th><th data-i18n="th_delivery_date">تاريخ التسليم</th><th data-i18n="th_days">الأيام</th><th data-i18n="th_actions">إجراءات</th></tr></thead>
@@ -2278,24 +2289,115 @@ function renderCarsTable(){
   }).join('');
 }
 
+function buildDeliveredRow(c){
+  const inv=state.invoices.find(i=>i.carId===c.id);
+  const days=c.dateOut&&c.dateIn?Math.floor((new Date(c.dateOut)-new Date(c.dateIn))/(1000*60*60*24)):0;
+  const remaining=Math.max(0,(c.estimate||0)-(c.paidTotal||0));
+  return`<tr>
+    <td><strong>${c.plate}</strong></td>
+    <td>
+      <div style="font-weight:600;">${c.owner}</div>
+      ${c.phone?`<div style="font-size:11px;color:var(--muted);">${c.phone}</div>`:''}
+    </td>
+    <td style="font-size:12px;">${c.model||'—'}</td>
+    <td>${serviceBadge(c.service)}</td>
+    <td><strong style="color:var(--gold);">${(c.estimate||0).toFixed(3)} ر.ع</strong></td>
+    <td>
+      <div style="color:var(--success);font-weight:600;">${(c.paidTotal||0).toFixed(3)} ر.ع</div>
+      ${remaining>0?`<div style="font-size:10px;color:var(--danger);">متبقي: ${remaining.toFixed(3)}</div>`:''}
+    </td>
+    <td style="font-size:12px;">${formatDate(c.dateIn)}</td>
+    <td style="font-size:12px;">${formatDate(c.dateOut)}</td>
+    <td style="text-align:center;"><span style="background:rgba(79,172,254,.12);color:var(--info);padding:2px 8px;border-radius:8px;font-size:12px;font-weight:600;">${days}د</span></td>
+    <td>
+      <div style="display:flex;gap:4px;flex-wrap:wrap;">
+        ${inv?`<button class="btn btn-outline btn-sm" onclick="generateReceipt(${inv.id})" title="إيصال">🧾</button>`:''}
+        <button class="btn btn-outline btn-sm" onclick="restoreCarToWorkshop('${c.id}')" title="استرجاع إلى الورشة" style="color:var(--gold);">↩️</button>
+      </div>
+    </td>
+  </tr>`;
+}
+
 function renderDeliveredTable(){
-  const delivered=state.cars.filter(c=>c.status==='delivered');
-  document.getElementById('delivered-count').textContent=delivered.length;
   const tbody=document.getElementById('delivered-table-body');
-  if(!delivered.length){tbody.innerHTML='<tr><td colspan="10"><div class="empty-state"><div class="empty-icon">✅</div><p>لا توجد سيارات مسلَّمة</p></div></td></tr>';return;}
-  tbody.innerHTML=delivered.map(c=>{
-    const inv=state.invoices.find(i=>i.carId===c.id);
-    const days=c.dateOut&&c.dateIn?Math.floor((new Date(c.dateOut)-new Date(c.dateIn))/(1000*60*60*24)):0;
-    return`<tr>
-      <td><strong>${c.plate}</strong></td><td>${c.owner}</td><td>${c.model||'—'}</td>
-      <td>${serviceBadge(c.service)}</td>
-      <td><strong style="color:var(--gold);">${(c.estimate||0).toFixed(3)} ر.ع</strong></td>
-      <td style="color:var(--success);">${(c.paidTotal||0).toFixed(3)} ر.ع</td>
-      <td>${formatDate(c.dateIn)}</td><td>${formatDate(c.dateOut)}</td>
-      <td>${days} يوم</td>
-      <td>${inv?`<button class="btn btn-outline btn-sm" onclick="generateReceipt(${inv.id})">🧾 إيصال</button>`:'—'}</td>
+  if(!tbody)return;
+
+  // Fill service filter options
+  const svcSel=document.getElementById('del-filter-service');
+  if(svcSel&&svcSel.options.length<=1){
+    const services=[...new Set(state.cars.filter(c=>c.status==='delivered'&&c.service).map(c=>c.service))].sort();
+    services.forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s;svcSel.appendChild(o);});
+  }
+
+  // Filters
+  const search=(document.getElementById('del-search')?.value||'').toLowerCase();
+  const fService=document.getElementById('del-filter-service')?.value||'';
+  const fMonth=document.getElementById('del-filter-month')?.value||'';
+
+  let delivered=state.cars.filter(c=>c.status==='delivered');
+  if(search) delivered=delivered.filter(c=>(c.plate||'').toLowerCase().includes(search)||(c.owner||'').toLowerCase().includes(search));
+  if(fService) delivered=delivered.filter(c=>c.service===fService);
+  if(fMonth) delivered=delivered.filter(c=>(c.dateOut||'').startsWith(fMonth));
+
+  document.getElementById('delivered-count').textContent=state.cars.filter(c=>c.status==='delivered').length;
+
+  if(!delivered.length){
+    tbody.innerHTML=`<tr><td colspan="10"><div class="empty-state"><div class="empty-icon">✅</div><p>${search||fService||fMonth?'لا توجد نتائج للفلتر':'لا توجد سيارات مسلَّمة'}</p>${(search||fService||fMonth)?'<button class="btn btn-outline btn-sm" onclick="clearDeliveredFilters()">مسح الفلتر</button>':''}</div></td></tr>`;
+    return;
+  }
+
+  // Sort descending by dateOut
+  delivered.sort((a,b)=>(b.dateOut||'').localeCompare(a.dateOut||''));
+
+  // Group by month
+  const groups={};
+  delivered.forEach(c=>{
+    const key=(c.dateOut||'').substring(0,7)||'0000-00';
+    if(!groups[key])groups[key]=[];
+    groups[key].push(c);
+  });
+
+  let html='';
+  Object.entries(groups).sort((a,b)=>b[0].localeCompare(a[0])).forEach(([month,cars])=>{
+    const label=month==='0000-00'?'غير محدد':new Date(month+'-15').toLocaleDateString('ar-SA',{year:'numeric',month:'long'});
+    const monthTotal=cars.reduce((s,c)=>s+(c.paidTotal||0),0);
+    const collapsed=localStorage.getItem('del_collapsed_'+month)==='1';
+    html+=`<tr onclick="toggleDeliveredMonth('${month}')" style="cursor:pointer;background:rgba(79,172,254,.07);border-top:2px solid rgba(79,172,254,.18);">
+      <td colspan="10" style="padding:10px 16px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-weight:700;color:var(--info);">📅 ${label} <span style="font-size:12px;opacity:.65;font-weight:400;">(${cars.length} سيارة)</span></span>
+          <span style="color:var(--success);font-size:13px;font-weight:700;">${monthTotal.toFixed(3)} ر.ع</span>
+          <span style="color:var(--muted);font-size:14px;">${collapsed?'▼':'▲'}</span>
+        </div>
+      </td>
     </tr>`;
-  }).join('');
+    if(!collapsed) cars.forEach(c=>{html+=buildDeliveredRow(c);});
+  });
+
+  tbody.innerHTML=html;
+}
+
+function toggleDeliveredMonth(month){
+  const key='del_collapsed_'+month;
+  localStorage.setItem(key,localStorage.getItem(key)==='1'?'0':'1');
+  renderDeliveredTable();
+}
+
+function clearDeliveredFilters(){
+  ['del-search','del-filter-service','del-filter-month'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  renderDeliveredTable();
+}
+
+function restoreCarToWorkshop(id){
+  if(!confirm('إعادة هذه السيارة إلى قسم "السيارات في الورشة"؟\nسيتم حذف الفاتورة المرتبطة بها.'))return;
+  const car=state.cars.find(c=>c.id===id);
+  if(!car)return;
+  car.status='waiting';
+  car.dateOut=null;
+  state.invoices=state.invoices.filter(i=>i.carId!==id);
+  saveState();
+  renderAll();
+  showPage('cars');
 }
 
 function renderAlertsTable(){
