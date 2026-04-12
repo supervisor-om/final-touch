@@ -1281,6 +1281,7 @@ label{font-size:14px;}
         <div class="form-grid">
           <div class="form-group"><label data-i18n="lbl_total_amount_omr">المبلغ الكلي (ر.ع)</label><input type="number" id="update-amount" placeholder="0.000" step="0.001" oninput="calcRemaining()"></div>
           <div class="form-group"><label data-i18n="lbl_paid_so_far">المدفوع حتى الآن (ر.ع)</label><input type="number" id="update-paid" placeholder="0.000" step="0.001" oninput="calcRemaining()"></div>
+          <div class="form-group"><label>💳 طريقة الدفع</label><select id="update-payment-method" style="padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:var(--card);color:var(--text);font-family:var(--font-main);font-size:13px;width:100%;"><option value="">غير محدد</option><option value="cash">💵 كاش</option><option value="visa">💳 فيزا / بطاقة</option><option value="transfer">🏦 تحويل بنكي</option></select></div>
         </div>
         <div class="payment-box" id="payment-preview">
           <div class="payment-row"><span data-i18n="pay_total">المبلغ الكلي</span><span id="pp-total">0.000 ر.ع</span></div>
@@ -1647,13 +1648,15 @@ function editCar(id){
   currentStage=car.stage||stageFromStatus(car.status);
   document.getElementById('update-amount').value=car.estimate||0;
   document.getElementById('update-paid').value=car.paidTotal||0;
+  const pmEl=document.getElementById('update-payment-method');
+  if(pmEl)pmEl.value=car.paymentMethod||'';
   document.getElementById('update-notes').value=car.notes||'';
   document.getElementById('update-phone').value=car.phone||'';
   document.getElementById('update-wakey').value=car.waBotKey||'';
   document.getElementById('update-expected-date').value=car.expectedDate||'';
   // Show/hide sections based on role
   const session=getSession();
-  const isAdmin=session&&session.role==='admin';
+  const isAdmin=session&&(session.role==='admin'||session.role==='accountant');
   const paySection=document.getElementById('update-payment-section');
   if(paySection)paySection.style.display=isAdmin?'':'none';
   const stageBtns=document.getElementById('stage-buttons-row');
@@ -1737,6 +1740,8 @@ function updateCar(){
   car.status=statusFromStage(currentStage,getCarStages(car));
   car.estimate=parseFloat(document.getElementById('update-amount').value)||0;
   car.paidTotal=parseFloat(document.getElementById('update-paid').value)||0;
+  const pmSave=document.getElementById('update-payment-method');
+  if(pmSave)car.paymentMethod=pmSave.value||car.paymentMethod||'';
   car.notes=document.getElementById('update-notes').value;
   const newPhone=document.getElementById('update-phone').value.trim();
   if(newPhone) car.phone=newPhone;
@@ -2293,6 +2298,9 @@ function buildDeliveredRow(c){
   const inv=state.invoices.find(i=>i.carId===c.id);
   const days=c.dateOut&&c.dateIn?Math.floor((new Date(c.dateOut)-new Date(c.dateIn))/(1000*60*60*24)):0;
   const remaining=Math.max(0,(c.estimate||0)-(c.paidTotal||0));
+  const methodLabel={cash:'💵 كاش',visa:'💳 فيزا',transfer:'🏦 تحويل'}[c.paymentMethod]||'';
+  const session=getSession();
+  const isAdmin=session&&(session.role==='admin'||session.role==='accountant');
   return`<tr>
     <td><strong>${c.plate}</strong></td>
     <td>
@@ -2305,14 +2313,17 @@ function buildDeliveredRow(c){
     <td>
       <div style="color:var(--success);font-weight:600;">${(c.paidTotal||0).toFixed(3)} ر.ع</div>
       ${remaining>0?`<div style="font-size:10px;color:var(--danger);">متبقي: ${remaining.toFixed(3)}</div>`:''}
+      ${methodLabel?`<div style="font-size:10px;color:var(--info);margin-top:2px;">${methodLabel}</div>`:''}
     </td>
     <td style="font-size:12px;">${formatDate(c.dateIn)}</td>
     <td style="font-size:12px;">${formatDate(c.dateOut)}</td>
     <td style="text-align:center;"><span style="background:rgba(79,172,254,.12);color:var(--info);padding:2px 8px;border-radius:8px;font-size:12px;font-weight:600;">${days}د</span></td>
     <td>
       <div style="display:flex;gap:4px;flex-wrap:wrap;">
+        <button class="btn btn-primary btn-sm" onclick="editCar('${c.id}')" title="تعديل">✏️</button>
         ${inv?`<button class="btn btn-outline btn-sm" onclick="generateReceipt(${inv.id})" title="إيصال">🧾</button>`:''}
         <button class="btn btn-outline btn-sm" onclick="restoreCarToWorkshop('${c.id}')" title="استرجاع إلى الورشة" style="color:var(--gold);">↩️</button>
+        ${isAdmin?`<button class="btn btn-danger btn-sm" onclick="deleteCar('${c.id}')" title="حذف">🗑️</button>`:''}
       </div>
     </td>
   </tr>`;
