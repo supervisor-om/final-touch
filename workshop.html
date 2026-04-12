@@ -2335,6 +2335,9 @@ function buildDeliveredRow(c){
   const session=getSession();
   const isAdmin=session&&(session.role==='admin'||session.role==='accountant');
   const isConfirmed=c.paymentConfirmed;
+  const confirmBtn=!isConfirmed
+    ?`<button class="btn btn-sm" onclick="openConfirmPayment('${c.id}')" style="background:linear-gradient(135deg,var(--gold),#ff8c00);color:#000;font-weight:700;white-space:nowrap;font-size:11px;">💰 تأكيد الدفع</button>`
+    :`<span style="font-size:11px;color:var(--success);font-weight:700;white-space:nowrap;">✅ مؤكد${methodLabel?`<br><span style="font-size:10px;color:var(--info);">${methodLabel}</span>`:''}</span>`;
   return`<tr>
     <td><strong>${c.plate}</strong></td>
     <td>
@@ -2354,10 +2357,7 @@ function buildDeliveredRow(c){
     <td style="text-align:center;"><span style="background:rgba(79,172,254,.12);color:var(--info);padding:2px 8px;border-radius:8px;font-size:12px;font-weight:600;">${days}د</span></td>
     <td>
       <div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center;">
-        ${!isConfirmed
-          ?`<button class="btn btn-sm" onclick="openConfirmPayment('${c.id}')" style="background:linear-gradient(135deg,var(--gold),#ff8c00);color:#000;font-weight:700;white-space:nowrap;font-size:11px;">💰 تأكيد الدفع</button>`
-          :`<span style="font-size:11px;color:var(--success);font-weight:700;white-space:nowrap;">✅ مؤكد${methodLabel?'<br><span style=\\'font-size:10px;color:var(--info);\\'>'+methodLabel+'</span>':''}</span>`
-        }
+        ${confirmBtn}
         <button class="btn btn-primary btn-sm" onclick="editCar('${c.id}')" title="تعديل">✏️</button>
         ${inv?`<button class="btn btn-outline btn-sm" onclick="generateReceipt(${inv.id})" title="إيصال">🧾</button>`:''}
         <button class="btn btn-outline btn-sm" onclick="restoreCarToWorkshop('${c.id}')" title="استرجاع إلى الورشة" style="color:var(--gold);">↩️</button>
