@@ -52,6 +52,8 @@ nav{flex:1;padding:12px 0;overflow-y:auto;}
 .btn-danger{background:linear-gradient(135deg,#e94560,#c0392b);color:white;}
 .btn-gold{background:linear-gradient(135deg,#f5a623,#e67e22);color:white;}
 .btn-info{background:linear-gradient(135deg,#4facfe,#00f2fe);color:#1a1a2e;}
+.cp-method-btn{padding:10px;border-radius:10px;border:2px solid var(--border);background:var(--card);color:var(--text);cursor:pointer;font-family:var(--font-main);font-size:13px;font-weight:600;transition:all .2s;width:100%;}
+.cp-method-btn.selected{border-color:var(--success);background:rgba(0,212,170,.15);color:var(--success);}
 .page{display:none;padding:24px;}
 .page.active{display:block;}
 .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:24px;}
@@ -1318,6 +1320,37 @@ label{font-size:14px;}
   </div>
 </div>
 
+<!-- Confirm Payment -->
+<div class="modal-overlay" id="modal-confirm-payment">
+  <div class="modal" style="max-width:440px;">
+    <div class="modal-header">
+      <div class="modal-title">💰 تأكيد استلام الدفع</div>
+      <button class="modal-close" onclick="closeModal('modal-confirm-payment')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="cp-car-info"></div>
+      <div class="form-group">
+        <label>💳 طريقة الدفع</label>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
+          <button class="cp-method-btn" data-method="cash" onclick="selectPayMethod('cash',this)">💵 كاش</button>
+          <button class="cp-method-btn" data-method="visa" onclick="selectPayMethod('visa',this)">💳 فيزا</button>
+          <button class="cp-method-btn" data-method="transfer" onclick="selectPayMethod('transfer',this)">🏦 تحويل</button>
+        </div>
+        <input type="hidden" id="cp-method">
+      </div>
+      <div class="form-group">
+        <label>💵 المبلغ المستلم (ر.ع)</label>
+        <input type="number" id="cp-amount" step="0.001" min="0" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:var(--input-bg,rgba(255,255,255,.06));color:var(--text);font-family:var(--font-main);font-size:15px;">
+      </div>
+      <input type="hidden" id="cp-car-id">
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-confirm-payment')">إلغاء</button>
+      <button class="btn btn-success" onclick="submitConfirmPayment()">✅ تأكيد الدفع</button>
+    </div>
+  </div>
+</div>
+
 <!-- Add Order -->
 <div class="modal-overlay" id="modal-add-order">
   <div class="modal">
@@ -2301,6 +2334,7 @@ function buildDeliveredRow(c){
   const methodLabel={cash:'💵 كاش',visa:'💳 فيزا',transfer:'🏦 تحويل'}[c.paymentMethod]||'';
   const session=getSession();
   const isAdmin=session&&(session.role==='admin'||session.role==='accountant');
+  const isConfirmed=c.paymentConfirmed;
   return`<tr>
     <td><strong>${c.plate}</strong></td>
     <td>
@@ -2319,7 +2353,11 @@ function buildDeliveredRow(c){
     <td style="font-size:12px;">${formatDate(c.dateOut)}</td>
     <td style="text-align:center;"><span style="background:rgba(79,172,254,.12);color:var(--info);padding:2px 8px;border-radius:8px;font-size:12px;font-weight:600;">${days}د</span></td>
     <td>
-      <div style="display:flex;gap:4px;flex-wrap:wrap;">
+      <div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center;">
+        ${!isConfirmed
+          ?`<button class="btn btn-sm" onclick="openConfirmPayment('${c.id}')" style="background:linear-gradient(135deg,var(--gold),#ff8c00);color:#000;font-weight:700;white-space:nowrap;font-size:11px;">💰 تأكيد الدفع</button>`
+          :`<span style="font-size:11px;color:var(--success);font-weight:700;white-space:nowrap;">✅ مؤكد${methodLabel?'<br><span style=\\'font-size:10px;color:var(--info);\\'>'+methodLabel+'</span>':''}</span>`
+        }
         <button class="btn btn-primary btn-sm" onclick="editCar('${c.id}')" title="تعديل">✏️</button>
         ${inv?`<button class="btn btn-outline btn-sm" onclick="generateReceipt(${inv.id})" title="إيصال">🧾</button>`:''}
         <button class="btn btn-outline btn-sm" onclick="restoreCarToWorkshop('${c.id}')" title="استرجاع إلى الورشة" style="color:var(--gold);">↩️</button>
@@ -2409,6 +2447,56 @@ function restoreCarToWorkshop(id){
   saveState();
   renderAll();
   showPage('cars');
+}
+
+function openConfirmPayment(carId){
+  const car=state.cars.find(c=>c.id===carId);
+  if(!car)return;
+  const remaining=Math.max(0,(car.estimate||0)-(car.paidTotal||0));
+  document.getElementById('cp-car-info').innerHTML=`
+    <div style="background:rgba(0,0,0,.2);border-radius:10px;padding:12px;margin-bottom:14px;">
+      <div style="font-weight:700;font-size:15px;">${car.plate} — ${car.owner}</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:2px;">${car.model||''} ${car.service?'| '+car.service:''}</div>
+      <div style="display:flex;gap:16px;margin-top:10px;font-size:13px;flex-wrap:wrap;">
+        <span>💰 إجمالي: <strong style="color:var(--gold);">${(car.estimate||0).toFixed(3)} ر.ع</strong></span>
+        <span>✅ مدفوع: <strong style="color:var(--success);">${(car.paidTotal||0).toFixed(3)} ر.ع</strong></span>
+        <span>⏳ متبقي: <strong style="color:var(--danger);">${remaining.toFixed(3)} ر.ع</strong></span>
+      </div>
+    </div>`;
+  document.getElementById('cp-amount').value=remaining.toFixed(3);
+  document.getElementById('cp-method').value=car.paymentMethod||'';
+  document.getElementById('cp-car-id').value=carId;
+  document.querySelectorAll('.cp-method-btn').forEach(b=>b.classList.remove('selected'));
+  if(car.paymentMethod){
+    const btn=document.querySelector(`.cp-method-btn[data-method="${car.paymentMethod}"]`);
+    if(btn)btn.classList.add('selected');
+  }
+  openModal('modal-confirm-payment');
+}
+
+function selectPayMethod(method,btn){
+  document.getElementById('cp-method').value=method;
+  document.querySelectorAll('.cp-method-btn').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+
+function submitConfirmPayment(){
+  const carId=document.getElementById('cp-car-id').value;
+  const method=document.getElementById('cp-method').value;
+  const amount=parseFloat(document.getElementById('cp-amount').value)||0;
+  if(!method){alert('يرجى اختيار طريقة الدفع');return;}
+  if(amount<=0){alert('يرجى إدخال مبلغ صحيح');return;}
+  const car=state.cars.find(c=>c.id===carId);
+  if(!car)return;
+  car.paidTotal=(car.paidTotal||0)+amount;
+  car.paymentMethod=method;
+  car.paymentConfirmed=true;
+  car.paymentConfirmedAt=new Date().toISOString();
+  const inv=state.invoices.find(i=>i.carId===carId);
+  if(inv){inv.paid=car.paidTotal;inv.paymentMethod=method;}
+  saveState();
+  closeModal('modal-confirm-payment');
+  renderAll();
 }
 
 function renderAlertsTable(){
