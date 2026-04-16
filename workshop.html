@@ -1709,14 +1709,23 @@ function quickStatus(carId,e){
   const popup=document.createElement('div');
   popup.id='qs-popup';popup.className='qs-popup';
   const rect=e.currentTarget.getBoundingClientRect();
-  popup.style.top=(rect.bottom+6)+'px';
-  popup.style.right=(window.innerWidth-rect.right)+'px';
   const carStages=getCarStages(car);
   popup.innerHTML=carStages.map((s,i)=>`
     <div class="qs-item${car.stage===i?' qs-active':''}" onclick="applyQuickStatus('${carId}',${i})">
       ${s.icon} ${s.label}
     </div>`).join('');
+  // حساب الموضع بعد الإضافة للـ DOM لمعرفة الارتفاع الحقيقي
+  popup.style.visibility='hidden';
+  popup.style.right=(window.innerWidth-rect.right)+'px';
+  popup.style.top=(rect.bottom+6)+'px';
   document.body.appendChild(popup);
+  const ph=popup.offsetHeight;
+  const spaceBelow=window.innerHeight-(rect.bottom+6);
+  if(spaceBelow<ph){
+    // لا يوجد مساحة كافية أسفل — ضعه فوق الزر
+    popup.style.top=Math.max(6,rect.top-ph-6)+'px';
+  }
+  popup.style.visibility='';
   setTimeout(()=>document.addEventListener('click',closeQsPopup,{once:true}),0);
 }
 function closeQsPopup(){document.getElementById('qs-popup')?.remove();}
