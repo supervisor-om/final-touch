@@ -219,23 +219,3 @@ showPage = function(id) {
 // Check URL on load
 window.addEventListener('load', initCustomerTracking);
 
-// ══════════════════════════════════════════
-// ☁️ FIREBASE REST API SYNC (No SDK needed)
-// ══════════════════════════════════════════
-
-const FB_PROJECT  = "i-hope-1-2-3-4-5-6-7";
-const FB_API_KEY  = "AIzaSyC7RmJuO7_sYa4wcErz4XNyguYIygY_ts8";
-const FB_BASE_URL = `https://firestore.googleapis.com/v1/projects/${FB_PROJECT}/databases/(default)/documents`;
-const FB_DOC_PATH = "workshop/data";
-
-let syncEnabled  = false;
-let saveTimeout  = null;
-let lastSaveHash = '';
-
-try {
-  document.getElementById('today-date').textContent=new Date().toLocaleDateString('ar-SA',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
-  document.getElementById('exp-date').value=today();
-  renderAll();
-} catch(e) { console.warn('Init render error:', e); }
-
-// ── Firestore value converters ──────────────────────────────────────────────
