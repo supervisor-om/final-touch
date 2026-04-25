@@ -659,6 +659,7 @@ label{font-size:14px;}
     <div class="nav-item admin-only" onclick="openModal('modal-users')"><span class="nav-icon">👥</span> <span data-i18n="nav_users">إدارة المستخدمين</span></div>
     <div class="nav-item admin-only" onclick="openManageStages()"><span class="nav-icon">⚙️</span> إدارة الحالات</div>
     <div class="nav-section" style="margin-top:6px;"><span>👥 الموظفون</span></div>
+    <div class="nav-item" onclick="showPage('bookings')"><span class="nav-icon">📅</span> الحجوزات <span class="nav-badge" id="bk-pending-count">0</span></div>
     <div class="nav-item" onclick="window.location='attendance.html'"><span class="nav-icon">⏰</span> الدوام والإجازات</div>
   </nav>
   <div class="sidebar-footer">
@@ -1119,10 +1120,75 @@ label{font-size:14px;}
     </div>
   </div>
 
+  </div>
+
+  <!-- BOOKINGS MANAGEMENT -->
+  <div class="page" id="page-bookings">
+    <div class="two-col-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px;">
+      <div class="card">
+        <div class="card-header"><div class="card-title">📊 ملخص الحجوزات</div></div>
+        <div class="card-body">
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
+            <div style="background:rgba(245,166,35,.1);border:1px solid rgba(245,166,35,.25);border-radius:12px;padding:16px;text-align:center;">
+              <div style="font-size:26px;font-weight:900;color:var(--gold);" id="bk-pending-count">0</div>
+              <div style="font-size:12px;color:var(--muted);">حجوزات جديدة</div>
+            </div>
+            <div style="background:rgba(79,172,254,.1);border:1px solid rgba(79,172,254,.25);border-radius:12px;padding:16px;text-align:center;">
+              <div style="font-size:26px;font-weight:900;color:var(--info);" id="bk-today-count">0</div>
+              <div style="font-size:12px;color:var(--muted);">اليوم</div>
+            </div>
+            <div style="background:rgba(0,212,170,.1);border:1px solid rgba(0,212,170,.25);border-radius:12px;padding:16px;text-align:center;">
+              <div style="font-size:26px;font-weight:900;color:var(--success);" id="bk-week-count">0</div>
+              <div style="font-size:12px;color:var(--muted);">هذا الأسبوع</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">📋 رابط الحجز العمومي</div></div>
+        <div class="card-body" style="text-align:center;">
+          <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">شارك هذا الرابط للعملاء لحجز موعد</p>
+          <input type="text" id="bk-public-link" readonly style="text-align:left;direction:ltr;background:rgba(255,255,255,.04);border:1px dashed var(--border);padding:10px;border-radius:10px;font-size:13px;color:var(--info);width:100%;margin-bottom:12px;">
+          <button class="btn btn-outline btn-sm" onclick="copyBLink()">📋 نسخ الرابط</button>
+          <a href="booking.html" target="_blank" class="btn btn-primary btn-sm" style="margin-top:8px;display:inline-block;">🔍 معاينة</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header" style="flex-wrap:wrap;gap:8px;">
+        <div class="card-title">📅 سجل الحجوزات</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+          <input type="date" id="bk-date-from" onchange="renderBookings()" style="padding:8px;border-radius:10px;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:13px;">
+          <input type="date" id="bk-date-to" onchange="renderBookings()" style="padding:8px;border-radius:10px;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:13px;">
+          <select id="bk-filter-status" onchange="renderBookings()" style="padding:8px;border-radius:10px;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:13px;">
+            <option value="">كل الحالات</option>
+            <option value="pending">⏳ جديدة</option>
+            <option value="confirmed">✅ مؤكدة</option>
+            <option value="arrived">🟢 وصلت</option>
+            <option value="done">🏁 مكتملة</option>
+            <option value="cancelled">❌ ملغية</option>
+          </select>
+          <button class="btn btn-outline btn-sm" onclick="exportBookingsCSV()">📊 CSV</button>
+        </div>
+      </div>
+      <div class="card-body" style="padding:0;">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>الحجز#</th><th>العميل</th><th>السيارة</th><th>الخدمة</th><th>التاريخ/الوقت</th><th>الحالة</th><th>ملاحظات</th><th>الاستلام</th><th>إجراء</th></tr></thead>
+            <tbody id="bookings-table-body"></tbody>
+          </table>
+        </div>
+        <div id="bookings-empty" class="empty-state" style="display:none;padding:40px 20px;text-align:center;color:var(--muted);">
+          <div style="font-size:36px;">📭</div><p>لا توجد حجوزات</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <!-- MODALS -->
-
 <!-- Add Car -->
 <div class="modal-overlay" id="modal-add-car">
   <div class="modal">
@@ -1618,9 +1684,10 @@ function showPage(id){
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   document.getElementById('page-'+id).classList.add('active');
   document.querySelectorAll('.nav-item').forEach(n=>{if(n.getAttribute('onclick')&&n.getAttribute('onclick').includes("'"+id+"'"))n.classList.add('active');});
-  const titleKeys={dashboard:'nav_dashboard',cars:'nav_cars',delivered:'nav_delivered',alerts:'nav_alerts',maintenance:'nav_maintenance',services:'nav_services',invoices:'nav_invoices',expenses:'nav_expenses',reports:'nav_reports',customers:'nav_customers',closing:'nav_closing'};
-  document.getElementById('page-title').textContent=t(titleKeys[id]||'')||'';
+  const titleKeys={dashboard:'nav_dashboard',cars:'nav_cars',delivered:'nav_delivered',alerts:'nav_alerts',maintenance:'nav_maintenance',services:'nav_services',invoices:'nav_invoices',expenses:'nav_expenses',reports:'nav_reports',customers:'nav_customers',closing:'nav_closing',bookings:'nav_bookings'};
+  document.getElementById('page-title').textContent=t(titleKeys[id]||'')||'الحجوزات';
   renderAll();
+  if(id==='bookings'){ renderBookings(); renderBookingBadges(); }
   if(document.getElementById('sidebar').classList.contains('open'))toggleSidebar();
 }
 function toggleSidebar(){
@@ -4974,6 +5041,8 @@ function deleteUser(idx) {
 // Run auth check after all scripts are parsed
 initAuth();
 </script>
+
+<script src="js/booking-manager.js"></script>
 
 <!-- ═══════════════════════════════════════════════════
      WHATSAPP NOTIFICATIONS — CallMeBot API
