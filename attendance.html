@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تسجيل الدوام والإجازات — اللمسة الأخيرة</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0f3460">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary:#1a1a2e; --secondary:#16213e; --accent:#e94560; --gold:#f5a623;
+  --success:#00d4aa; --info:#4facfe; --warning:#f5a623; --danger:#e94560;
+  --surface:#0f3460; --card:rgba(255,255,255,0.05); --border:rgba(255,255,255,0.1);
+  --text:#eaeaea; --muted:#8892a4; --font-main:'Cairo',sans-serif; --font-display:'Tajawal',sans-serif;
+  --radius:16px; --shadow:0 8px 32px rgba(0,0,0,0.4);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:var(--font-main);background:var(--primary);color:var(--text);min-height:100vh;direction:rtl;overflow-x:hidden;}
+body::before{content:'';position:fixed;top:0;left:0;right:0;bottom:0;background:radial-gradient(ellipse at 20% 50%,rgba(233,69,96,.08) 0%,transparent 50%),radial-gradient(ellipse at 80% 20%,rgba(79,172,254,.08) 0%,transparent 50%),radial-gradient(ellipse at 50% 80%,rgba(245,166,35,.05) 0%,transparent 50%);pointer-events:none;z-index:0;}
+
+/* ── HEADER ── */
+.header{position:sticky;top:0;z-index:50;background:rgba(15,52,96,.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;}
+.page-title{font-family:var(--font-display);font-size:18px;font-weight:800;}
+.back-btn{padding:8px 16px;background:rgba(255,255,255,.08);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:var(--font-main);font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:6px;}
+.back-btn:hover{background:rgba(255,255,255,.15);}
+
+/* ── TABS ── */
+.tabs{display:flex;gap:4px;background:rgba(255,255,255,.05);padding:4px;border-radius:12px;margin:20px auto;max-width:500px;width:calc(100% - 32px);}
+.tab{flex:1;padding:12px 8px;border:none;background:transparent;color:var(--muted);font-family:var(--font-main);font-size:14px;font-weight:700;cursor:pointer;border-radius:8px;transition:all .2s;text-align:center;position:relative;}
+.tab.active{background:linear-gradient(135deg,var(--accent),#ff6b35);color:#fff;box-shadow:0 4px 15px rgba(233,69,96,.3);}
+.tab .badge-count{position:absolute;top:-6px;right:6px;background:var(--gold);color:#1a1a2e;font-size:10px;font-weight:900;border-radius:8px;padding:1px 6px;}
+
+/* ── CONTENT ── */
+.content{padding:16px 24px 40px;position:relative;z-index:1;max-width:900px;margin:0 auto;}
+.section{display:none;}
+.section.active{display:block;animation:fadeIn .3s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+
+/* ── CARDS ── */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:18px;backdrop-filter:blur(10px);overflow:hidden;}
+.card-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.card-title{font-size:15px;font-weight:800;}
+.card-body{padding:20px;}
+
+/* ── CLOCK IN / OUT ── */
+.clock-btn-area{display:flex;justify-content:center;gap:24px;padding:30px 0;}
+.clock-btn{display:flex;flex-direction:column;align-items:center;align-items:center;gap:12px;padding:30px 50px;border:none;border-radius:24px;font-family:var(--font-main);font-size:14px;font-weight:800;cursor:pointer;transition:all .3s;position:relative;}
+.clock-btn .icon{font-size:36px;}
+.clock-btn .label{font-size:11px;opacity:.8;}
+.clock-btn.in{background:linear-gradient(135deg,var(--success),#00b894);color:#fff;box-shadow:0 8px 25px rgba(0,212,170,.3);}
+.clock-btn.in:hover{transform:translateY(-3px);box-shadow:0 12px 35px rgba(0,212,170,.4);}
+.clock-btn.in:disabled{background:rgba(255,255,255,.1);color:var(--muted);box-shadow:none;cursor:not-allowed;transform:none;opacity:.5;}
+.clock-btn.out{background:linear-gradient(135deg,var(--accent),#ff6b35);color:#fff;box-shadow:0 8px 25px rgba(233,69,96,.3);}
+.clock-btn.out:hover{transform:translateY(-3px);box-shadow:0 12px 35px rgba(233,69,96,.4);}
+.clock-btn.out:disabled{background:rgba(255,255,255,.1);color:var(--muted);box-shadow:none;cursor:not-allowed;transform:none;opacity:.5;}
+
+.current-status{text-align:center;padding:12px 20px;border-radius:12px;margin-bottom:20px;font-size:14px;font-weight:700;display:none;}
+.current-status.working{background:rgba(0,212,170,.08);border:1px solid rgba(0,212,170,.25);color:var(--success);}
+.current-status.out{background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--muted);}
+
+/* ── FORM GRID ── */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+@media(max-width:600px){.form-grid{grid-template-columns:1fr;}.clock-btn{padding:20px 30px;}}
+
+.form-group{display:flex;flex-direction:column;gap:6px;}
+.form-group.full{grid-column:1/-1;}
+label{font-size:12px;font-weight:600;color:var(--muted);}
+input,select,textarea{background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:10px;padding:11px 14px;color:var(--text);font-family:var(--font-main);font-size:13px;transition:border-color .2s;width:100%;direction:rtl;}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);background:rgba(233,69,96,.05);}
+select option{background:var(--secondary);}
+textarea{resize:vertical;min-height:80px;}
+
+/* ── BUTTONS ── */
+.btn{padding:11px 20px;border:none;border-radius:10px;font-family:var(--font-main);font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:8px;}
+.btn-primary{background:linear-gradient(135deg,var(--accent),#ff6b35);color:#fff;box-shadow:0 4px 15px rgba(233,69,96,.3);}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(233,69,96,.4);}
+.btn-success{background:linear-gradient(135deg,#00d4aa,#00b894);color:#fff;}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text);}
+.btn-outline:hover{background:rgba(255,255,255,.05);}
+
+/* ── TABLE ── */
+.table-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+thead tr{background:rgba(255,255,255,.05);}
+th{padding:12px 14px;text-align:right;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;}
+td{padding:10px 14px;border-bottom:1px solid var(--border);color:var(--text);}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:rgba(255,255,255,.03);}
+
+.badge{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:700;}
+.badge-in{background:rgba(0,212,170,.15);color:var(--success);}
+.badge-out{background:rgba(150,150,150,.15);color:var(--muted);}
+.badge-ot{background:rgba(245,166,35,.15);color:var(--gold);}
+.badge-leave-approved{background:rgba(0,212,170,.15);color:var(--success);}
+.badge-leave-pending{background:rgba(245,166,35,.15);color:var(--gold);}
+.badge-leave-rejected{background:rgba(233,69,96,.15);color:var(--danger);}
+
+/* ── OVERTIME SUMMARY ── */
+.summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:20px;}
+.summary-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px;text-align:center;}
+.summary-value{font-family:var(--font-display);font-size:26px;font-weight:900;color:#fff;}
+.summary-label{font-size:12px;color:var(--muted);margin-top:4px;}
+.summary-card .summary-value.OT{color:var(--gold);}
+
+/* ── FLASH MSG ── */
+.flash{position:fixed;top:20px;left:50%;transform:translateX(-50%);padding:12px 24px;border-radius:12px;font-size:14px;font-weight:700;z-index:300;animation:slideDown .3s ease;display:none;}
+.flash.success{background:rgba(0,212,170,.15);border:1px solid var(--success);color:var(--success);}
+.flash.error{background:rgba(233,69,96,.15);border:1px solid var(--danger);color:var(--danger);}
+@keyframes slideDown{from{transform:translateX(-50%) translateY(-20px);opacity:0;}to{transform:translateX(-50%) translateY(0);opacity:1;}}
+
+/* ── FILTERS ── */
+.filter-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:16px;}
+.filter-row input,.filter-row select{flex:1;min-width:130px;max-width:180px;}
+
+.empty-state{text-align:center;padding:40px 20px;color:var(--muted);}
+.empty-state .empty-icon{font-size:40px;margin-bottom:10px;}
+
+.today-btn{padding:8px 14px;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:var(--font-main);font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;}
+.today-btn:hover{background:rgba(255,255,255,.1);}
+
+/* ── LOGIN OVERLAY ── */
+#auth-overlay{position:fixed;inset:0;z-index:9000;background:linear-gradient(135deg,#0a0f1e 0%,#0f1f3d 50%,#1a1a2e 100%);display:flex;align-items:center;justify-content:center;}
+.auth-box{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:24px;padding:36px 32px;width:100%;max-width:360px;backdrop-filter:blur(20px);text-align:center;}
+.auth-logo-title{font-family:var(--font-display);font-size:22px;font-weight:900;color:#fff;}
+.auth-logo-sub{font-size:11px;color:var(--muted);letter-spacing:2px;margin-top:4px;}
+.auth-field{margin-bottom:14px;text-align:right;}
+.auth-field label{font-size:11px;font-weight:700;color:var(--muted);display:block;margin-bottom:6px;}
+.auth-field input{width:100%;padding:12px 14px;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:12px;color:#fff;font-size:14px;}
+.auth-field input:focus{border-color:var(--accent);outline:none;}
+.auth-btn{width:100%;padding:13px;background:linear-gradient(135deg,var(--accent),#ff6b35);border:none;border-radius:13px;color:#fff;font-family:var(--font-main);font-size:15px;font-weight:800;cursor:pointer;margin-top:8px;}
+.auth-error{color:var(--danger);font-size:13px;margin-top:12px;display:none;}
+
+/* ── USER INFO ── */
+.user-bar{display:flex;align-items:center;gap:10px;padding:8px 14px;background:rgba(255,255,255,.04);border-radius:10px;margin-bottom:16px;}
+.user-bar .role-badge{font-size:11px;padding:3px 10px;border-radius:20px;font-weight:700;}
+</style>
+</head>
+<body>
+
+<!-- ═══════ FLASH MSG ═══════ -->
+<div id="flash" class="flash"></div>
+
+<!-- ═══════ LOGIN ═══════ -->
+<div id="auth-overlay">
+  <div class="auth-box">
+    <div class="auth-logo-title">⏰اللمسة الأخيرة</div>
+    <div class="auth-logo-sub">تسجيل الدوام والإجازات</div>
+    <div style="height:24px;"></div>
+    <div class="auth-field">
+      <label>اسم المستخدم</label>
+      <input type="text" id="auth-username" placeholder="مثال: ahmed" onkeydown="if(event.key==='Enter')document.getElementById('auth-password').focus()">
+    </div>
+    <div class="auth-field">
+      <label>كلمة المرور</label>
+      <input type="password" id="auth-password" placeholder="••••••" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <button class="auth-btn" onclick="doLogin()">دخول</button>
+    <div class="auth-error" id="auth-error">❌ اسم المستخدم أو كلمة المرور غير صحيحة</div>
+  </div>
+</div>
+
+<!-- ═══════ MAIN (hidden until login) ═══════ -->
+<div id="main-ui" style="display:none;">
+
+  <!-- Header -->
+  <div class="header">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <button class="back-btn" onclick="location.href='index.html'">← العودة للورشة</button>
+      <div class="page-title">⏰ تسجيل الدوام والإجازات</div>
+    </div>
+    <div id="header-user" style="display:flex;align-items:center;gap:10px;font-size:13px;font-weight:700;">
+      <span id="user-name"></span> <span id="user-role"></span>
+      <button class="btn btn-outline btn-sm" onclick="logout()" style="padding:6px 12px;font-size:12px;">خروج</button>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs" id="main-tabs">
+    <div class="tab active" onclick="showSection('clock')" id="tab-clock">🕐 التسجيل</div>
+    <div class="tab" onclick="showSection('logs')" id="tab-logs">📋 السجل</div>
+    <div class="tab" onclick="showSection('ot')" id="tab-ot">⏱️ ساعات إضافية</div>
+    <div class="tab" onclick="showSection('leaves')" id="tab-leaves">🌴 إجازات</div>
+    <div class="tab admin-only" onclick="showSection('reports')" id="tab-reports">📊 تقارير</div>
+  </div>
+
+  <!-- ═══════ SECTION: CLOCK IN/OUT ═══════ -->
+  <div id="sec-clock" class="section active content">
+
+    <div id="clock-status-bar" class="current-status"></div>
+
+    <div class="clock-btn-area">
+      <button class="clock-btn in" id="btn-clock-in" onclick="clockIn()">
+        <span class="icon">🟢</span>
+        <span>تسجيل حضور</span>
+        <span class="label" id="lbl-in-time">--:--</span>
+      </button>
+      <button class="clock-btn out" id="btn-clock-out" disabled onclick="clockOut()">
+        <span class="icon">🔴</span>
+        <span>تسجيل خروج</span>
+        <span class="label" id="lbl-out-time">--:--</span>
+      </button>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><div class="card-title">📅 الحضور اليوم</div><div id="today-date" style="font-size:12px;color:var(--muted);"></div></div>
+      <div class="card-body">
+        <div class="summary-grid" id="today-summary"></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>الوقت</th><th>النوع</th><th style="min-width:250px;">ملاحظة</th></tr></thead>
+            <tbody id="today-entries"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Extra hours today -->
+    <div class="card" id="today-ot-card" style="display:none;">
+      <div class="card-header"><div class="card-title">⚡ ساعتك الإضافية اليوم</div></div>
+      <div class="card-body" id="today-ot-body"></div>
+    </div>
+  </div>
+
+  <!-- ═══════ SECTION: LOGS ═══════ -->
+  <div id="sec-logs" class="section content">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">📋 سجل الحضور</div>
+        <div class="filter-row">
+          <input type="date" id="log-from">
+          <input type="date" id="log-to">
+          <select id="log-employee"><option value="">كل الموظفين</option></select>
+          <button class="btn btn-primary" onclick="renderLogs()">🔍 بحث</button>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>التاريخ</th><th>الموظف</th><th>الدخول</th><th>الخروج</th><th>المدة</th><th>ملاحظة</th></tr></thead>
+            <tbody id="logs-table"></tbody>
+          </table>
+        </div>
+        <div id="logs-empty" class="empty-state" style="display:none;"><div class="empty-icon">📭</div><p>لا توجد سجلات</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════ SECTION: OVERTIME ═══════ -->
+  <div id="sec-ot" class="section content">
+    <div class="card">
+      <div class="card-header"><div class="card-title">⏱️ طلب ساعات إضافية</div></div>
+      <div class="card-body">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>اليوم</label>
+            <input type="date" id="ot-date">
+          </div>
+          <div class="form-group">
+            <label>عدد الساعات</label>
+            <input type="number" id="ot-hours" min="0.5" max="12" step="0.5" placeholder="مثال: 3.5">
+          </div>
+          <div class="form-group full">
+            <label>سبب الساعات الإضافية</label>
+            <textarea id="ot-reason" placeholder="مثال: اشتغلت على سيارة ضمان..."></textarea>
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="requestOT()" style="margin-top:14px;">📤 تقديم الطلب</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">📋 طلباتي</div>
+        <div class="filter-row">
+          <select id="ot-filter-status"><option value="">كل الحالات</option><option value="pending">⏳ قيد المراجعة</option><option value="approved">✅ مقبول</option><option value="rejected">❌ مرفوض</option></select>
+          <button class="btn btn-primary" onclick="renderMyOT()">🔍 عرض</button>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>التاريخ</th><th>الساعات</th><th>السبب</th><th>الحالة</th><th style="min-width:140px;">بواسطة</th></tr></thead>
+            <tbody id="ot-table"></tbody>
+          </table>
+        </div>
+        <div id="ot-empty" class="empty-state" style="display:none;"><div class="empty-icon">📭</div><p>لا توجد طلبات</p></div>
+      </div>
+    </div>
+
+    <!-- Admin: Pending approvals -->
+    <div class="admin-only card" id="ot-admin-card">
+      <div class="card-header"><div class="card-title">🟡 طلبات بانتظار الموافقة</div></div>
+      <div class="card-body">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>الموظف</th><th>التاريخ</th><th>الساعات</th><th>السبب</th><th>التاريخ المُقدّم</th><th>إجراء</th></tr></thead>
+            <tbody id="ot-pending-table"></tbody>
+          </table>
+        </div>
+        <div id="ot-pending-empty" class="empty-state" style="display:none;"><div class="empty-icon">🎉</div><p>لا توجد طلبات معلقة</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════ SECTION: LEAVES ═══════ -->
+  <div id="sec-leaves" class="section content">
+    <div class="card">
+      <div class="card-header"><div class="card-title">🌴 طلب إجازة</div></div>
+      <div class="card-body">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>نوع الإجازة</label>
+            <select id="leave-type">
+              <option value="annual">🌴 سنوية</option>
+              <option value="sick">🤒 مرضية</option>
+              <option value="emergency">🚨 طارئة</option>
+              <option value="unpaid">💸 بدون راتب</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>من تاريخ</label>
+            <input type="date" id="leave-from">
+          </div>
+          <div class="form-group">
+            <label>إلى تاريخ</label>
+            <input type="date" id="leave-to">
+          </div>
+          <div class="form-group full">
+            <label>السبب</label>
+            <textarea id="leave-reason" placeholder="ملاحظات..."></textarea>
+          </div>
+        </div>
+        <div style="margin-top:10px;font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px;">
+          📆 <span id="leave-days-preview">0</span> يوم
+        </div>
+        <button class="btn btn-primary" onclick="requestLeave()" style="margin-top:14px;">📤 تقديم الطلب</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><div class="card-title">📋 إجازاتي</div></div>
+      <div class="card-body">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>نوع</th><th>من</th><th>إلى</th><th>الأيام</th><th>الحالة</th><th>ملاحظة</th></tr></thead>
+            <tbody id="leaves-table"></tbody>
+          </table>
+        </div>
+        <div id="leaves-empty" class="empty-state" style="display:none;"><div class="empty-icon">📭</div><p>لا توجد إجازات</p></div>
+      </div>
+    </div>
+
+    <!-- Admin: Pending leave approvals -->
+    <div class="admin-only card" id="leave-admin-card">
+      <div class="card-header"><div class="card-title">🟡 إجازات بانتظار الموافقة</div></div>
+      <div class="card-body">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>الموظف</th><th>النوع</th><th>من</th><th>إلى</th><th>الأيام</th><th>السبب</th><th>إجراء</th></tr></thead>
+            <tbody id="leaves-pending-table"></tbody>
+          </table>
+        </div>
+        <div id="leaves-pending-empty" class="empty-state" style="display:none;"><div class="empty-icon">🎉</div><p>لا توجد طلبات معلقة</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════ SECTION: REPORTS (admin) ═══════ -->
+  <div id="sec-reports" class="section content">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">📊 تقرير الحضور</div>
+        <div class="filter-row">
+          <select id="rep-employee"><option value="">كل الموظفين</option></select>
+          <input type="month" id="rep-month">
+          <button class="btn btn-primary" onclick="generateReport()">📊 توليد التقرير</button>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="summary-grid" id="report-summary"></div>
+        <div class="table-wrap">
+          <table id="report-table-wrap" style="display:none;">
+            <thead><tr><th>التاريخ</th><th>الموظف</th><th>دخول</th><th>خروج</th><th>ساعات</th><th>إضافي</th><th>حالة</th></tr></thead>
+            <tbody id="report-table"></tbody>
+          </table>
+        </div>
+        <div id="report-empty" class="empty-state" style="display:none;"><div class="empty-icon">📊</div><p>اختر الشهر لتوليد التقرير</p></div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- main-ui -->
+
+<script src="js/db.js"></script>
+<script src="js/auth-attendance.js"></script>
+<script src="js/attendance.js"></script>
+</body>
+</html>

@@ -6,9 +6,13 @@ const BASE = self.registration.scope;
 const STATIC_ASSETS = [
   BASE + 'workshop.html',
   BASE + 'track.html',
+  BASE + 'attendance.html',
   BASE + 'manifest.json',
   BASE + 'icon-192.png',
   BASE + 'icon-512.png',
+  BASE + 'js/db.js',
+  BASE + 'js/auth-attendance.js',
+  BASE + 'js/attendance.js',
   'https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Tajawal:wght@300;400;500;700;900&display=swap',
   'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'
 ];

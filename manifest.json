@@ -29,6 +29,12 @@
       "short_name": "تتبع",
       "url": "track.html",
       "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "الدوام والإجازات",
+      "short_name": "الدوام",
+      "url": "attendance.html",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
     }
   ],
   "categories": ["business", "productivity"]
