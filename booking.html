@@ -273,9 +273,12 @@ function prevStep(){ if(currentStep>1) goToStep(currentStep-1); }
 
 // ─── STEP 1: Service ───
 function selectService(el){
+  var btn = el.closest ? el.closest('.svc-btn') : el;
+  btn = btn || el.parentElement.closest('.svc-btn') || el.parentElement.parentElement.closest('.svc-btn');
+  if(!btn || !btn.dataset || !btn.dataset.svc) return;
   document.querySelectorAll('.svc-btn').forEach(b=>b.classList.remove('selected'));
-  el.classList.add('selected');
-  bookingData.service = el.dataset.svc;
+  btn.classList.add('selected');
+  bookingData.service = btn.dataset.svc;
   nextStep();
   renderWeeks();
 }
