@@ -1,6 +1,17 @@
-<!DOCTYPE html>
+  <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
+<script>
+/* حماية — العميل العادي يروح لحجز موعد */
+(function(){
+  try{
+    var sess = JSON.parse(sessionStorage.getItem('ft_session'));
+    if(!sess && !location.search.includes('workshop') && !location.search.includes('admin')){
+      location.replace('booking.html');
+    }
+  }catch(e){}
+})();
+</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>تسجيل الدوام والإجازات — اللمسة الأخيرة</title>
