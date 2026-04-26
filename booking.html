@@ -6,6 +6,9 @@
 <meta name="cache-control" content="no-cache, no-store, must-revalidate">
 <meta name="pragma" content="no-cache">
 <meta name="expires" content="0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>حجز موعد — اللمسة الأخيرة</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0f3460">
@@ -46,8 +49,9 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .week-card.selected{border-color:var(--success);background:rgba(0,212,170,.08);box-shadow:0 4px 15px rgba(0,212,170,.1);}
 .week-card.full{opacity:.6;cursor:not-allowed;border-color:rgba(233,69,96,.2);background:rgba(233,69,96,.03);}
 .week-card .wk-label{font-size:11px;color:var(--muted);font-weight:700;margin-bottom:4px;}
-.week-card .wk-range{font-size:14px;font-weight:800;margin-bottom:8px;}
-.week-card .wk-cars{display:flex;justify-content:center;gap:6px;margin-bottom:8px;}
+.week-card .wk-range{font-size:14px;font-weight:800;margin-bottom:4px;}
+.week-card .wk-range-sub{font-size:13px;color:var(--muted);margin-bottom:10px;}
+.week-card .wk-cars{display:flex;justify-content:center;gap:6px;margin-bottom:10px;}
 .wk-car-dot{width:14px;height:14px;border-radius:50%;border:1px solid var(--border);}
 .wk-car-dot.taken{background:var(--success);border-color:var(--success);}
 .wk-car-dot.wait{background:var(--gold);border-color:var(--gold);}
@@ -90,6 +94,7 @@ textarea{resize:vertical;min-height:70px;}
 .whatsapp-btn{display:inline-flex;align-items:center;gap:8px;padding:12px 20px;background:linear-gradient(135deg,#25d366,#128c7e);color:#fff;border-radius:12px;text-decoration:none;font-weight:700;font-size:14px;transition:all .2s;margin-top:10px;}
 .whatsapp-btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(37,211,102,.3);}
 .flash{position:fixed;top:20px;left:50%;transform:translateX(-50%);padding:12px 24px;border-radius:12px;font-size:14px;font-weight:700;z-index:300;display:none;}
+.flash.show{display:block;}
 .flash.success{background:rgba(0,212,170,.15);border:1px solid var(--success);color:var(--success);}
 .flash.error{background:rgba(233,69,96,.15);border:1px solid var(--danger);color:var(--danger);}
 .warn-box{background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.25);border-radius:10px;padding:12px 16px;margin:16px 0;font-size:13px;color:var(--warning);text-align:center;}
@@ -103,7 +108,7 @@ textarea{resize:vertical;min-height:70px;}
   <div class="brand-sub">حجز موعد للورشة · ٤ سيارات في الأسبوع</div>
 </div>
 <div class="wrap">
-  <a href="track.html" class="back-link">← العودة لتتبع السيارة</a>
+  <a href="track.html?v=2" class="back-link">← العودة لتتبع السيارة</a>
 
   <div class="steps" id="stepper">
     <div class="step active" id="step-1"><span>1</span> الخدمة</div>
@@ -116,14 +121,14 @@ textarea{resize:vertical;min-height:70px;}
     <div class="card">
       <div class="card-header">🛠️ اختر نوع الخدمة</div>
       <div class="card-body">
-        <div class="services-grid" id="services-grid" style="grid-template-columns:1fr 1fr;">
-          <button id="svc-body" class="svc-btn" data-svc="سمكرة ودهان" style="padding:28px 16px;font-size:18px;">
-            <span class="svc-emoji" style="font-size:36px;">🎨</span>
-            <span class="svc-name" style="font-size:16px;">سمكرة ودهان</span>
+        <div class="services-grid" id="services-grid">
+          <button id="svc-body" class="svc-btn" data-svc="سمكرة ودهان">
+            <span class="svc-emoji">🎨</span>
+            <span class="svc-name">سمكرة ودهان</span>
           </button>
-          <button id="svc-mech" class="svc-btn" data-svc="صيانة وكهرباء" style="padding:28px 16px;font-size:18px;">
-            <span class="svc-emoji" style="font-size:36px;">⚡</span>
-            <span class="svc-name" style="font-size:16px;">صيانة وكهرباء</span>
+          <button id="svc-mech" class="svc-btn" data-svc="صيانة وكهرباء">
+            <span class="svc-emoji">⚡</span>
+            <span class="svc-name">صيانة وكهرباء</span>
           </button>
         </div>
       </div>
@@ -143,8 +148,8 @@ textarea{resize:vertical;min-height:70px;}
       </div>
     </div>
     <div style="display:flex;gap:10px;">
-      <button class="btn btn-back" onclick="prevStep()">↩️ السابق</button>
-      <button class="btn btn-primary" id="btn-to-3" onclick="nextStep()" disabled>التالي →</button>
+      <button class="btn btn-back" id="btn-prev-2">↩️ السابق</button>
+      <button class="btn btn-primary" id="btn-next-2" disabled>التالي →</button>
     </div>
   </div>
 
@@ -177,8 +182,8 @@ textarea{resize:vertical;min-height:70px;}
       </div>
     </div>
     <div style="display:flex;gap:10px;">
-      <button class="btn btn-back" onclick="prevStep()">↩️ السابق</button>
-      <button class="btn btn-primary" id="btn-submit" onclick="submitBooking()">✅ تأكيد الحجز</button>
+      <button class="btn btn-back" id="btn-prev-3">↩️ السابق</button>
+      <button class="btn btn-primary" id="btn-submit">✅ تأكيد الحجز</button>
     </div>
   </div>
 
@@ -191,224 +196,270 @@ textarea{resize:vertical;min-height:70px;}
       <div id="confirm-summary" style="margin-bottom:16px;text-align:right;"></div>
       <div id="confirm-queue" style="background:rgba(255,255,255,.05);border-radius:10px;padding:12px;margin-bottom:16px;font-size:13px;"></div>
       <a href="#" class="whatsapp-btn" id="wa-share">📱 شارك في واتساب</a><br>
-      <a href="track.html" class="whatsapp-btn" style="background:var(--info);margin-top:8px;">🔍 تتبع سيارتك</a>
+      <a href="track.html?v=2" class="whatsapp-btn" style="background:var(--info);margin-top:8px;">🔍 تتبع سيارتك</a>
     </div>
   </div>
 </div>
 
 <script>
-var currentStep = 1;
-var bookingData = {
-  service:'', weekKey:'', weekLabel:'',
-  weekStart:'', weekEnd:'', position:0, totalInWeek:0,
-  name:'', phone:'', plate:'', model:'', notes:'', isWaiting:false
-};
-var CAPACITY = 4;
-var WEEKS_TO_SHOW = 8;
+(function(){
+  'use strict';
 
-function nowISO(){return new Date().toISOString();}
+  var CAPACITY = 4;
+  var WEEKS_TO_SHOW = 8;
+  var DAYS_AR = ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
 
-function flash(msg,type){
-  var el=document.getElementById('flash');
-  el.textContent=msg; el.className='flash '+(type||'success');
-  el.style.display='block';
-  setTimeout(function(){el.style.display='none';},3000);
-}
-
-function bkLoad(){ try{var r=localStorage.getItem('finaltouch_bookings'); if(r) return JSON.parse(r);}catch(e){} return []; }
-function bkSave(data){ try{localStorage.setItem('finaltouch_bookings',JSON.stringify(data));}catch(e){} }
-
-function goToStep(n){
-  document.querySelectorAll('.step-content').forEach(function(s){s.classList.remove('active');});
-  document.getElementById('content-'+n).classList.add('active');
-  for(var i=1;i<=4;i++){
-    var s=document.getElementById('step-'+i);
-    s.classList.remove('active','done');
-    if(i<n)s.classList.add('done');
-    if(i===n)s.classList.add('active');
-  }
-  currentStep=n;
-}
-function nextStep(){ if(currentStep<4) goToStep(currentStep+1); }
-function prevStep(){ if(currentStep>1) goToStep(currentStep-1); }
-
-function selectService(id){
-  var btn = document.getElementById(id);
-  if(!btn || !btn.dataset || !btn.dataset.svc) return;
-  document.querySelectorAll('.svc-btn').forEach(function(b){b.classList.remove('selected');});
-  btn.classList.add('selected');
-  bookingData.service = btn.dataset.svc;
-  nextStep();
-  renderWeeks();
-}
-
-function getWeekRange(offset){
-  var now = new Date();
-  var d = new Date(now);
-  var day = d.getDay();
-  d.setDate(d.getDate() - day + (offset * 7));
-  var end = new Date(d); end.setDate(d.getDate() + 6);
-  return {
-    key: d.toISOString().split('T')[0],
-    start: d.toISOString().split('T')[0],
-    label: d.getDate()+'/'+(d.getMonth()+1)+' – '+end.getDate()+'/'+(end.getMonth()+1)
+  var state = {
+    step:1,
+    svc:'',
+    wkKey:'', wkLabel:'', wkStart:'', wkEnd:'',
+    pos:0, total:0, waiting:false,
+    name:'', phone:'', plate:'', model:'', notes:''
   };
-}
 
-function fmtDateFull(iso){
-  var d = new Date(iso);
-  var days = ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
-  return days[d.getDay()] + ' ' + d.getDate() + '/' + (d.getMonth()+1) + '/' + d.getFullYear();
-}
+  function nowISO(){ return new Date().toISOString(); }
 
-function getWeekBookings(weekKey){
-  var all = bkLoad();
-  return all.filter(function(b){ return b.weekKey === weekKey && b.status !== 'cancelled'; })
-    .sort(function(a,b){ return new Date(a.createdAt)-new Date(b.createdAt); });
-}
+  function pad(n){ return n < 10 ? '0'+n : ''+n; }
+  function fmtDate(dobj){
+    return DAYS_AR[dobj.getDay()] + ' ' + dobj.getDate() + '/' + (dobj.getMonth()+1);
+  }
+  function fmtISOLocal(d){
+    return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+  }
 
-function renderWeeks(){
-  var grid = document.getElementById('week-grid');
-  var html = '';
-  for(var i=0; i<WEEKS_TO_SHOW; i++){
-    var week = getWeekRange(i);
-    var list = getWeekBookings(week.key);
-    var count = list.length;
-    var isFull = count >= CAPACITY;
-    var taken = Math.min(count, CAPACITY);
-    var wait = Math.max(0, count - CAPACITY);
+  function bkLoad(){
+    try{ var r=localStorage.getItem('finaltouch_bookings'); if(r) return JSON.parse(r); }catch(e){}
+    return [];
+  }
+  function bkSave(data){
+    try{ localStorage.setItem('finaltouch_bookings',JSON.stringify(data)); }catch(e){}
+  }
 
-    var dots = '';
-    for(var j=0; j<4; j++){
-      if(j < taken) dots += '<div class="wk-car-dot taken"></div>';
-      else dots += '<div class="wk-car-dot empty"></div>';
+  function flash(msg,type){
+    var el=document.getElementById('flash');
+    el.textContent=msg;
+    el.className='flash '+(type||'success');
+    el.classList.add('show');
+    setTimeout(function(){el.classList.remove('show');},3500);
+  }
+
+  function goToStep(n){
+    document.querySelectorAll('.step-content').forEach(function(s){ s.classList.remove('active'); });
+    document.getElementById('content-'+n).classList.add('active');
+    for(var i=1;i<=4;i++){
+      var s=document.getElementById('step-'+i);
+      s.classList.remove('active','done');
+      if(i<n) s.classList.add('done');
+      if(i===n) s.classList.add('active');
     }
-    if(wait > 0){
-      for(var j=0; j<Math.min(wait,3); j++) dots += '<div class="wk-car-dot wait" title="انتظار"></div>';
+    state.step=n;
+  }
+  function nextStep(){ if(state.step<4) goToStep(state.step+1); }
+  function prevStep(){ if(state.step>1) goToStep(state.step-1); }
+
+  function getWeekRange(offset){
+    var now = new Date();
+    var d   = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    var day = d.getDay();  // 0=Sun
+    d.setDate(d.getDate() - day + (offset * 7));
+    var end = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    end.setDate(end.getDate() + 6);
+    return {
+      key: fmtISOLocal(d),
+      startISO: fmtISOLocal(d),
+      endISO: fmtISOLocal(end),
+      startObj: d,
+      endObj: end,
+      label: d.getDate()+'/'+(d.getMonth()+1)+' – '+end.getDate()+'/'+(end.getMonth()+1)
+    };
+  }
+
+  function getWeekBookings(key){
+    return bkLoad().filter(function(b){ return b.weekKey===key && b.status!=='cancelled'; })
+      .sort(function(a,b){ return new Date(a.createdAt)-new Date(b.createdAt); });
+  }
+
+  function renderWeeks(){
+    var grid = document.getElementById('week-grid');
+    var out='';
+    for(var i=0;i<WEEKS_TO_SHOW;i++){
+      var w=getWeekRange(i);
+      var list=getWeekBookings(w.key);
+      var count=list.length;
+      var isFull=count>=CAPACITY;
+      var taken=Math.min(count,CAPACITY);
+      var wait=Math.max(0,count-CAPACITY);
+
+      var dots='';
+      for(var j=0;j<CAPACITY;j++){
+        dots+='<div class="wk-car-dot '+(j<taken?'taken':'empty')+'"></div>';
+      }
+      if(wait>0){
+        for(var j=0;j<Math.min(wait,3);j++){
+          dots+='<div class="wk-car-dot wait" title="انتظار"></div>';
+        }
+      }
+
+      var label=i===0?'هذا الأسبوع':i===1?'الأسبوع القادم':'الأسبوع '+(i+1);
+      var statusText=isFull?('ممتلئ · '+wait+' بالانتظار'):('متاح · '+(CAPACITY-count)+' من '+CAPACITY);
+      var statusClass=isFull?'wk-full':'wk-free';
+      var cardClass=isFull?'week-card full':'week-card';
+
+      out+='<div class="'+cardClass+'" data-idx="'+i+'">';
+      out+='<div class="wk-label">'+label+'</div>';
+      out+='<div class="wk-range">'+fmtDate(w.startObj)+' – '+fmtDate(w.endObj)+'</div>';
+      out+='<div class="wk-range-sub">'+fmtISOLocal(w.startObj)+' » '+fmtISOLocal(w.endObj)+'</div>';
+      out+='<div class="wk-cars">'+dots+'</div>';
+      out+='<div class="wk-status '+statusClass+'">'+statusText+'</div>';
+      out+='</div>';
+    }
+    grid.innerHTML=out;
+
+    // attach listeners
+    grid.querySelectorAll('.week-card').forEach(function(card){
+      card.addEventListener('click',function(ev){
+        pickWeek(parseInt(card.getAttribute('data-idx')));
+      });
+    });
+  }
+
+  function pickWeek(idx){
+    var w=getWeekRange(idx);
+    var list=getWeekBookings(w.key);
+    var count=list.length;
+    var isFull=count>=CAPACITY;
+
+    if(isFull && !confirm('هذا الأسبوع ممتلئ (٤ سيارات). تبي تنضم قائمة الانتظار؟')){
+      return;
     }
 
-    var label = i===0?'هذا الأسبوع':i===1?'الأسبوع القادم':'الأسبوع '+(i+1);
-    var statusText = isFull ? ('ممتلئ · '+wait+' بالانتظار') : ('متاح · '+(CAPACITY-count)+' من '+CAPACITY);
-    var statusClass = isFull ? 'wk-full' : 'wk-free';
-    var cls = isFull ? 'week-card full' : 'week-card';
+    // visual select
+    document.querySelectorAll('.week-card').forEach(function(c){ c.classList.remove('selected'); });
+    var cards=document.querySelectorAll('.week-card');
+    if(cards[idx]) cards[idx].classList.add('selected');
 
-    html += '<div class="'+cls+'" data-key="'+week.key+'" data-label="'+week.label+'" data-start="'+week.start+'" onclick="pickWeek(\''+week.key+'\')">';
-    html += '<div class="wk-label">'+label+'</div>';
-    html += '<div class="wk-range">'+fmtDateFull(week.start)+'</div>';
-    html += '<div class="wk-range" style="font-size:12px;color:var(--muted);margin-bottom:4px;">حتى '+fmtDateFull(week.start)+'</div>';
-    html += '<div class="wk-cars">'+dots+'</div>';
-    html += '<div class="wk-status '+statusClass+'">'+statusText+'</div>';
-    html += '</div>';
-  }
-  grid.innerHTML = html;
-}
+    // update state
+    state.wkKey=w.key;
+    state.wkLabel=w.label;
+    state.wkStart=w.startISO;
+    state.wkEnd=w.endISO;
+    state.total=count;
 
-function pickWeek(key){
-  var list = getWeekBookings(key);
-  var count = list.length;
-  var week = getWeekRange(parseInt(key)); // find week object
+    var qi=document.getElementById('queue-info');
+    var qn=document.getElementById('queue-num');
+    var qt=document.getElementById('queue-text');
 
-  // Find the card element
-  var el = document.querySelector('.week-card[data-key="'+key+'"]');
-  if(!el) return;
+    if(count>=CAPACITY){
+      state.pos=count+1;
+      state.waiting=true;
+      qi.className='queue-box show queue-wait';
+      qn.textContent='#'+state.pos;
+      qt.textContent='أنت في قائمة الانتظار لهذا الأسبوع';
+    } else {
+      state.pos=count+1;
+      state.waiting=false;
+      qi.className='queue-box show';
+      qn.textContent='#'+state.pos+' من '+CAPACITY;
+      if(state.pos===1) qt.textContent='🏆 أنت أول حاجز هذا الأسبوع!';
+      else if(state.pos===CAPACITY) qt.textContent='آخر سيارة متاحة هذا الأسبوع!';
+      else qt.textContent='سيارة '+state.pos+' من أصل '+CAPACITY;
+    }
 
-  if(el.classList.contains('full') && !confirm('هذا الأسبوع ممتلئ (٤ سيارات). تبي تنضم قائمة الانتظار؟')){
-    return;
-  }
-
-  document.querySelectorAll('.week-card').forEach(function(b){b.classList.remove('selected');});
-  el.classList.add('selected');
-
-  bookingData.weekKey = key;
-  bookingData.weekLabel = el.getAttribute('data-label') || '';
-  bookingData.weekStart = el.getAttribute('data-start') || '';
-  bookingData.weekEnd = el.getAttribute('data-end') || '';
-  bookingData.totalInWeek = count;
-
-  var qi = document.getElementById('queue-info');
-  var qn = document.getElementById('queue-num');
-  var qt = document.getElementById('queue-text');
-
-  if(count >= CAPACITY){
-    bookingData.position = count + 1;
-    bookingData.isWaiting = true;
-    qi.className = 'queue-box show queue-wait';
-    qn.textContent = '#' + bookingData.position;
-    qt.textContent = 'أنت في قائمة الانتظار لهذا الأسبوع';
-  } else {
-    bookingData.position = count + 1;
-    bookingData.isWaiting = false;
-    qi.className = 'queue-box show';
-    qn.textContent = '#' + bookingData.position + ' من ' + CAPACITY;
-    if(bookingData.position === 1) qt.textContent = '🏆 أنت أول حاجز هذا الأسبوع!';
-    else if(bookingData.position === CAPACITY) qt.textContent = 'آخر سيارة متاحة هذا الأسبوع!';
-    else qt.textContent = 'سيارة ' + bookingData.position + ' من أصل ' + CAPACITY;
+    document.getElementById('btn-next-2').disabled=false;
   }
 
-  document.getElementById('btn-to-3').disabled = false;
-}
+  function submitBooking(){
+    var name=document.getElementById('cust-name').value.trim();
+    var phone=document.getElementById('cust-phone').value.trim();
+    var plate=document.getElementById('cust-plate').value.trim();
+    var model=document.getElementById('cust-model').value.trim();
+    var notes=document.getElementById('cust-notes').value.trim();
 
-function submitBooking(){
-  var name = document.getElementById('cust-name').value.trim();
-  var phone = document.getElementById('cust-phone').value.trim();
-  var plate = document.getElementById('cust-plate').value.trim();
-  var model = document.getElementById('cust-model').value.trim();
-  var notes = document.getElementById('cust-notes').value.trim();
+    if(!name||!phone||!plate){ flash('يرجى تعبئة الحقول المطلوبة *','error'); return; }
 
-  if(!name || !phone || !plate){ flash('يرجى تعبئة الحقول المطلوبة *','error'); return; }
+    state.name=name; state.phone=phone;
+    state.plate=plate; state.model=model; state.notes=notes;
 
-  bookingData.name = name; bookingData.phone = phone;
-  bookingData.plate = plate; bookingData.model = model; bookingData.notes = notes;
+    var all=bkLoad();
+    var realCount=all.filter(function(b){ return b.weekKey===state.wkKey && b.status!=='cancelled'; }).length;
+    if(realCount>=CAPACITY && !state.waiting){
+      state.waiting=true;
+      state.pos=realCount+1;
+    }
 
-  var all = bkLoad();
-  var count = all.filter(function(b){ return b.weekKey===bookingData.weekKey && b.status!=='cancelled'; }).length;
-  if(count >= CAPACITY && !bookingData.isWaiting){
-    bookingData.isWaiting = true;
-    bookingData.position = count + 1;
+    var bkId='BK-'+Math.floor(10000+Math.random()*90000);
+    all.push({
+      id:bkId, service:state.svc,
+      weekKey:state.wkKey, weekLabel:state.wkLabel,
+      weekStart:state.wkStart, weekEnd:state.wkEnd,
+      position:state.pos, isWaiting:state.waiting,
+      customerName:name, phone:phone, plate:plate, model:model,
+      notes:notes, status:'pending', createdAt:nowISO()
+    });
+    bkSave(all);
+
+    document.getElementById('confirm-id').textContent=bkId;
+
+    var queueHtml;
+    if(state.waiting){
+      document.getElementById('confirm-wait-msg').textContent='هذا الأسبوع ممتلئ · أنت في قائمة الانتظار';
+      queueHtml='<div style="color:var(--gold);font-weight:700;">#'+state.pos+' في قائمة الانتظار</div><div style="font-size:12px;color:var(--muted);margin-top:4px;">سننبهك لو صار مكان متاح</div>';
+    } else {
+      document.getElementById('confirm-wait-msg').textContent='تم التأكيد · سيتم التواصل معك';
+      queueHtml='<div style="color:var(--success);font-weight:700;">#'+state.pos+' من '+CAPACITY+'</div><div style="font-size:12px;color:var(--muted);margin-top:4px;">أولوية الكاملة</div>';
+    }
+
+    document.getElementById('confirm-summary').innerHTML=
+      '<div class="sum-row"><span class="sum-label">الاسم:</span><span class="sum-val">'+name+'</span></div>'+
+      '<div class="sum-row"><span class="sum-label">الخدمة:</span><span class="sum-val">'+state.svc+'</span></div>'+
+      '<div class="sum-row"><span class="sum-label">الأسبوع:</span><span class="sum-val">'+state.wkLabel+'</span></div>'+
+      '<div class="sum-row"><span class="sum-label">اللوحة:</span><span class="sum-val">'+plate+'</span></div>';
+
+    document.getElementById('confirm-queue').innerHTML=queueHtml;
+
+    var msg='مرحباً%20اللمسة%20الأخيرة،%20أرغب%20في%20الاستفسار%20عن%20حجزي%20'+bkId+'%20'+name+'%20'+plate;
+    document.getElementById('wa-share').href='https://wa.me/?text='+msg;
+
+    goToStep(4);
   }
 
-  var bkId = 'BK-' + Math.floor(10000 + Math.random()*90000);
-  var record = {
-    id: bkId, service: bookingData.service,
-    weekKey: bookingData.weekKey, weekLabel: bookingData.weekLabel,
-    weekStart: bookingData.weekStart, weekEnd: bookingData.weekEnd,
-    position: bookingData.position, isWaiting: bookingData.isWaiting,
-    customerName: name, phone: phone, plate: plate, model: model,
-    notes: notes, status: 'pending', createdAt: nowISO()
-  };
-  all.push(record);
-  bkSave(all);
+  // wire everything
+  document.addEventListener('DOMContentLoaded',function(){
+    // service buttons
+    var svcBody=document.getElementById('svc-body');
+    var svcMech=document.getElementById('svc-mech');
+    if(svcBody){
+      svcBody.addEventListener('click',function(){
+        svcBody.classList.add('selected');
+        if(svcMech) svcMech.classList.remove('selected');
+        state.svc=svcBody.getAttribute('data-svc');
+        nextStep();
+        renderWeeks();
+      });
+    }
+    if(svcMech){
+      svcMech.addEventListener('click',function(){
+        svcMech.classList.add('selected');
+        if(svcBody) svcBody.classList.remove('selected');
+        state.svc=svcMech.getAttribute('data-svc');
+        nextStep();
+        renderWeeks();
+      });
+    }
 
-  document.getElementById('confirm-id').textContent = bkId;
+    // step 2 nav
+    var btnPrev2=document.getElementById('btn-prev-2');
+    var btnNext2=document.getElementById('btn-next-2');
+    if(btnPrev2) btnPrev2.addEventListener('click',prevStep);
+    if(btnNext2) btnNext2.addEventListener('click',nextStep);
 
-  var queueHtml;
-  if(bookingData.isWaiting){
-    document.getElementById('confirm-wait-msg').textContent = 'هذا الأسبوع ممتلئ · أنت في قائمة الانتظار';
-    queueHtml = '<div style="color:var(--gold);font-weight:700;">#'+bookingData.position+' في قائمة الانتظار</div><div style="font-size:12px;color:var(--muted);margin-top:4px;">سننبهك لو صار مكان متاح</div>';
-  } else {
-    document.getElementById('confirm-wait-msg').textContent = 'تم التأكيد · سيتم التواصل معك';
-    queueHtml = '<div style="color:var(--success);font-weight:700;">#'+bookingData.position+' من '+CAPACITY+'</div><div style="font-size:12px;color:var(--muted);margin-top:4px;">أولوية الكاملة</div>';
-  }
-
-  document.getElementById('confirm-summary').innerHTML =
-    '<div class="sum-row"><span class="sum-label">الاسم:</span><span class="sum-val">'+name+'</span></div>'+
-    '<div class="sum-row"><span class="sum-label">الخدمة:</span><span class="sum-val">'+bookingData.service+'</span></div>'+
-    '<div class="sum-row"><span class="sum-label">الأسبوع:</span><span class="sum-val">'+bookingData.weekLabel+'</span></div>'+
-    '<div class="sum-row"><span class="sum-label">اللوحة:</span><span class="sum-val">'+plate+'</span></div>';
-
-  document.getElementById('confirm-queue').innerHTML = queueHtml;
-
-  var msg = 'مرحباً%20اللمسة%20الأخيرة،%20أرغب%20في%20الاستفسار%20عن%20حجزي%20'+bkId+'%20'+name+'%20'+plate;
-  document.getElementById('wa-share').href = 'https://wa.me/?text='+msg;
-
-  goToStep(4);
-}
-
-// Wire up buttons after DOM ready
-document.addEventListener('DOMContentLoaded', function(){
-  document.getElementById('svc-body').addEventListener('click', function(){ selectService('svc-body'); });
-  document.getElementById('svc-mech').addEventListener('click', function(){ selectService('svc-mech'); });
-});
+    // step 3 nav + submit
+    var btnPrev3=document.getElementById('btn-prev-3');
+    var btnSubmit=document.getElementById('btn-submit');
+    if(btnPrev3) btnPrev3.addEventListener('click',prevStep);
+    if(btnSubmit) btnSubmit.addEventListener('click',submitBooking);
+  });
+})();
 </script>
 </body>
 </html>
