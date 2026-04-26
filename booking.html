@@ -24,12 +24,11 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .brand{font-family:var(--font-display);font-size:24px;font-weight:900;}
 .brand-sub{font-size:13px;color:var(--muted);margin-top:2px;}
 
-.wrap{max-width:580px;margin:0 auto;padding:24px 16px;position:relative;z-index:1;}
-
+.wrap{max-width:640px;margin:0 auto;padding:24px 16px;position:relative;z-index:1;}
 .page-title{font-size:18px;font-weight:800;margin-bottom:20px;text-align:center;}
 
 /* ─── Steps ─── */
-.steps{display:flex;justify-content:center;gap:8px;margin-bottom:24px;position:sticky;top:0;background:var(--primary);padding:8px 0;z-index:10;}
+.steps{display:flex;justify-content:center;gap:8px;margin-bottom:24px;flex-wrap:wrap;}
 .step{display:flex;align-items:center;gap:6px;padding:8px 16px;border-radius:24px;background:rgba(255,255,255,.05);border:1px solid var(--border);font-size:13px;font-weight:700;color:var(--muted);transition:all .3s;}
 .step.active{background:linear-gradient(135deg,var(--accent),#ff6b35);color:#fff;border-color:transparent;}
 .step.done{background:rgba(0,212,170,.1);border-color:rgba(0,212,170,.3);color:var(--success);}
@@ -47,23 +46,33 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .svc-btn .svc-emoji{font-size:24px;display:block;margin-bottom:6px;}
 .svc-btn .svc-name{font-size:12px;}
 
-/* ─── Date & Time ─── */
-.date-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:8px;margin-top:12px;}
-.day-btn{padding:12px 8px;border:1px solid var(--border);background:rgba(255,255,255,.04);border-radius:12px;color:var(--text);font-family:var(--font-main);font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;text-align:center;position:relative;}
-.day-btn:hover{border-color:rgba(79,172,254,.4);background:rgba(79,172,254,.05);}
-.day-btn.selected{border-color:var(--success);background:rgba(0,212,170,.1);color:var(--success);}
-.day-btn.past{opacity:.4;cursor:not-allowed;}
-.day-btn .day-n{font-size:10px;color:var(--muted);margin-bottom:2px;}
-.day-btn .day-x{font-size:18px;font-weight:900;}
+/* ─── Week Grid ─── */
+.week-grid{display:grid;grid-template-columns:1fr;gap:12px;margin-top:12px;}
+@media(min-width:500px){.week-grid{grid-template-columns:repeat(2,1fr);}}
+.week-card{padding:16px;border:1px solid var(--border);background:rgba(255,255,255,.04);border-radius:14px;cursor:pointer;transition:all .2s;position:relative;text-align:center;}
+.week-card:hover{border-color:rgba(79,172,254,.4);background:rgba(79,172,254,.05);}
+.week-card.selected{border-color:var(--success);background:rgba(0,212,170,.08);box-shadow:0 4px 15px rgba(0,212,170,.1);}
+.week-card.full{opacity:.6;cursor:not-allowed;border-color:rgba(233,69,96,.2);background:rgba(233,69,96,.03);}
+.week-card.full:hover{border-color:rgba(233,69,96,.2);background:rgba(233,69,96,.03);}
+.week-card .wk-label{font-size:11px;color:var(--muted);font-weight:700;margin-bottom:4px;}
+.week-card .wk-range{font-size:14px;font-weight:800;margin-bottom:8px;}
+.week-card .wk-cars{display:flex;justify-content:center;gap:6px;margin-bottom:8px;}
+.wk-car-dot{width:14px;height:14px;border-radius:50%;border:1px solid var(--border);}
+.wk-car-dot.taken{background:var(--success);border-color:var(--success);}
+.wk-car-dot.wait{background:var(--gold);border-color:var(--gold);}
+.wk-car-dot.empty{background:transparent;}
+.week-card .wk-status{font-size:12px;font-weight:700;margin-top:4px;}
+.week-card .wk-free{color:var(--success);}
+.week-card .wk-full{color:var(--danger);}
+.week-card .wk-wl{color:var(--gold);}
 
-.time-slots{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:12px;}
-.slot-btn{padding:14px 12px;border:1px solid var(--border);background:rgba(255,255,255,.04);border-radius:12px;color:var(--text);font-family:var(--font-main);font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;text-align:center;display:flex;flex-direction:column;gap:4px;align-items:center;}
-.slot-btn:hover{border-color:var(--info);background:rgba(79,172,254,.05);}
-.slot-btn.selected{border-color:var(--success);background:rgba(0,212,170,.1);color:var(--success);}
-.slot-btn.full{opacity:.4;cursor:not-allowed;border-color:rgba(233,69,96,.2);color:var(--danger);background:rgba(233,69,96,.05);}
-.slot-btn .slot-range{font-size:15px;font-weight:900;}
-.slot-btn .slot-avail{font-size:11px;color:var(--muted);font-weight:600;}
-.slot-btn.full .slot-avail{color:var(--danger);}
+/* ─── Queue Info ─── */
+.queue-box{display:none;background:rgba(0,212,170,.08);border:1px solid rgba(0,212,170,.25);border-radius:12px;padding:16px;margin:16px 0;text-align:center;}
+.queue-box.show{display:block;}
+.queue-num{font-family:var(--font-display);font-size:36px;font-weight:900;color:var(--success);}
+.queue-total{font-size:14px;color:var(--muted);}
+.queue-wait{background:rgba(245,166,35,.08);border-color:rgba(245,166,35,.25);}
+.queue-wait .queue-num{color:var(--gold);}
 
 /* ─── Form ─── */
 .form-grid{display:grid;grid-template-columns:1fr;gap:14px;}
@@ -74,7 +83,6 @@ input,select,textarea{background:rgba(255,255,255,.05);border:1px solid var(--bo
 input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);background:rgba(233,69,96,.05);}
 textarea{resize:vertical;min-height:70px;}
 
-/* ── Buttons ── */
 .btn{padding:13px 24px;border:none;border-radius:12px;font-family:var(--font-main);font-size:15px;font-weight:800;cursor:pointer;transition:all .2s;width:100%;text-align:center;}
 .btn-primary{background:linear-gradient(135deg,var(--accent),#ff6b35);color:#fff;box-shadow:0 6px 20px rgba(233,69,96,.3);}
 .btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(233,69,96,.4);}
@@ -82,11 +90,9 @@ textarea{resize:vertical;min-height:70px;}
 .btn-back{background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);}
 .btn-back:hover{background:rgba(255,255,255,.1);}
 
-/* ─── Back link ─── */
 .back-link{color:var(--muted);font-size:13px;text-decoration:none;display:inline-flex;align-items:center;gap:6px;margin-bottom:12px;}
 .back-link:hover{color:var(--text);}
 
-/* ─── Step content ─── */
 .step-content{display:none;animation:fadeIn .3s ease;}
 .step-content.active{display:block;}
 @keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
@@ -94,8 +100,8 @@ textarea{resize:vertical;min-height:70px;}
 /* ─── Summary ─── */
 .sum-row{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);font-size:14px;}
 .sum-row:last-child{border-bottom:none;}
-.sum-row .sum-label{color:var(--muted);}
-.sum-row .sum-val{font-weight:700;}
+.sum-label{color:var(--muted);}
+.sum-val{font-weight:700;}
 
 /* ─── Confirmation ─── */
 .confirm-card{background:rgba(0,212,170,.08);border:1px solid rgba(0,212,170,.25);border-radius:var(--radius);padding:30px;text-align:center;}
@@ -104,16 +110,14 @@ textarea{resize:vertical;min-height:70px;}
 .confirm-sub{font-size:14px;color:var(--muted);margin-bottom:16px;}
 .booking-id{font-family:var(--font-display);font-size:28px;font-weight:900;color:var(--success);letter-spacing:2px;background:rgba(0,212,170,.1);padding:10px 24px;border-radius:12px;display:inline-block;margin-bottom:16px;border:1px dashed var(--success);}
 
-/* ─── Warning ─── */
-.warning-box{display:none;background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.25);border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:13px;color:var(--warning);text-align:center;}
-
-/* ─── WhatsApp ─── */
 .whatsapp-btn{display:inline-flex;align-items:center;gap:8px;padding:12px 20px;background:linear-gradient(135deg,#25d366,#128c7e);color:#fff;border-radius:12px;text-decoration:none;font-weight:700;font-size:14px;transition:all .2s;margin-top:10px;}
 .whatsapp-btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(37,211,102,.3);}
 
 .flash{position:fixed;top:20px;left:50%;transform:translateX(-50%);padding:12px 24px;border-radius:12px;font-size:14px;font-weight:700;z-index:300;display:none;}
 .flash.success{background:rgba(0,212,170,.15);border:1px solid var(--success);color:var(--success);}
 .flash.error{background:rgba(233,69,96,.15);border:1px solid var(--danger);color:var(--danger);}
+
+.warn-box{background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.25);border-radius:10px;padding:12px 16px;margin:16px 0;font-size:13px;color:var(--warning);text-align:center;}
 </style>
 </head>
 <body>
@@ -123,7 +127,7 @@ textarea{resize:vertical;min-height:70px;}
 <div class="header">
   <img src="icon-192.png" alt="logo" class="logo-img">
   <div class="brand">اللمسة الأخيرة</div>
-  <div class="brand-sub">حجز موعد للورشة</div>
+  <div class="brand-sub">حجز موعد للورشة · ٤ سيارات في الأسبوع</div>
 </div>
 
 <div class="wrap">
@@ -131,7 +135,7 @@ textarea{resize:vertical;min-height:70px;}
 
   <div class="steps" id="stepper">
     <div class="step active" id="step-1"><span>1</span> الخدمة</div>
-    <div class="step" id="step-2"><span>2</span> التاريخ والوقت</div>
+    <div class="step" id="step-2"><span>2</span> أسبوع الحجز</div>
     <div class="step" id="step-3"><span>3</span> البيانات</div>
     <div class="step" id="step-4"><span>4</span> التأكيد</div>
   </div>
@@ -142,57 +146,30 @@ textarea{resize:vertical;min-height:70px;}
       <div class="card-header">🛠️ اختر نوع الخدمة</div>
       <div class="card-body">
         <div class="services-grid" id="services-grid">
-          <button class="svc-btn" data-svc="صيانة ميكانيكية" onclick="selectService(this)">
-            <span class="svc-emoji">🔧</span>
-            <span class="svc-name">صيانة ميكانيكية</span>
-          </button>
-          <button class="svc-btn" data-svc="سمكرة وإصلاح هيكل" onclick="selectService(this)">
-            <span class="svc-emoji">🔨</span>
-            <span class="svc-name">سمكرة وإصلاح هيكل</span>
-          </button>
-          <button class="svc-btn" data-svc="دهان وتلميع" onclick="selectService(this)">
-            <span class="svc-emoji">🎨</span>
-            <span class="svc-name">دهان وتلميع</span>
-          </button>
-          <button class="svc-btn" data-svc="فحص دوري" onclick="selectService(this)">
-            <span class="svc-emoji">📋</span>
-            <span class="svc-name">فحص دوري MoT</span>
-          </button>
-          <button class="svc-btn" data-svc="تغيير زيت" onclick="selectService(this)">
-            <span class="svc-emoji">🛢️</span>
-            <span class="svc-name">تغيير زيت</span>
-          </button>
-          <button class="svc-btn" data-svc="تبديل تواير" onclick="selectService(this)">
-            <span class="svc-emoji">🚙</span>
-            <span class="svc-name">تبديل تواير</span>
-          </button>
-          <button class="svc-btn" data-svc="إصلاح كهرباء" onclick="selectService(this)">
-            <span class="svc-emoji">⚡</span>
-            <span class="svc-name">إصلاح كهرباء</span>
-          </button>
-          <button class="svc-btn" data-svc="باتري" onclick="selectService(this)">
-            <span class="svc-emoji">🔋</span>
-            <span class="svc-name">باتري</span>
-          </button>
+          <button class="svc-btn" data-svc="صيانة ميكانيكية" onclick="selectService(this)"><span class="svc-emoji">🔧</span><span class="svc-name">صيانة ميكانيكية</span></button>
+          <button class="svc-btn" data-svc="سمكرة وإصلاح هيكل" onclick="selectService(this)"><span class="svc-emoji">🔨</span><span class="svc-name">سمكرة وإصلاح هيكل</span></button>
+          <button class="svc-btn" data-svc="دهان وتلميع" onclick="selectService(this)"><span class="svc-emoji">🎨</span><span class="svc-name">دهان وتلميع</span></button>
+          <button class="svc-btn" data-svc="فحص دوري" onclick="selectService(this)"><span class="svc-emoji">📋</span><span class="svc-name">فحص دوري MoT</span></button>
+          <button class="svc-btn" data-svc="إصلاح كهرباء" onclick="selectService(this)"><span class="svc-emoji">⚡</span><span class="svc-name">إصلاح كهرباء</span></button>
+          <button class="svc-btn" data-svc="أخرى" onclick="selectService(this)"><span class="svc-emoji">🔩</span><span class="svc-name">خدمة أخرى</span></button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- STEP 2: DATE & TIME -->
+  <!-- STEP 2: WEEK SELECTION -->
   <div id="content-2" class="step-content">
-    <div class="card">
-      <div class="card-header">📅 اختر التاريخ</div>
-      <div class="card-body">
-        <div class="date-grid" id="date-grid"></div>
-        <div class="warning-box" id="date-warning">يرجى اختيار تاريخ من القائمة</div>
-      </div>
-    </div>
+    <div class="warn-box">⚡ الورشة تستقبل <strong>٤ سيارات في الأسبوع</strong> فقط · سارع بالحجز!</div>
 
     <div class="card">
-      <div class="card-header">🕐 اختر الوقت (السعة: ٣ حجوزات / فترة)</div>
+      <div class="card-header">📅 اختر أسبوع الحجز</div>
       <div class="card-body">
-        <div class="time-slots" id="time-slots"></div>
+        <div class="week-grid" id="week-grid"></div>
+
+        <div class="queue-box" id="queue-info">
+          <div class="queue-num" id="queue-num">#</div>
+          <div class="queue-total" id="queue-text"></div>
+        </div>
       </div>
     </div>
 
@@ -242,10 +219,12 @@ textarea{resize:vertical;min-height:70px;}
     <div class="confirm-card">
       <div class="confirm-emoji">🎉</div>
       <div class="confirm-title">تم الحجز بنجاح!</div>
-      <div class="confirm-sub">احتفظ برقم الحجز، سيتم التواصل معك للتأكيد</div>
+      <div class="confirm-sub" id="confirm-wait-msg">سيتم التواصل معك للتأكيد</div>
       <div class="booking-id" id="confirm-id">BK-00000</div>
 
       <div id="confirm-summary" style="margin-bottom:16px;text-align:right;"></div>
+
+      <div id="confirm-queue" style="background:rgba(255,255,255,.05);border-radius:10px;padding:12px;margin-bottom:16px;font-size:13px;"></div>
 
       <a href="#" class="whatsapp-btn" id="wa-share">📱 شارك في واتساب</a><br>
       <a href="track.html" class="whatsapp-btn" style="background:var(--info);margin-top:8px;">🔍 تتبع سيارتك</a>
@@ -254,95 +233,176 @@ textarea{resize:vertical;min-height:70px;}
 </div>
 
 <script>
-// ================= BOOKING SYSTEM =================
+// ================= WEEKLY BOOKING SYSTEM =================
 
 var currentStep = 1;
-var bookingData = { service:'', date:'', time:'', timeLabel:'', name:'', phone:'', plate:'', model:'', notes:'' };
-var CAPACITY = 3; // max bookings per slot
+var bookingData = {
+  service:'', weekKey:'', weekLabel:'',
+  weekStart:'', weekEnd:'', position:0, totalInWeek:0,
+  name:'', phone:'', plate:'', model:'', notes:'', isWaiting:false
+};
+
+var CAPACITY = 4; // 4 cars per week
+var WEEKS_TO_SHOW = 8; // show next 8 weeks
 
 function nowISO(){return new Date().toISOString();}
-function fmtDate(iso){if(!iso)return '—'; var d=new Date(iso); return d.toLocaleDateString('ar-SA',{weekday:'long',year:'numeric',month:'long',day:'numeric'});}
-function fmtShort(iso){return new Date(iso).toLocaleDateString('ar-SA',{month:'numeric',day:'numeric'});}
+
 function flash(msg,type){
-  var el=document.getElementById('flash'); el.textContent=msg; el.className='flash '+(type||'success'); el.style.display='block';
+  var el=document.getElementById('flash');
+  el.textContent=msg; el.className='flash '+(type||'success');
+  el.style.display='block';
   setTimeout(function(){el.style.display='none';},3000);
 }
 
-// localStorage helpers
-var BK_STORES = {
-  bookings: 'finaltouch_bookings'
-};
-function bkLoad(){try{var r=localStorage.getItem(BK_STORES.bookings);if(r)return JSON.parse(r);}catch(e){}return [];}
-function bkSave(data){try{localStorage.setItem(BK_STORES.bookings,JSON.stringify(data));}catch(e){}}
+// ─── DB ───
+var BK_STORES = { bookings: 'finaltouch_bookings' };
+function bkLoad(){ try{var r=localStorage.getItem(BK_STORES.bookings); if(r) return JSON.parse(r);}catch(e){} return []; }
+function bkSave(data){ try{localStorage.setItem(BK_STORES.bookings, JSON.stringify(data));}catch(e){} }
 
-// ─── STEP NAVIGATION ───
+// ─── STEP NAV ───
 function goToStep(n){
   document.querySelectorAll('.step-content').forEach(s=>s.classList.remove('active'));
   document.getElementById('content-'+n).classList.add('active');
-  for(var i=1;i<=4;i++){var s=document.getElementById('step-'+i); s.classList.remove('active','done'); if(i<n){s.classList.add('done');} if(i===n){s.classList.add('active');} }
+  for(var i=1;i<=4;i++){var s=document.getElementById('step-'+i); s.classList.remove('active','done'); if(i<n)s.classList.add('done'); if(i===n)s.classList.add('active'); }
   currentStep=n;
 }
-function nextStep(){if(currentStep<4)goToStep(currentStep+1);}
-function prevStep(){if(currentStep>1)goToStep(currentStep-1);}
+function nextStep(){ if(currentStep<4) goToStep(currentStep+1); }
+function prevStep(){ if(currentStep>1) goToStep(currentStep-1); }
 
-// ─── STEP 1: Select Service ───
+// ─── STEP 1: Service ───
 function selectService(el){
   document.querySelectorAll('.svc-btn').forEach(b=>b.classList.remove('selected'));
   el.classList.add('selected');
   bookingData.service = el.dataset.svc;
   nextStep();
-  renderDates();
+  renderWeeks();
 }
 
-// ─── STEP 2: Date & Time ───
-function renderDates(){
-  var grid = document.getElementById('date-grid');
-  var days = [];
-  var today = new Date();
-  for(var i=0;i<14;i++){
-    var d = new Date(today); d.setDate(today.getDate()+i);
-    days.push({iso:d.toISOString().split('T')[0], name:['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'][d.getDay()], num:d.getDate(), past:i===0});
-  }
-  grid.innerHTML = days.map(d=>{
-    var cls = d.past?'day-btn past':'day-btn';
-    if(d.past) return '<div class="'+cls+'"><div class="day-n">'+d.name+'</div><div class="day-x">'+d.num+'</div></div>';
-    return '<button class="'+cls+'" onclick="selectDate(this,\''+d.iso+'\')"><div class="day-n">'+d.name+'</div><div class="day-x">'+d.num+'</div></button>';
-  }).join('');
+// ─── STEP 2: Week Selection ───
+function getWeekRange(offset){
+  var now = new Date();
+  var d = new Date(now);
+  // Start from Monday (or Sunday — let's use Sunday as start)
+  var day = d.getDay(); // 0=Sun
+  d.setDate(d.getDate() - day + (offset * 7));
+  var end = new Date(d); end.setDate(d.getDate() + 6);
+  var key = d.toISOString().split('T')[0];
+  return {
+    key: key,
+    start: key,
+    startDate: d,
+    end: end.toISOString().split('T')[0],
+    endDate: end,
+    label: formatWeekRange(d, end)
+  };
 }
 
-var timeSlots = [
-  {label:'08:00 - 10:00 صباحاً', key:'08-10'},
-  {label:'10:00 - 12:00 صباحاً', key:'10-12'},
-  {label:'14:00 - 16:00 مساءً', key:'14-16'},
-  {label:'16:00 - 18:00 مساءً', key:'16-18'}
-];
-
-function selectDate(el, iso){
-  document.querySelectorAll('.day-btn').forEach(b=>{ if(!b.classList.contains('past')) b.classList.remove('selected'); });
-  if(!el.classList.contains('past')) el.classList.add('selected');
-  bookingData.date = iso;
-  renderTimes(iso);
-  document.getElementById('btn-to-3').disabled = true;
+function formatWeekRange(s, e){
+  var sm = s.getMonth() + 1, sd = s.getDate();
+  var em = e.getMonth() + 1, ed = e.getDate();
+  return sd + '/' + sm + ' – ' + ed + '/' + em;
 }
 
-function renderTimes(iso){
+function fmtDateFull(iso){
+  var d = new Date(iso);
+  var days = ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+  return days[d.getDay()] + ' ' + d.getDate() + '/' + (d.getMonth()+1) + '/' + d.getFullYear();
+}
+
+function getWeekBookings(weekKey){
   var all = bkLoad();
-  var grid = document.getElementById('time-slots');
-  grid.innerHTML = timeSlots.map(s=>{
-    var count = all.filter(b=>b.date===iso && b.time===s.key && b.status!=='cancelled').length;
-    var full = count >= CAPACITY;
-    var cls = full ? 'slot-btn full' : 'slot-btn';
-    var avail = full ? 'ممتلئ' : (CAPACITY - count) + ' متاح';
-    if(full) return '<div class="'+cls+'"><span class="slot-range">'+s.label+'</span><span class="slot-avail">'+avail+'</span></div>';
-    return '<button class="'+cls+'" onclick="selectTime(this,\''+s.key+'\',\''+s.label+'\')"><span class="slot-range">'+s.label+'</span><span class="slot-avail">'+avail+'</span></button>';
-  }).join('');
+  return all.filter(b => b.weekKey === weekKey && b.status !== 'cancelled').sort((a,b)=>new Date(a.createdAt)-new Date(b.createdAt));
 }
 
-function selectTime(el, key, label){
-  document.querySelectorAll('.slot-btn').forEach(b=>{ if(!b.classList.contains('full')) b.classList.remove('selected'); });
+function renderWeeks(){
+  var grid = document.getElementById('week-grid');
+  var html = '';
+  var now = new Date();
+
+  for(var i=0; i<WEEKS_TO_SHOW; i++){
+    var week = getWeekRange(i);
+    var list = getWeekBookings(week.key);
+    var count = list.length;
+    var isFull = count >= CAPACITY;
+    var taken = Math.min(count, CAPACITY);
+    var wait = Math.max(0, count - CAPACITY);
+
+    var dots = '';
+    for(var j=0; j<4; j++){
+      if(j < taken) dots += '<div class="wk-car-dot taken"></div>';
+      else if(j >= 4 && j < 4 + wait) dots += '<div class="wk-car-dot wait"></div>';
+      else dots += '<div class="wk-car-dot empty"></div>';
+    }
+    // Add waiting dots if needed
+    if(wait > 0){
+      for(var j=0; j<Math.min(wait,3); j++) dots += '<div class="wk-car-dot wait" title="قائمة انتظار"></div>';
+    }
+
+    var label = i===0?'هذا الأسبوع':i===1?'الأسبوع القادم':'الأسبوع '+ (i+1);
+    var statusText = '';
+    var statusClass = '';
+    if(isFull){
+      statusText = 'ممتلئ · '+wait+' بالانتظار';
+      statusClass = 'wk-full';
+    } else {
+      statusText = 'متاح · '+(CAPACITY-count)+' من '+CAPACITY;
+      statusClass = 'wk-free';
+    }
+
+    var cls = isFull?'week-card full':'week-card';
+    html += '<div class="'+cls+'" data-key="'+week.key+'" onclick="selectWeek(this)" data-label="'+week.label+'" data-start="'+week.start+'" data-end="'+week.end+'"'>';
+    html += '<div class="wk-label">'+label+'</div>';
+    html += '<div class="wk-range">'+fmtDateFull(week.start)+'</div>';
+    html += '<div class="wk-range" style="font-size:12px;color:var(--muted);margin-bottom:4px;">حتى '+fmtDateFull(week.end)+'</div>';
+    html += '<div class="wk-cars">'+dots+'</div>';
+    html += '<div class="wk-status '+statusClass+'">'+statusText+'</div>';
+    html += '</div>';
+  }
+  grid.innerHTML = html;
+}
+
+function selectWeek(el){
+  if(el.classList.contains('full') && confirm('هذا الأسبوع ممتلئ (٤ سيارات). تبي تنضم قائمة الانتظار؟')){
+    // Allow waiting list
+  } else if(el.classList.contains('full')){
+    return;
+  }
+
+  document.querySelectorAll('.week-card').forEach(b=>b.classList.remove('selected'));
   el.classList.add('selected');
-  bookingData.time = key;
-  bookingData.timeLabel = label;
+
+  var key = el.dataset.key;
+  var list = getWeekBookings(key);
+  var count = list.length;
+
+  bookingData.weekKey = key;
+  bookingData.weekLabel = el.dataset.label;
+  bookingData.weekStart = el.dataset.start;
+  bookingData.weekEnd = el.dataset.end;
+  bookingData.totalInWeek = count;
+
+  var qi = document.getElementById('queue-info');
+  var qn = document.getElementById('queue-num');
+  var qt = document.getElementById('queue-text');
+
+  if(count >= CAPACITY){
+    // Waiting list
+    bookingData.position = count + 1;
+    bookingData.isWaiting = true;
+    qi.className = 'queue-box show queue-wait';
+    qn.textContent = '#' + bookingData.position;
+    qt.textContent = 'أنت في قائمة الانتظار لهذا الأسبوع';
+  } else {
+    // Confirmed slot
+    bookingData.position = count + 1;
+    bookingData.isWaiting = false;
+    qi.className = 'queue-box show';
+    qn.textContent = '#' + bookingData.position + ' من ' + CAPACITY;
+    if(bookingData.position === 1) qt.textContent = '🏆 أنت أول حاجز هذا الأسبوع!';
+    else if(bookingData.position === CAPACITY) qt.textContent = 'آخر سيارة متاحة هذا الأسبوع!';
+    else qt.textContent = 'سيارة ' + bookingData.position + ' من أصل ' + CAPACITY;
+  }
+
   document.getElementById('btn-to-3').disabled = false;
 }
 
@@ -354,23 +414,33 @@ function submitBooking(){
   var model = document.getElementById('cust-model').value.trim();
   var notes = document.getElementById('cust-notes').value.trim();
 
-  if(!name || !phone || !plate){ flash('يرجى تعبئة كل الحقول المطلوبة *','error'); return; }
+  if(!name || !phone || !plate){ flash('يرجى تعبئة الحقول المطلوبة *','error'); return; }
 
-  // double check capacity
+  bookingData.name = name;
+  bookingData.phone = phone;
+  bookingData.plate = plate;
+  bookingData.model = model;
+  bookingData.notes = notes;
+
+  // Double check capacity
   var all = bkLoad();
-  var count = all.filter(b=>b.date===bookingData.date && b.time===bookingData.time && b.status!=='cancelled').length;
-  if(count >= CAPACITY){ flash('عذراً، هذه الفترة امتلأت بالكامل!','error'); renderTimes(bookingData.date); return; }
+  var count = all.filter(b=>b.weekKey===bookingData.weekKey && b.status!=='cancelled').length;
+  if(count >= CAPACITY && !bookingData.isWaiting){
+    // Shouldn't happen but handle it
+    bookingData.isWaiting = true;
+    bookingData.position = count + 1;
+  }
 
-  bookingData.name = name; bookingData.phone = phone; bookingData.plate = plate;
-  bookingData.model = model; bookingData.notes = notes;
-
-  var bkId = 'BK-'+Math.floor(10000+Math.random()*90000);
+  var bkId = 'BK-' + Math.floor(10000 + Math.random()*90000);
   var record = {
     id: bkId,
     service: bookingData.service,
-    date: bookingData.date,
-    time: bookingData.time,
-    timeLabel: bookingData.timeLabel,
+    weekKey: bookingData.weekKey,
+    weekLabel: bookingData.weekLabel,
+    weekStart: bookingData.weekStart,
+    weekEnd: bookingData.weekEnd,
+    position: bookingData.position,
+    isWaiting: bookingData.isWaiting,
     customerName: name,
     phone: phone,
     plate: plate,
@@ -384,12 +454,26 @@ function submitBooking(){
 
   // Show confirmation
   document.getElementById('confirm-id').textContent = bkId;
-  document.getElementById('confirm-summary').innerHTML = 
+
+  var waitMsg = '';
+  var queueHtml = '';
+  if(bookingData.isWaiting){
+    document.getElementById('confirm-wait-msg').textContent = 'هذا الأسبوع ممتلئ · أنت في قائمة الانتظار';
+    waitMsg = '⚠️ الأسبوع ممتلئ · أنت #' + bookingData.position + ' في الانتظار';
+    queueHtml = '<div style="color:var(--gold);font-weight:700;">#'+bookingData.position+' في قائمة الانتظار</div><div style="font-size:12px;color:var(--muted);margin-top:4px;">سننبهك لو صار مكان متاح</div>';
+  } else {
+    document.getElementById('confirm-wait-msg').textContent = 'تم التأكيد · سيتم التواصل معك';
+    waitMsg = '✅ سيارة #' + bookingData.position + ' من ' + CAPACITY;
+    queueHtml = '<div style="color:var(--success);font-weight:700;">#'+bookingData.position+' من '+CAPACITY+'</div><div style="font-size:12px;color:var(--muted);margin-top:4px;">أولوية الكاملة</div>';
+  }
+
+  document.getElementById('confirm-summary').innerHTML =
     '<div class="sum-row"><span class="sum-label">الاسم:</span><span class="sum-val">'+name+'</span></div>'+
     '<div class="sum-row"><span class="sum-label">الخدمة:</span><span class="sum-val">'+bookingData.service+'</span></div>'+
-    '<div class="sum-row"><span class="sum-label">التاريخ:</span><span class="sum-val">'+fmtDate(bookingData.date)+'</span></div>'+
-    '<div class="sum-row"><span class="sum-label">الوقت:</span><span class="sum-val">'+bookingData.timeLabel+'</span></div>'+
-    '<div class="sum-row"><span class="sum-label">رقم اللوحة:</span><span class="sum-val">'+plate+'</span></div>';
+    '<div class="sum-row"><span class="sum-label">الأسبوع:</span><span class="sum-val">'+bookingData.weekLabel+'</span></div>'+
+    '<div class="sum-row"><span class="sum-label">اللوحة:</span><span class="sum-val">'+plate+'</span></div>';
+
+  document.getElementById('confirm-queue').innerHTML = queueHtml;
 
   // WhatsApp
   var msg = 'مرحباً%20اللمسة%20الأخيرة،%20أرغب%20في%20الاستفسار%20عن%20حجزي%20'+bkId+'%20'+name+'%20'+plate;
@@ -399,7 +483,6 @@ function submitBooking(){
 }
 
 // init
-renderDates();
 </script>
 </body>
 </html>
