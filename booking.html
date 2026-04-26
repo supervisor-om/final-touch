@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="cache-control" content="no-cache, no-store, must-revalidate">
+<meta name="pragma" content="no-cache">
+<meta name="expires" content="0">
 <title>حجز موعد — اللمسة الأخيرة</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0f3460">
@@ -18,42 +21,30 @@
 *{margin:0;padding:0;box-sizing:border-box;}
 body{font-family:var(--font-main);background:var(--primary);color:var(--text);min-height:100vh;direction:rtl;}
 body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 50%,rgba(233,69,96,.08) 0%,transparent 50%),radial-gradient(ellipse at 80% 20%,rgba(79,172,254,.08) 0%,transparent 50%);pointer-events:none;z-index:0;}
-
 .header{padding:20px 0;text-align:center;border-bottom:1px solid var(--border);background:rgba(15,52,96,.5);backdrop-filter:blur(10px);position:relative;z-index:1;}
 .logo-img{width:90px;height:90px;object-fit:contain;display:block;margin:0 auto 8px;filter:drop-shadow(0 4px 20px rgba(233,69,96,.5));}
 .brand{font-family:var(--font-display);font-size:24px;font-weight:900;}
 .brand-sub{font-size:13px;color:var(--muted);margin-top:2px;}
-
 .wrap{max-width:640px;margin:0 auto;padding:24px 16px;position:relative;z-index:1;}
-.page-title{font-size:18px;font-weight:800;margin-bottom:20px;text-align:center;}
-
-/* ─── Steps ─── */
 .steps{display:flex;justify-content:center;gap:8px;margin-bottom:24px;flex-wrap:wrap;}
 .step{display:flex;align-items:center;gap:6px;padding:8px 16px;border-radius:24px;background:rgba(255,255,255,.05);border:1px solid var(--border);font-size:13px;font-weight:700;color:var(--muted);transition:all .3s;}
 .step.active{background:linear-gradient(135deg,var(--accent),#ff6b35);color:#fff;border-color:transparent;}
 .step.done{background:rgba(0,212,170,.1);border-color:rgba(0,212,170,.3);color:var(--success);}
-
-/* ─── Cards ─── */
 .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:16px;overflow:hidden;backdrop-filter:blur(10px);}
 .card-header{padding:16px 20px;border-bottom:1px solid var(--border);font-size:15px;font-weight:800;}
 .card-body{padding:20px;}
-
-/* ─── Service options ─── */
-.services-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;}
-.svc-btn{padding:14px 12px;border:2px solid var(--border);background:rgba(255,255,255,.04);border-radius:14px;color:var(--text);font-family:var(--font-main);font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;text-align:center;position:relative;}
+.services-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.svc-btn{padding:28px 16px;border:2px solid var(--border);background:rgba(255,255,255,.04);border-radius:14px;color:var(--text);font-family:var(--font-main);font-size:18px;font-weight:700;cursor:pointer;transition:all .2s;text-align:center;position:relative;}
 .svc-btn:hover{border-color:rgba(255,255,255,.2);background:rgba(255,255,255,.07);}
 .svc-btn.selected{border-color:var(--accent);background:rgba(233,69,96,.1);box-shadow:0 4px 15px rgba(233,69,96,.15);}
-.svc-btn .svc-emoji{font-size:24px;display:block;margin-bottom:6px;}
-.svc-btn .svc-name{font-size:12px;}
-
-/* ─── Week Grid ─── */
+.svc-btn .svc-emoji{font-size:36px;display:block;margin-bottom:8px;}
+.svc-btn .svc-name{font-size:16px;display:block;}
 .week-grid{display:grid;grid-template-columns:1fr;gap:12px;margin-top:12px;}
 @media(min-width:500px){.week-grid{grid-template-columns:repeat(2,1fr);}}
 .week-card{padding:16px;border:1px solid var(--border);background:rgba(255,255,255,.04);border-radius:14px;cursor:pointer;transition:all .2s;position:relative;text-align:center;}
 .week-card:hover{border-color:rgba(79,172,254,.4);background:rgba(79,172,254,.05);}
 .week-card.selected{border-color:var(--success);background:rgba(0,212,170,.08);box-shadow:0 4px 15px rgba(0,212,170,.1);}
 .week-card.full{opacity:.6;cursor:not-allowed;border-color:rgba(233,69,96,.2);background:rgba(233,69,96,.03);}
-.week-card.full:hover{border-color:rgba(233,69,96,.2);background:rgba(233,69,96,.03);}
 .week-card .wk-label{font-size:11px;color:var(--muted);font-weight:700;margin-bottom:4px;}
 .week-card .wk-range{font-size:14px;font-weight:800;margin-bottom:8px;}
 .week-card .wk-cars{display:flex;justify-content:center;gap:6px;margin-bottom:8px;}
@@ -64,72 +55,53 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .week-card .wk-status{font-size:12px;font-weight:700;margin-top:4px;}
 .week-card .wk-free{color:var(--success);}
 .week-card .wk-full{color:var(--danger);}
-.week-card .wk-wl{color:var(--gold);}
-
-/* ─── Queue Info ─── */
 .queue-box{display:none;background:rgba(0,212,170,.08);border:1px solid rgba(0,212,170,.25);border-radius:12px;padding:16px;margin:16px 0;text-align:center;}
 .queue-box.show{display:block;}
 .queue-num{font-family:var(--font-display);font-size:36px;font-weight:900;color:var(--success);}
 .queue-total{font-size:14px;color:var(--muted);}
 .queue-wait{background:rgba(245,166,35,.08);border-color:rgba(245,166,35,.25);}
 .queue-wait .queue-num{color:var(--gold);}
-
-/* ─── Form ─── */
 .form-grid{display:grid;grid-template-columns:1fr;gap:14px;}
 @media(min-width:500px){.form-grid{grid-template-columns:1fr 1fr;}.form-group.full{grid-column:1/-1;}}
 .form-group{display:flex;flex-direction:column;gap:6px;}
-label{font-size:12px;font-weight:600;color:var(--muted);}
-input,select,textarea{background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--text);font-family:var(--font-main);font-size:14px;transition:border-color .2s;width:100%;direction:rtl;}
-input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);background:rgba(233,69,96,.05);}
+input,textarea{background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--text);font-family:var(--font-main);font-size:14px;transition:border-color .2s;width:100%;direction:rtl;}
+input:focus,textarea:focus{outline:none;border-color:var(--accent);background:rgba(233,69,96,.05);}
 textarea{resize:vertical;min-height:70px;}
-
 .btn{padding:13px 24px;border:none;border-radius:12px;font-family:var(--font-main);font-size:15px;font-weight:800;cursor:pointer;transition:all .2s;width:100%;text-align:center;}
 .btn-primary{background:linear-gradient(135deg,var(--accent),#ff6b35);color:#fff;box-shadow:0 6px 20px rgba(233,69,96,.3);}
 .btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(233,69,96,.4);}
 .btn-primary:disabled{background:rgba(255,255,255,.1);color:var(--muted);box-shadow:none;cursor:not-allowed;transform:none;}
 .btn-back{background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);}
-.btn-back:hover{background:rgba(255,255,255,.1);}
-
+.btn-back:hover{background:rgba(255,255,255,.11);}
 .back-link{color:var(--muted);font-size:13px;text-decoration:none;display:inline-flex;align-items:center;gap:6px;margin-bottom:12px;}
 .back-link:hover{color:var(--text);}
-
 .step-content{display:none;animation:fadeIn .3s ease;}
 .step-content.active{display:block;}
 @keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
-
-/* ─── Summary ─── */
 .sum-row{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);font-size:14px;}
 .sum-row:last-child{border-bottom:none;}
 .sum-label{color:var(--muted);}
 .sum-val{font-weight:700;}
-
-/* ─── Confirmation ─── */
 .confirm-card{background:rgba(0,212,170,.08);border:1px solid rgba(0,212,170,.25);border-radius:var(--radius);padding:30px;text-align:center;}
 .confirm-emoji{font-size:48px;margin-bottom:12px;}
 .confirm-title{font-size:20px;font-weight:900;margin-bottom:6px;}
 .confirm-sub{font-size:14px;color:var(--muted);margin-bottom:16px;}
 .booking-id{font-family:var(--font-display);font-size:28px;font-weight:900;color:var(--success);letter-spacing:2px;background:rgba(0,212,170,.1);padding:10px 24px;border-radius:12px;display:inline-block;margin-bottom:16px;border:1px dashed var(--success);}
-
 .whatsapp-btn{display:inline-flex;align-items:center;gap:8px;padding:12px 20px;background:linear-gradient(135deg,#25d366,#128c7e);color:#fff;border-radius:12px;text-decoration:none;font-weight:700;font-size:14px;transition:all .2s;margin-top:10px;}
 .whatsapp-btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(37,211,102,.3);}
-
 .flash{position:fixed;top:20px;left:50%;transform:translateX(-50%);padding:12px 24px;border-radius:12px;font-size:14px;font-weight:700;z-index:300;display:none;}
 .flash.success{background:rgba(0,212,170,.15);border:1px solid var(--success);color:var(--success);}
 .flash.error{background:rgba(233,69,96,.15);border:1px solid var(--danger);color:var(--danger);}
-
 .warn-box{background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.25);border-radius:10px;padding:12px 16px;margin:16px 0;font-size:13px;color:var(--warning);text-align:center;}
 </style>
 </head>
 <body>
-
 <div id="flash" class="flash"></div>
-
 <div class="header">
   <img src="icon-192.png" alt="logo" class="logo-img">
   <div class="brand">اللمسة الأخيرة</div>
   <div class="brand-sub">حجز موعد للورشة · ٤ سيارات في الأسبوع</div>
 </div>
-
 <div class="wrap">
   <a href="track.html" class="back-link">← العودة لتتبع السيارة</a>
 
@@ -140,17 +112,16 @@ textarea{resize:vertical;min-height:70px;}
     <div class="step" id="step-4"><span>4</span> التأكيد</div>
   </div>
 
-  <!-- STEP 1: SERVICE -->
   <div id="content-1" class="step-content active">
     <div class="card">
       <div class="card-header">🛠️ اختر نوع الخدمة</div>
       <div class="card-body">
         <div class="services-grid" id="services-grid" style="grid-template-columns:1fr 1fr;">
-          <button id="svc-body" class="svc-btn" data-svc="سمكرة ودهان" onclick="selectService('svc-body')" style="padding:28px 16px;font-size:18px;">
+          <button id="svc-body" class="svc-btn" data-svc="سمكرة ودهان" style="padding:28px 16px;font-size:18px;">
             <span class="svc-emoji" style="font-size:36px;">🎨</span>
             <span class="svc-name" style="font-size:16px;">سمكرة ودهان</span>
           </button>
-          <button id="svc-mech" class="svc-btn" data-svc="صيانة وكهرباء" onclick="selectService('svc-mech')" style="padding:28px 16px;font-size:18px;">
+          <button id="svc-mech" class="svc-btn" data-svc="صيانة وكهرباء" style="padding:28px 16px;font-size:18px;">
             <span class="svc-emoji" style="font-size:36px;">⚡</span>
             <span class="svc-name" style="font-size:16px;">صيانة وكهرباء</span>
           </button>
@@ -159,29 +130,24 @@ textarea{resize:vertical;min-height:70px;}
     </div>
   </div>
 
-  <!-- STEP 2: WEEK SELECTION -->
   <div id="content-2" class="step-content">
     <div class="warn-box">⚡ الورشة تستقبل <strong>٤ سيارات في الأسبوع</strong> فقط · سارع بالحجز!</div>
-
     <div class="card">
       <div class="card-header">📅 اختر أسبوع الحجز</div>
       <div class="card-body">
         <div class="week-grid" id="week-grid"></div>
-
         <div class="queue-box" id="queue-info">
           <div class="queue-num" id="queue-num">#</div>
           <div class="queue-total" id="queue-text"></div>
         </div>
       </div>
     </div>
-
     <div style="display:flex;gap:10px;">
       <button class="btn btn-back" onclick="prevStep()">↩️ السابق</button>
       <button class="btn btn-primary" id="btn-to-3" onclick="nextStep()" disabled>التالي →</button>
     </div>
   </div>
 
-  <!-- STEP 3: DETAILS -->
   <div id="content-3" class="step-content">
     <div class="card">
       <div class="card-header">📝 بياناتك</div>
@@ -216,18 +182,14 @@ textarea{resize:vertical;min-height:70px;}
     </div>
   </div>
 
-  <!-- STEP 4: CONFIRMATION -->
   <div id="content-4" class="step-content">
     <div class="confirm-card">
       <div class="confirm-emoji">🎉</div>
       <div class="confirm-title">تم الحجز بنجاح!</div>
-      <div class="confirm-sub" id="confirm-wait-msg">سيتم التواصل معك للتأكيد</div>
+      <div class="confirm-sub" id="confirm-wait-msg"></div>
       <div class="booking-id" id="confirm-id">BK-00000</div>
-
       <div id="confirm-summary" style="margin-bottom:16px;text-align:right;"></div>
-
       <div id="confirm-queue" style="background:rgba(255,255,255,.05);border-radius:10px;padding:12px;margin-bottom:16px;font-size:13px;"></div>
-
       <a href="#" class="whatsapp-btn" id="wa-share">📱 شارك في واتساب</a><br>
       <a href="track.html" class="whatsapp-btn" style="background:var(--info);margin-top:8px;">🔍 تتبع سيارتك</a>
     </div>
@@ -235,17 +197,14 @@ textarea{resize:vertical;min-height:70px;}
 </div>
 
 <script>
-// ================= WEEKLY BOOKING SYSTEM =================
-
 var currentStep = 1;
 var bookingData = {
   service:'', weekKey:'', weekLabel:'',
   weekStart:'', weekEnd:'', position:0, totalInWeek:0,
   name:'', phone:'', plate:'', model:'', notes:'', isWaiting:false
 };
-
-var CAPACITY = 4; // 4 cars per week
-var WEEKS_TO_SHOW = 8; // show next 8 weeks
+var CAPACITY = 4;
+var WEEKS_TO_SHOW = 8;
 
 function nowISO(){return new Date().toISOString();}
 
@@ -256,55 +215,44 @@ function flash(msg,type){
   setTimeout(function(){el.style.display='none';},3000);
 }
 
-// ─── DB ───
-var BK_STORES = { bookings: 'finaltouch_bookings' };
-function bkLoad(){ try{var r=localStorage.getItem(BK_STORES.bookings); if(r) return JSON.parse(r);}catch(e){} return []; }
-function bkSave(data){ try{localStorage.setItem(BK_STORES.bookings, JSON.stringify(data));}catch(e){} }
+function bkLoad(){ try{var r=localStorage.getItem('finaltouch_bookings'); if(r) return JSON.parse(r);}catch(e){} return []; }
+function bkSave(data){ try{localStorage.setItem('finaltouch_bookings',JSON.stringify(data));}catch(e){} }
 
-// ─── STEP NAV ───
 function goToStep(n){
-  document.querySelectorAll('.step-content').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.step-content').forEach(function(s){s.classList.remove('active');});
   document.getElementById('content-'+n).classList.add('active');
-  for(var i=1;i<=4;i++){var s=document.getElementById('step-'+i); s.classList.remove('active','done'); if(i<n)s.classList.add('done'); if(i===n)s.classList.add('active'); }
+  for(var i=1;i<=4;i++){
+    var s=document.getElementById('step-'+i);
+    s.classList.remove('active','done');
+    if(i<n)s.classList.add('done');
+    if(i===n)s.classList.add('active');
+  }
   currentStep=n;
 }
 function nextStep(){ if(currentStep<4) goToStep(currentStep+1); }
 function prevStep(){ if(currentStep>1) goToStep(currentStep-1); }
 
-// ─── STEP 1: Service ───
 function selectService(id){
   var btn = document.getElementById(id);
   if(!btn || !btn.dataset || !btn.dataset.svc) return;
-  document.querySelectorAll('.svc-btn').forEach(b=>b.classList.remove('selected'));
+  document.querySelectorAll('.svc-btn').forEach(function(b){b.classList.remove('selected');});
   btn.classList.add('selected');
   bookingData.service = btn.dataset.svc;
   nextStep();
   renderWeeks();
 }
 
-// ─── STEP 2: Week Selection ───
 function getWeekRange(offset){
   var now = new Date();
   var d = new Date(now);
-  // Start from Monday (or Sunday — let's use Sunday as start)
-  var day = d.getDay(); // 0=Sun
+  var day = d.getDay();
   d.setDate(d.getDate() - day + (offset * 7));
   var end = new Date(d); end.setDate(d.getDate() + 6);
-  var key = d.toISOString().split('T')[0];
   return {
-    key: key,
-    start: key,
-    startDate: d,
-    end: end.toISOString().split('T')[0],
-    endDate: end,
-    label: formatWeekRange(d, end)
+    key: d.toISOString().split('T')[0],
+    start: d.toISOString().split('T')[0],
+    label: d.getDate()+'/'+(d.getMonth()+1)+' – '+end.getDate()+'/'+(end.getMonth()+1)
   };
-}
-
-function formatWeekRange(s, e){
-  var sm = s.getMonth() + 1, sd = s.getDate();
-  var em = e.getMonth() + 1, ed = e.getDate();
-  return sd + '/' + sm + ' – ' + ed + '/' + em;
 }
 
 function fmtDateFull(iso){
@@ -315,14 +263,13 @@ function fmtDateFull(iso){
 
 function getWeekBookings(weekKey){
   var all = bkLoad();
-  return all.filter(b => b.weekKey === weekKey && b.status !== 'cancelled').sort((a,b)=>new Date(a.createdAt)-new Date(b.createdAt));
+  return all.filter(function(b){ return b.weekKey === weekKey && b.status !== 'cancelled'; })
+    .sort(function(a,b){ return new Date(a.createdAt)-new Date(b.createdAt); });
 }
 
 function renderWeeks(){
   var grid = document.getElementById('week-grid');
   var html = '';
-  var now = new Date();
-
   for(var i=0; i<WEEKS_TO_SHOW; i++){
     var week = getWeekRange(i);
     var list = getWeekBookings(week.key);
@@ -334,30 +281,21 @@ function renderWeeks(){
     var dots = '';
     for(var j=0; j<4; j++){
       if(j < taken) dots += '<div class="wk-car-dot taken"></div>';
-      else if(j >= 4 && j < 4 + wait) dots += '<div class="wk-car-dot wait"></div>';
       else dots += '<div class="wk-car-dot empty"></div>';
     }
-    // Add waiting dots if needed
     if(wait > 0){
-      for(var j=0; j<Math.min(wait,3); j++) dots += '<div class="wk-car-dot wait" title="قائمة انتظار"></div>';
+      for(var j=0; j<Math.min(wait,3); j++) dots += '<div class="wk-car-dot wait" title="انتظار"></div>';
     }
 
-    var label = i===0?'هذا الأسبوع':i===1?'الأسبوع القادم':'الأسبوع '+ (i+1);
-    var statusText = '';
-    var statusClass = '';
-    if(isFull){
-      statusText = 'ممتلئ · '+wait+' بالانتظار';
-      statusClass = 'wk-full';
-    } else {
-      statusText = 'متاح · '+(CAPACITY-count)+' من '+CAPACITY;
-      statusClass = 'wk-free';
-    }
+    var label = i===0?'هذا الأسبوع':i===1?'الأسبوع القادم':'الأسبوع '+(i+1);
+    var statusText = isFull ? ('ممتلئ · '+wait+' بالانتظار') : ('متاح · '+(CAPACITY-count)+' من '+CAPACITY);
+    var statusClass = isFull ? 'wk-full' : 'wk-free';
+    var cls = isFull ? 'week-card full' : 'week-card';
 
-    var cls = isFull?'week-card full':'week-card';
-    html += '<div class="'+cls+'" data-key="'+week.key+'" onclick="selectWeek(this)" data-label="'+week.label+'" data-start="'+week.start+'" data-end="'+week.end+'"'>';
+    html += '<div class="'+cls+'" data-key="'+week.key+'" data-label="'+week.label+'" data-start="'+week.start+'" onclick="pickWeek(\''+week.key+'\')">';
     html += '<div class="wk-label">'+label+'</div>';
     html += '<div class="wk-range">'+fmtDateFull(week.start)+'</div>';
-    html += '<div class="wk-range" style="font-size:12px;color:var(--muted);margin-bottom:4px;">حتى '+fmtDateFull(week.end)+'</div>';
+    html += '<div class="wk-range" style="font-size:12px;color:var(--muted);margin-bottom:4px;">حتى '+fmtDateFull(week.start)+'</div>';
     html += '<div class="wk-cars">'+dots+'</div>';
     html += '<div class="wk-status '+statusClass+'">'+statusText+'</div>';
     html += '</div>';
@@ -365,24 +303,26 @@ function renderWeeks(){
   grid.innerHTML = html;
 }
 
-function selectWeek(el){
-  if(el.classList.contains('full') && confirm('هذا الأسبوع ممتلئ (٤ سيارات). تبي تنضم قائمة الانتظار؟')){
-    // Allow waiting list
-  } else if(el.classList.contains('full')){
+function pickWeek(key){
+  var list = getWeekBookings(key);
+  var count = list.length;
+  var week = getWeekRange(parseInt(key)); // find week object
+
+  // Find the card element
+  var el = document.querySelector('.week-card[data-key="'+key+'"]');
+  if(!el) return;
+
+  if(el.classList.contains('full') && !confirm('هذا الأسبوع ممتلئ (٤ سيارات). تبي تنضم قائمة الانتظار؟')){
     return;
   }
 
-  document.querySelectorAll('.week-card').forEach(b=>b.classList.remove('selected'));
+  document.querySelectorAll('.week-card').forEach(function(b){b.classList.remove('selected');});
   el.classList.add('selected');
 
-  var key = el.dataset.key;
-  var list = getWeekBookings(key);
-  var count = list.length;
-
   bookingData.weekKey = key;
-  bookingData.weekLabel = el.dataset.label;
-  bookingData.weekStart = el.dataset.start;
-  bookingData.weekEnd = el.dataset.end;
+  bookingData.weekLabel = el.getAttribute('data-label') || '';
+  bookingData.weekStart = el.getAttribute('data-start') || '';
+  bookingData.weekEnd = el.getAttribute('data-end') || '';
   bookingData.totalInWeek = count;
 
   var qi = document.getElementById('queue-info');
@@ -390,14 +330,12 @@ function selectWeek(el){
   var qt = document.getElementById('queue-text');
 
   if(count >= CAPACITY){
-    // Waiting list
     bookingData.position = count + 1;
     bookingData.isWaiting = true;
     qi.className = 'queue-box show queue-wait';
     qn.textContent = '#' + bookingData.position;
     qt.textContent = 'أنت في قائمة الانتظار لهذا الأسبوع';
   } else {
-    // Confirmed slot
     bookingData.position = count + 1;
     bookingData.isWaiting = false;
     qi.className = 'queue-box show';
@@ -410,7 +348,6 @@ function selectWeek(el){
   document.getElementById('btn-to-3').disabled = false;
 }
 
-// ─── STEP 3: Submit ───
 function submitBooking(){
   var name = document.getElementById('cust-name').value.trim();
   var phone = document.getElementById('cust-phone').value.trim();
@@ -420,54 +357,36 @@ function submitBooking(){
 
   if(!name || !phone || !plate){ flash('يرجى تعبئة الحقول المطلوبة *','error'); return; }
 
-  bookingData.name = name;
-  bookingData.phone = phone;
-  bookingData.plate = plate;
-  bookingData.model = model;
-  bookingData.notes = notes;
+  bookingData.name = name; bookingData.phone = phone;
+  bookingData.plate = plate; bookingData.model = model; bookingData.notes = notes;
 
-  // Double check capacity
   var all = bkLoad();
-  var count = all.filter(b=>b.weekKey===bookingData.weekKey && b.status!=='cancelled').length;
+  var count = all.filter(function(b){ return b.weekKey===bookingData.weekKey && b.status!=='cancelled'; }).length;
   if(count >= CAPACITY && !bookingData.isWaiting){
-    // Shouldn't happen but handle it
     bookingData.isWaiting = true;
     bookingData.position = count + 1;
   }
 
   var bkId = 'BK-' + Math.floor(10000 + Math.random()*90000);
   var record = {
-    id: bkId,
-    service: bookingData.service,
-    weekKey: bookingData.weekKey,
-    weekLabel: bookingData.weekLabel,
-    weekStart: bookingData.weekStart,
-    weekEnd: bookingData.weekEnd,
-    position: bookingData.position,
-    isWaiting: bookingData.isWaiting,
-    customerName: name,
-    phone: phone,
-    plate: plate,
-    model: model,
-    notes: notes,
-    status: 'pending',
-    createdAt: nowISO()
+    id: bkId, service: bookingData.service,
+    weekKey: bookingData.weekKey, weekLabel: bookingData.weekLabel,
+    weekStart: bookingData.weekStart, weekEnd: bookingData.weekEnd,
+    position: bookingData.position, isWaiting: bookingData.isWaiting,
+    customerName: name, phone: phone, plate: plate, model: model,
+    notes: notes, status: 'pending', createdAt: nowISO()
   };
   all.push(record);
   bkSave(all);
 
-  // Show confirmation
   document.getElementById('confirm-id').textContent = bkId;
 
-  var waitMsg = '';
-  var queueHtml = '';
+  var queueHtml;
   if(bookingData.isWaiting){
     document.getElementById('confirm-wait-msg').textContent = 'هذا الأسبوع ممتلئ · أنت في قائمة الانتظار';
-    waitMsg = '⚠️ الأسبوع ممتلئ · أنت #' + bookingData.position + ' في الانتظار';
     queueHtml = '<div style="color:var(--gold);font-weight:700;">#'+bookingData.position+' في قائمة الانتظار</div><div style="font-size:12px;color:var(--muted);margin-top:4px;">سننبهك لو صار مكان متاح</div>';
   } else {
     document.getElementById('confirm-wait-msg').textContent = 'تم التأكيد · سيتم التواصل معك';
-    waitMsg = '✅ سيارة #' + bookingData.position + ' من ' + CAPACITY;
     queueHtml = '<div style="color:var(--success);font-weight:700;">#'+bookingData.position+' من '+CAPACITY+'</div><div style="font-size:12px;color:var(--muted);margin-top:4px;">أولوية الكاملة</div>';
   }
 
@@ -479,14 +398,17 @@ function submitBooking(){
 
   document.getElementById('confirm-queue').innerHTML = queueHtml;
 
-  // WhatsApp
   var msg = 'مرحباً%20اللمسة%20الأخيرة،%20أرغب%20في%20الاستفسار%20عن%20حجزي%20'+bkId+'%20'+name+'%20'+plate;
   document.getElementById('wa-share').href = 'https://wa.me/?text='+msg;
 
   goToStep(4);
 }
 
-// init
+// Wire up buttons after DOM ready
+document.addEventListener('DOMContentLoaded', function(){
+  document.getElementById('svc-body').addEventListener('click', function(){ selectService('svc-body'); });
+  document.getElementById('svc-mech').addEventListener('click', function(){ selectService('svc-mech'); });
+});
 </script>
 </body>
 </html>
