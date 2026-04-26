@@ -145,13 +145,15 @@ textarea{resize:vertical;min-height:70px;}
     <div class="card">
       <div class="card-header">🛠️ اختر نوع الخدمة</div>
       <div class="card-body">
-        <div class="services-grid" id="services-grid">
-          <button class="svc-btn" data-svc="صيانة ميكانيكية" onclick="selectService(this)"><span class="svc-emoji">🔧</span><span class="svc-name">صيانة ميكانيكية</span></button>
-          <button class="svc-btn" data-svc="سمكرة وإصلاح هيكل" onclick="selectService(this)"><span class="svc-emoji">🔨</span><span class="svc-name">سمكرة وإصلاح هيكل</span></button>
-          <button class="svc-btn" data-svc="دهان وتلميع" onclick="selectService(this)"><span class="svc-emoji">🎨</span><span class="svc-name">دهان وتلميع</span></button>
-          <button class="svc-btn" data-svc="فحص دوري" onclick="selectService(this)"><span class="svc-emoji">📋</span><span class="svc-name">فحص دوري MoT</span></button>
-          <button class="svc-btn" data-svc="إصلاح كهرباء" onclick="selectService(this)"><span class="svc-emoji">⚡</span><span class="svc-name">إصلاح كهرباء</span></button>
-          <button class="svc-btn" data-svc="أخرى" onclick="selectService(this)"><span class="svc-emoji">🔩</span><span class="svc-name">خدمة أخرى</span></button>
+        <div class="services-grid" id="services-grid" style="grid-template-columns:1fr 1fr;">
+            <button class="svc-btn" data-svc="سمكرة ودهان" onclick="selectService(this)" style="padding:28px 16px;font-size:18px;">
+            <span class="svc-emoji" style="font-size:36px;">🎨</span>
+            <span class="svc-name" style="font-size:16px;">سمكرة ودهان</span>
+          </button>
+          <button class="svc-btn" data-svc="صيانة وكهرباء" onclick="selectService(this)" style="padding:28px 16px;font-size:18px;">
+            <span class="svc-emoji" style="font-size:36px;">⚡</span>
+            <span class="svc-name" style="font-size:16px;">صيانة وكهرباء</span>
+          </button>
         </div>
       </div>
     </div>

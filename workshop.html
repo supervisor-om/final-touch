@@ -1235,9 +1235,8 @@ label{font-size:14px;}
       <div style="margin-bottom:14px;">
         <label style="font-size:12px;font-weight:700;color:var(--muted);" data-i18n="lbl_quick_service">⚡ خدمة سريعة</label>
         <div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:7px;">
-          <button type="button" class="quick-svc-btn" onclick="setQuickService('صيانة ميكانيكية')">🔧 صيانة</button>
-          <button type="button" class="quick-svc-btn" onclick="setQuickService('سمكرة وهيكل')">🔨 سمكرة</button>
-          <button type="button" class="quick-svc-btn" onclick="setQuickService('دهان وتلميع')">🎨 دهان</button>
+          <button type="button" class="quick-svc-btn" onclick="setQuickService('سمكرة ودهان')">🎨 سمكرة ودهان</button>
+          <button type="button" class="quick-svc-btn" onclick="setQuickService('صيانة وكهرباء')">⚡ صيانة وكهرباء</button>
           <button type="button" class="quick-svc-btn" onclick="setQuickService('خدمة شاملة')">⭐ شاملة</button>
           <button type="button" class="quick-svc-btn" onclick="setQuickService('تغيير زيت')">🛢️ زيت</button>
           <button type="button" class="quick-svc-btn" onclick="setQuickService('فرامل')">🛑 فرامل</button>
@@ -1273,9 +1272,8 @@ label{font-size:14px;}
         <div class="form-group"><label data-i18n="lbl_car_model_opt">موديل السيارة</label><input type="text" id="car-model" placeholder="مثال: Toyota Camry 2022"></div>
         <div class="form-group"><label data-i18n="lbl_service_type_req">نوع الخدمة *</label>
           <select id="car-service">
-            <option value="صيانة ميكانيكية">🔧 صيانة ميكانيكية</option>
-            <option value="سمكرة وهيكل">🔨 سمكرة وهيكل</option>
-            <option value="دهان وتلميع">🎨 دهان وتلميع</option>
+            <option value="سمكرة ودهان">🎨 سمكرة ودهان</option>
+            <option value="صيانة وكهرباء">⚡ صيانة وكهرباء</option>
             <option value="خدمة شاملة">⭐ خدمة شاملة</option>
             <option value="تغيير زيت">🛢️ تغيير زيت</option>
             <option value="فرامل">🛑 فرامل</option>
@@ -1453,9 +1451,8 @@ label{font-size:14px;}
         <div class="form-group"><label data-i18n="lbl_car_select">السيارة</label><select id="order-car"></select></div>
         <div class="form-group"><label data-i18n="lbl_work_type_lbl">نوع العمل</label>
           <select id="order-type">
-            <option value="صيانة ميكانيكية">صيانة ميكانيكية</option>
-            <option value="سمكرة">سمكرة وهيكل</option>
-            <option value="دهان">دهان وتلميع</option>
+            <option value="سمكرة ودهان">سمكرة ودهان</option>
+            <option value="صيانة وكهرباء">صيانة وكهرباء</option>
             <option value="كهرباء">كهرباء ودوائر</option>
             <option value="تكييف">نظام التكييف</option>
             <option value="إطارات">إطارات وفرامل</option>
@@ -1498,9 +1495,8 @@ label{font-size:14px;}
         <div class="form-group"><label data-i18n="lbl_service_name_req">اسم الخدمة *</label><input type="text" id="svc-name" placeholder="مثال: تغيير زيت المحرك"></div>
         <div class="form-group"><label data-i18n="th_type">النوع</label>
           <select id="svc-type">
-            <option value="صيانة">صيانة ميكانيكية</option>
-            <option value="سمكرة">سمكرة وهيكل</option>
-            <option value="دهان">دهان وتلميع</option>
+            <option value="سمكرة ودهان">سمكرة ودهان</option>
+            <option value="صيانة وكهرباء">صيانة وكهرباء</option>
             <option value="كهرباء">كهرباء</option>
             <option value="أخرى">أخرى</option>
           </select>
@@ -1637,13 +1633,12 @@ let state = {
     {icon:'📦',label:'تسليم'},
   ],
   stageTemplates:{
-    'دهان وتلميع':    [{icon:'📋',label:'استلام'},{icon:'⏳',label:'في الانتظار'},{icon:'🛠️',label:'تشطيبات قبل الدهان'},{icon:'🎨',label:'دهان السيارة'},{icon:'✅',label:'جاهزة'},{icon:'📦',label:'تسليم'}],
-    'صيانة ميكانيكية':[{icon:'📋',label:'استلام'},{icon:'🔍',label:'تشخيص'},{icon:'🔧',label:'إصلاح'},{icon:'✅',label:'جاهزة'},{icon:'📦',label:'تسليم'}],
-    'سمكرة وهيكل':   [{icon:'📋',label:'استلام'},{icon:'🔍',label:'تشخيص'},{icon:'🔨',label:'سمكرة'},{icon:'🎨',label:'دهان'},{icon:'✅',label:'جاهزة'},{icon:'📦',label:'تسليم'}],
+    'صيانة وكهرباء':[{icon:'📋',label:'استلام'},{icon:'🔍',label:'تشخيص'},{icon:'🔧',label:'إصلاح الميكانيك والكهرباء'},{icon:'✅',label:'جاهزة'},{icon:'📦',label:'تسليم'}],
+    'سمكرة ودهان':   [{icon:'📋',label:'استلام'},{icon:'🔍',label:'تشخيص'},{icon:'🔨',label:'سمكرة'},{icon:'🎨',label:'دهان'},{icon:'✅',label:'جاهزة'},{icon:'📦',label:'تسليم'}],
     'خدمة شاملة':    [{icon:'📋',label:'استلام'},{icon:'🔍',label:'تشخيص'},{icon:'🔧',label:'إصلاح'},{icon:'🔨',label:'سمكرة'},{icon:'🎨',label:'دهان'},{icon:'✅',label:'جاهزة'},{icon:'📦',label:'تسليم'}],
     'تغيير زيت':     [{icon:'📋',label:'استلام'},{icon:'🛢️',label:'تغيير الزيت والفلاتر'},{icon:'✅',label:'جاهزة'},{icon:'📦',label:'تسليم'}],
     'فرامل':         [{icon:'📋',label:'استلام'},{icon:'🔍',label:'تشخيص'},{icon:'🔧',label:'إصلاح الفرامل'},{icon:'✅',label:'جاهزة'},{icon:'📦',label:'تسليم'}],
-    'مكيف':          [{icon:'📋',label:'استلام'},{icon:'🔍',label:'تشخيص'},{icon:'❄️',label:'إصلاح المكيف'},{icon:'✅',label:'جاهزة'},{icon:'📦',label:'تسليم'}],
+    'مكيف':          [{icon:'📋',label:'استلام'},{icon:'🔍',label:'تشغيص'},{icon:'❄️',label:'إصلاح المكيف'},{icon:'✅',label:'جاهزة'},{icon:'📦',label:'تسليم'}],
     'كهرباء':        [{icon:'📋',label:'استلام'},{icon:'🔍',label:'تشخيص كهربائي'},{icon:'⚡',label:'إصلاح كهربائي'},{icon:'✅',label:'جاهزة'},{icon:'📦',label:'تسليم'}],
   },
 };
