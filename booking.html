@@ -4,8 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="cache-control" content="no-cache, no-store, must-revalidate">
-<meta name="pragma" content="no-cache">
-<meta name="expires" content="0">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
@@ -108,7 +106,7 @@ textarea{resize:vertical;min-height:70px;}
   <div class="brand-sub">حجز موعد للورشة · ٤ سيارات في الأسبوع</div>
 </div>
 <div class="wrap">
-  <a href="track.html?v=2" class="back-link">← العودة لتتبع السيارة</a>
+  <a href="index.html" class="back-link">← العودة للرئيسية</a>
 
   <div class="steps" id="stepper">
     <div class="step active" id="step-1"><span>1</span> الخدمة</div>
@@ -196,268 +194,217 @@ textarea{resize:vertical;min-height:70px;}
       <div id="confirm-summary" style="margin-bottom:16px;text-align:right;"></div>
       <div id="confirm-queue" style="background:rgba(255,255,255,.05);border-radius:10px;padding:12px;margin-bottom:16px;font-size:13px;"></div>
       <a href="#" class="whatsapp-btn" id="wa-share">📱 شارك في واتساب</a><br>
-      <a href="track.html?v=2" class="whatsapp-btn" style="background:var(--info);margin-top:8px;">🔍 تتبع سيارتك</a>
+      <a href="index.html" class="whatsapp-btn" style="background:var(--info);margin-top:8px;">🏠 الرئيسية</a>
     </div>
   </div>
 </div>
 
+<!-- ═══════════════════════════════════════
+     STEP 1: أنشئ مشروع Firebase مجاني
+     ثم عوّض القيم تحت بـ config الحقيقي
+     ═══════════════════════════════════════ -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+<script>
+  // ⚠️ عوّض القيم هنا بعد إنشاء مشروعك في Firebase
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT_ID.appspot.com",
+    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+    appId: "YOUR_APP_ID"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+</script>
+
 <script>
 (function(){
   'use strict';
-
   var CAPACITY = 4;
   var WEEKS_TO_SHOW = 8;
   var DAYS_AR = ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
 
+  var allBookings = [];
   var state = {
-    step:1,
-    svc:'',
-    wkKey:'', wkLabel:'', wkStart:'', wkEnd:'',
+    step:1, svc:'', wkKey:'', wkLabel:'', wkStart:'', wkEnd:'',
     pos:0, total:0, waiting:false,
     name:'', phone:'', plate:'', model:'', notes:''
   };
 
-  function nowISO(){ return new Date().toISOString(); }
-
   function pad(n){ return n < 10 ? '0'+n : ''+n; }
-  function fmtDate(dobj){
-    return DAYS_AR[dobj.getDay()] + ' ' + dobj.getDate() + '/' + (dobj.getMonth()+1);
-  }
-  function fmtISOLocal(d){
-    return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
-  }
-
-  function bkLoad(){
-    try{ var r=localStorage.getItem('finaltouch_bookings'); if(r) return JSON.parse(r); }catch(e){}
-    return [];
-  }
-  function bkSave(data){
-    try{ localStorage.setItem('finaltouch_bookings',JSON.stringify(data)); }catch(e){}
-  }
+  function fmtDate(dobj){ return DAYS_AR[dobj.getDay()] + ' ' + dobj.getDate() + '/' + (dobj.getMonth()+1); }
+  function fmtISOLocal(d){ return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); }
 
   function flash(msg,type){
-    var el=document.getElementById('flash');
-    el.textContent=msg;
-    el.className='flash '+(type||'success');
+    var el = document.getElementById('flash');
+    el.textContent = msg;
+    el.className = 'flash ' + (type||'success');
     el.classList.add('show');
-    setTimeout(function(){el.classList.remove('show');},3500);
+    setTimeout(function(){ el.classList.remove('show'); }, 3500);
   }
 
   function goToStep(n){
     document.querySelectorAll('.step-content').forEach(function(s){ s.classList.remove('active'); });
     document.getElementById('content-'+n).classList.add('active');
-    for(var i=1;i<=4;i++){
-      var s=document.getElementById('step-'+i);
+    for(var i=1; i<=4; i++){
+      var s = document.getElementById('step-'+i);
       s.classList.remove('active','done');
-      if(i<n) s.classList.add('done');
-      if(i===n) s.classList.add('active');
+      if(i < n) s.classList.add('done');
+      if(i === n) s.classList.add('active');
     }
-    state.step=n;
+    state.step = n;
   }
-  function nextStep(){ if(state.step<4) goToStep(state.step+1); }
-  function prevStep(){ if(state.step>1) goToStep(state.step-1); }
+  function nextStep(){ if(state.step < 4) goToStep(state.step+1); }
+  function prevStep(){ if(state.step > 1) goToStep(state.step-1); }
 
   function getWeekRange(offset){
     var now = new Date();
-    var d   = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    var day = d.getDay();  // 0=Sun
-    d.setDate(d.getDate() - day + (offset * 7));
+    var d = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    d.setDate(d.getDate() - d.getDay() + (offset * 7));
     var end = new Date(d.getFullYear(), d.getMonth(), d.getDate());
     end.setDate(end.getDate() + 6);
     return {
-      key: fmtISOLocal(d),
-      startISO: fmtISOLocal(d),
-      endISO: fmtISOLocal(end),
-      startObj: d,
-      endObj: end,
+      key: fmtISOLocal(d), startISO: fmtISOLocal(d), endISO: fmtISOLocal(end),
+      startObj: d, endObj: end,
       label: d.getDate()+'/'+(d.getMonth()+1)+' – '+end.getDate()+'/'+(end.getMonth()+1)
     };
   }
 
-  function getWeekBookings(key){
-    return bkLoad().filter(function(b){ return b.weekKey===key && b.status!=='cancelled'; })
-      .sort(function(a,b){ return new Date(a.createdAt)-new Date(b.createdAt); });
+  function countBookingsInWeek(weekKey){
+    return allBookings.filter(function(b){ return b.weekKey === weekKey && b.status !== 'cancelled'; }).length;
   }
 
   function renderWeeks(){
     var grid = document.getElementById('week-grid');
-    var out='';
-    for(var i=0;i<WEEKS_TO_SHOW;i++){
-      var w=getWeekRange(i);
-      var list=getWeekBookings(w.key);
-      var count=list.length;
-      var isFull=count>=CAPACITY;
-      var taken=Math.min(count,CAPACITY);
-      var wait=Math.max(0,count-CAPACITY);
+    var out = '';
+    for(var i=0; i<WEEKS_TO_SHOW; i++){
+      var w = getWeekRange(i);
+      var count = countBookingsInWeek(w.key);
+      var isFull = count >= CAPACITY;
+      var taken = Math.min(count, CAPACITY);
+      var wait = Math.max(0, count - CAPACITY);
 
-      var dots='';
-      for(var j=0;j<CAPACITY;j++){
-        dots+='<div class="wk-car-dot '+(j<taken?'taken':'empty')+'"></div>';
-      }
-      if(wait>0){
-        for(var j=0;j<Math.min(wait,3);j++){
-          dots+='<div class="wk-car-dot wait" title="انتظار"></div>';
-        }
-      }
+      var dots = '';
+      for(var j=0; j<CAPACITY; j++) dots += '<div class="wk-car-dot '+(j<taken?'taken':'empty')+'"></div>';
+      if(wait>0) for(var j=0; j<Math.min(wait,3); j++) dots += '<div class="wk-car-dot wait" title="انتظار"></div>';
 
-      var label=i===0?'هذا الأسبوع':i===1?'الأسبوع القادم':'الأسبوع '+(i+1);
-      var statusText=isFull?('ممتلئ · '+wait+' بالانتظار'):('متاح · '+(CAPACITY-count)+' من '+CAPACITY);
-      var statusClass=isFull?'wk-full':'wk-free';
-      var cardClass=isFull?'week-card full':'week-card';
+      var label = i===0?'هذا الأسبوع':i===1?'الأسبوع القادم':'الأسبوع '+(i+1);
+      var statusText = isFull ? ('ممتلئ · '+wait+' بالانتظار') : ('متاح · '+(CAPACITY-count)+' من '+CAPACITY);
+      var cls = isFull ? 'week-card full' : 'week-card';
 
-      out+='<div class="'+cardClass+'" data-idx="'+i+'">';
-      out+='<div class="wk-label">'+label+'</div>';
-      out+='<div class="wk-range">'+fmtDate(w.startObj)+' – '+fmtDate(w.endObj)+'</div>';
-      out+='<div class="wk-range-sub">'+fmtISOLocal(w.startObj)+' » '+fmtISOLocal(w.endObj)+'</div>';
-      out+='<div class="wk-cars">'+dots+'</div>';
-      out+='<div class="wk-status '+statusClass+'">'+statusText+'</div>';
-      out+='</div>';
+      out += '<div class="'+cls+'" data-idx="'+i+'">';
+      out += '<div class="wk-label">'+label+'</div>';
+      out += '<div class="wk-range">'+fmtDate(w.startObj)+' – '+fmtDate(w.endObj)+'</div>';
+      out += '<div class="wk-range-sub">'+w.startISO+' » '+w.endISO+'</div>';
+      out += '<div class="wk-cars">'+dots+'</div>';
+      out += '<div class="wk-status '+(isFull?'wk-full':'wk-free')+'">'+statusText+'</div>';
+      out += '</div>';
     }
-    grid.innerHTML=out;
-
-    // attach listeners
+    grid.innerHTML = out;
     grid.querySelectorAll('.week-card').forEach(function(card){
-      card.addEventListener('click',function(ev){
-        pickWeek(parseInt(card.getAttribute('data-idx')));
-      });
+      card.addEventListener('click', function(){ pickWeek(parseInt(card.getAttribute('data-idx'))); });
     });
   }
 
   function pickWeek(idx){
-    var w=getWeekRange(idx);
-    var list=getWeekBookings(w.key);
-    var count=list.length;
-    var isFull=count>=CAPACITY;
+    var w = getWeekRange(idx);
+    var count = countBookingsInWeek(w.key);
+    var isFull = count >= CAPACITY;
+    if(isFull && !confirm('هذا الأسبوع ممتلئ (٤ سيارات). تبي تنضم قائمة الانتظار؟')) return;
 
-    if(isFull && !confirm('هذا الأسبوع ممتلئ (٤ سيارات). تبي تنضم قائمة الانتظار؟')){
-      return;
-    }
-
-    // visual select
     document.querySelectorAll('.week-card').forEach(function(c){ c.classList.remove('selected'); });
-    var cards=document.querySelectorAll('.week-card');
+    var cards = document.querySelectorAll('.week-card');
     if(cards[idx]) cards[idx].classList.add('selected');
 
-    // update state
-    state.wkKey=w.key;
-    state.wkLabel=w.label;
-    state.wkStart=w.startISO;
-    state.wkEnd=w.endISO;
-    state.total=count;
+    state.wkKey = w.key; state.wkLabel = w.label; state.wkStart = w.startISO; state.wkEnd = w.endISO; state.total = count;
 
-    var qi=document.getElementById('queue-info');
-    var qn=document.getElementById('queue-num');
-    var qt=document.getElementById('queue-text');
+    var qi = document.getElementById('queue-info');
+    var qn = document.getElementById('queue-num');
+    var qt = document.getElementById('queue-text');
 
-    if(count>=CAPACITY){
-      state.pos=count+1;
-      state.waiting=true;
-      qi.className='queue-box show queue-wait';
-      qn.textContent='#'+state.pos;
-      qt.textContent='أنت في قائمة الانتظار لهذا الأسبوع';
+    if(count >= CAPACITY){
+      state.pos = count + 1; state.waiting = true;
+      qi.className = 'queue-box show queue-wait';
+      qn.textContent = '#'+state.pos;
+      qt.textContent = 'أنت في قائمة الانتظار لهذا الأسبوع';
     } else {
-      state.pos=count+1;
-      state.waiting=false;
-      qi.className='queue-box show';
-      qn.textContent='#'+state.pos+' من '+CAPACITY;
-      if(state.pos===1) qt.textContent='🏆 أنت أول حاجز هذا الأسبوع!';
-      else if(state.pos===CAPACITY) qt.textContent='آخر سيارة متاحة هذا الأسبوع!';
-      else qt.textContent='سيارة '+state.pos+' من أصل '+CAPACITY;
+      state.pos = count + 1; state.waiting = false;
+      qi.className = 'queue-box show';
+      qn.textContent = '#'+state.pos+' من '+CAPACITY;
+      if(state.pos===1) qt.textContent = '🏆 أنت أول حاجز هذا الأسبوع!';
+      else if(state.pos===CAPACITY) qt.textContent = 'آخر سيارة متاحة هذا الأسبوع!';
+      else qt.textContent = 'سيارة '+state.pos+' من أصل '+CAPACITY;
     }
-
-    document.getElementById('btn-next-2').disabled=false;
+    document.getElementById('btn-next-2').disabled = false;
   }
 
   function submitBooking(){
-    var name=document.getElementById('cust-name').value.trim();
-    var phone=document.getElementById('cust-phone').value.trim();
-    var plate=document.getElementById('cust-plate').value.trim();
-    var model=document.getElementById('cust-model').value.trim();
-    var notes=document.getElementById('cust-notes').value.trim();
+    var name  = document.getElementById('cust-name').value.trim();
+    var phone = document.getElementById('cust-phone').value.trim();
+    var plate = document.getElementById('cust-plate').value.trim();
+    var model = document.getElementById('cust-model').value.trim();
+    var notes = document.getElementById('cust-notes').value.trim();
+    if(!name || !phone || !plate){ flash('يرجى تعبئة الحقول المطلوبة *','error'); return; }
 
-    if(!name||!phone||!plate){ flash('يرجى تعبئة الحقول المطلوبة *','error'); return; }
+    state.name=name; state.phone=phone; state.plate=plate; state.model=model; state.notes=notes;
+    var realCount = countBookingsInWeek(state.wkKey);
+    if(realCount >= CAPACITY && !state.waiting){ state.waiting=true; state.pos=realCount+1; }
 
-    state.name=name; state.phone=phone;
-    state.plate=plate; state.model=model; state.notes=notes;
+    var bkId = 'BK-'+Math.floor(10000+Math.random()*90000);
 
-    var all=bkLoad();
-    var realCount=all.filter(function(b){ return b.weekKey===state.wkKey && b.status!=='cancelled'; }).length;
-    if(realCount>=CAPACITY && !state.waiting){
-      state.waiting=true;
-      state.pos=realCount+1;
-    }
-
-    var bkId='BK-'+Math.floor(10000+Math.random()*90000);
-    all.push({
+    db.collection('bookings').add({
       id:bkId, service:state.svc,
-      weekKey:state.wkKey, weekLabel:state.wkLabel,
-      weekStart:state.wkStart, weekEnd:state.wkEnd,
+      weekKey:state.wkKey, weekLabel:state.wkLabel, weekStart:state.wkStart, weekEnd:state.wkEnd,
       position:state.pos, isWaiting:state.waiting,
-      customerName:name, phone:phone, plate:plate, model:model,
-      notes:notes, status:'pending', createdAt:nowISO()
+      customerName:name, phone:phone, plate:plate, model:model, notes:notes,
+      status:'pending', createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    }).then(function(){
+      document.getElementById('confirm-id').textContent = bkId;
+      var queueHtml;
+      if(state.waiting){
+        document.getElementById('confirm-wait-msg').textContent = 'هذا الأسبوع ممتلئ · أنت في قائمة الانتظار';
+        queueHtml = '<div style="color:var(--gold);font-weight:700;">#'+state.pos+' في قائمة الانتظار</div><div style="font-size:12px;color:var(--muted);margin-top:4px;">سننبهك لو صار مكان متاح</div>';
+      } else {
+        document.getElementById('confirm-wait-msg').textContent = 'تم التأكيد · سيتم التواصل معك';
+        queueHtml = '<div style="color:var(--success);font-weight:700;">#'+state.pos+' من '+CAPACITY+'</div><div style="font-size:12px;color:var(--muted);margin-top:4px;">أولوية الكاملة</div>';
+      }
+      document.getElementById('confirm-summary').innerHTML =
+        '<div class="sum-row"><span class="sum-label">الاسم:</span><span class="sum-val">'+name+'</span></div>' +
+        '<div class="sum-row"><span class="sum-label">الخدمة:</span><span class="sum-val">'+state.svc+'</span></div>' +
+        '<div class="sum-row"><span class="sum-label">الأسبوع:</span><span class="sum-val">'+state.wkLabel+'</span></div>' +
+        '<div class="sum-row"><span class="sum-label">اللوحة:</span><span class="sum-val">'+plate+'</span></div>';
+      document.getElementById('confirm-queue').innerHTML = queueHtml;
+      var msg = 'مرحباً%20اللمسة%20الأخيرة،%20أرغب%20في%20الاستفسار%20عن%20حجزي%20'+bkId+'%20'+name+'%20'+plate;
+      document.getElementById('wa-share').href = 'https://wa.me/?text='+msg;
+      goToStep(4);
+    }).catch(function(err){
+      console.error(err);
+      flash('❌ خطأ في الحفظ: '+err.message, 'error');
     });
-    bkSave(all);
-
-    document.getElementById('confirm-id').textContent=bkId;
-
-    var queueHtml;
-    if(state.waiting){
-      document.getElementById('confirm-wait-msg').textContent='هذا الأسبوع ممتلئ · أنت في قائمة الانتظار';
-      queueHtml='<div style="color:var(--gold);font-weight:700;">#'+state.pos+' في قائمة الانتظار</div><div style="font-size:12px;color:var(--muted);margin-top:4px;">سننبهك لو صار مكان متاح</div>';
-    } else {
-      document.getElementById('confirm-wait-msg').textContent='تم التأكيد · سيتم التواصل معك';
-      queueHtml='<div style="color:var(--success);font-weight:700;">#'+state.pos+' من '+CAPACITY+'</div><div style="font-size:12px;color:var(--muted);margin-top:4px;">أولوية الكاملة</div>';
-    }
-
-    document.getElementById('confirm-summary').innerHTML=
-      '<div class="sum-row"><span class="sum-label">الاسم:</span><span class="sum-val">'+name+'</span></div>'+
-      '<div class="sum-row"><span class="sum-label">الخدمة:</span><span class="sum-val">'+state.svc+'</span></div>'+
-      '<div class="sum-row"><span class="sum-label">الأسبوع:</span><span class="sum-val">'+state.wkLabel+'</span></div>'+
-      '<div class="sum-row"><span class="sum-label">اللوحة:</span><span class="sum-val">'+plate+'</span></div>';
-
-    document.getElementById('confirm-queue').innerHTML=queueHtml;
-
-    var msg='مرحباً%20اللمسة%20الأخيرة،%20أرغب%20في%20الاستفسار%20عن%20حجزي%20'+bkId+'%20'+name+'%20'+plate;
-    document.getElementById('wa-share').href='https://wa.me/?text='+msg;
-
-    goToStep(4);
   }
 
-  // wire everything
-  document.addEventListener('DOMContentLoaded',function(){
-    // service buttons
-    var svcBody=document.getElementById('svc-body');
-    var svcMech=document.getElementById('svc-mech');
-    if(svcBody){
-      svcBody.addEventListener('click',function(){
-        svcBody.classList.add('selected');
-        if(svcMech) svcMech.classList.remove('selected');
-        state.svc=svcBody.getAttribute('data-svc');
-        nextStep();
-        renderWeeks();
-      });
-    }
-    if(svcMech){
-      svcMech.addEventListener('click',function(){
-        svcMech.classList.add('selected');
-        if(svcBody) svcBody.classList.remove('selected');
-        state.svc=svcMech.getAttribute('data-svc');
-        nextStep();
-        renderWeeks();
-      });
-    }
+  function initFirestore(){
+    db.collection('bookings').onSnapshot(function(snap){
+      allBookings = snap.docs.map(function(d){ return d.data(); });
+      if(state.step === 2) renderWeeks();
+    }, function(err){
+      console.error('Firestore:', err);
+      flash('⚠️ مشكلة في الاتصال بالسحابة','error');
+    });
+  }
 
-    // step 2 nav
-    var btnPrev2=document.getElementById('btn-prev-2');
-    var btnNext2=document.getElementById('btn-next-2');
-    if(btnPrev2) btnPrev2.addEventListener('click',prevStep);
-    if(btnNext2) btnNext2.addEventListener('click',nextStep);
-
-    // step 3 nav + submit
-    var btnPrev3=document.getElementById('btn-prev-3');
-    var btnSubmit=document.getElementById('btn-submit');
-    if(btnPrev3) btnPrev3.addEventListener('click',prevStep);
-    if(btnSubmit) btnSubmit.addEventListener('click',submitBooking);
+  document.addEventListener('DOMContentLoaded', function(){
+    initFirestore();
+    var svcBody = document.getElementById('svc-body');
+    var svcMech = document.getElementById('svc-mech');
+    svcBody.addEventListener('click', function(){ svcBody.classList.add('selected'); svcMech.classList.remove('selected'); state.svc=svcBody.getAttribute('data-svc'); nextStep(); renderWeeks(); });
+    svcMech.addEventListener('click', function(){ svcMech.classList.add('selected'); svcBody.classList.remove('selected'); state.svc=svcMech.getAttribute('data-svc'); nextStep(); renderWeeks(); });
+    document.getElementById('btn-prev-2').addEventListener('click', prevStep);
+    document.getElementById('btn-next-2').addEventListener('click', nextStep);
+    document.getElementById('btn-prev-3').addEventListener('click', prevStep);
+    document.getElementById('btn-submit').addEventListener('click', submitBooking);
   });
 })();
 </script>
