@@ -14,7 +14,7 @@ function showPage(id){
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   document.getElementById('page-'+id).classList.add('active');
   document.querySelectorAll('.nav-item').forEach(n=>{if(n.getAttribute('onclick')&&n.getAttribute('onclick').includes("'"+id+"'"))n.classList.add('active');});
-  const titleKeys={dashboard:'nav_dashboard',cars:'nav_cars',delivered:'nav_delivered',alerts:'nav_alerts',maintenance:'nav_maintenance',services:'nav_services',invoices:'nav_invoices',expenses:'nav_expenses',reports:'nav_reports',customers:'nav_customers',closing:'nav_closing'};
+  const titleKeys={dashboard:'nav_dashboard',cars:'nav_cars',delivered:'nav_delivered',alerts:'nav_alerts',maintenance:'nav_maintenance',services:'nav_services',invoices:'nav_invoices',expenses:'nav_expenses',reports:'nav_reports',customers:'nav_customers',closing:'nav_closing',bookings:'تتبع الحجوزات'};
   document.getElementById('page-title').textContent=t(titleKeys[id]||'')||'';
   renderAll();
   if(document.getElementById('sidebar').classList.contains('open'))toggleSidebar();
