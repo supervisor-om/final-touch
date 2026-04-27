@@ -115,6 +115,8 @@
     <div class="nav-item" onclick="openManageStages()"><span class="nav-icon">⚙️</span> إدارة الحالات</div>
     <div class="nav-section" style="margin-top:6px;"><span>👥 الموظفون</span></div>
     <div class="nav-item" onclick="window.location='attendance.html'"><span class="nav-icon">⏰</span> الدوام والإجازات</div>
+    <div class="nav-section"><span>📅 الحجوزات</span></div>
+    <div class="nav-item" onclick="showPage('bookings')"><span class="nav-icon">📅</span> تتبع الحجوزات <span class="nav-badge" id="badge-bookings">0</span></div>
   </nav>
   <div class="sidebar-footer">
     <div id="auth-user-info" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:8px 12px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;">
@@ -1032,5 +1034,29 @@ if ('serviceWorker' in navigator) {
     .catch(e => console.log('SW error', e));
 }
 </script>
+
+
+  <!-- BOOKINGS TRACKING PAGE -->
+  <div class="page" id="page-bookings">
+    <div class="stats-grid" style="margin-bottom:20px;grid-template-columns:repeat(4,1fr);">
+      <div class="stat-card blue"><span class="stat-icon">📋</span><div class="stat-value" id="bk-stat-pending">0</div><div class="stat-label">معلق</div></div>
+      <div class="stat-card green"><span class="stat-icon">✅</span><div class="stat-value" id="bk-stat-confirmed">0</div><div class="stat-label">مؤكد</div></div>
+      <div class="stat-card" style="background:rgba(245,166,35,.1);border-color:rgba(245,166,35,.2);"><span class="stat-icon">🟡</span><div class="stat-value" id="bk-stat-waiting">0</div><div class="stat-label">انتظار</div></div>
+      <div class="stat-card red"><span class="stat-icon">❌</span><div class="stat-value" id="bk-stat-cancelled">0</div><div class="stat-label">ملغى</div></div>
+    </div>
+
+    <div class="filter-bar" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;">
+      <button class="btn btn-primary active" style="width:auto;padding:8px 16px;border-radius:20px;font-size:13px;" onclick="filterBookings('all',this)">الكل</button>
+      <button class="btn btn-back" style="width:auto;padding:8px 16px;border-radius:20px;font-size:13px;" onclick="filterBookings('pending',this)">معلق</button>
+      <button class="btn btn-back" style="width:auto;padding:8px 16px;border-radius:20px;font-size:13px;" onclick="filterBookings('confirmed',this)">مؤكد</button>
+      <button class="btn btn-back" style="width:auto;padding:8px 16px;border-radius:20px;font-size:13px;" onclick="filterBookings('waiting',this)">انتظار</button>
+      <button class="btn btn-back" style="width:auto;padding:8px 16px;border-radius:20px;font-size:13px;" onclick="filterBookings('cancelled',this)">ملغى</button>
+    </div>
+
+    <div id="bookings-container">
+      <div style="text-align:center;padding:40px;color:var(--muted);">⏳ جارٍ تحميل الحجوزات...</div>
+    </div>
+  </div>
+
 </body>
 </html>
