@@ -7,12 +7,13 @@
   'use strict';
 
   const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT_ID.appspot.com",
-    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-    appId: "YOUR_APP_ID"
+    apiKey: "AIzaSyC7RmJuO7_sYa4wcErz4XNyguYIygY_ts8",
+    authDomain: "i-hope-1-2-3-4-5-6-7.firebaseapp.com",
+    projectId: "i-hope-1-2-3-4-5-6-7",
+    storageBucket: "i-hope-1-2-3-4-5-6-7.firebasestorage.app",
+    messagingSenderId: "389629834219",
+    appId: "1:389629834219:web:0cc4fea1d874dbbe66dfae",
+    measurementId: "G-J9JE87QEP6"
   };
 
   let fbInitialized = false;
@@ -137,9 +138,9 @@
         if(b.notes) html += '<div>📝 <strong style="color:var(--muted);font-weight:600;">ملاحظات:</strong> ' + b.notes + '</div>';
         html += '</div>';
         html += '<div style="display:flex;gap:8px;margin-top:6px;flex-wrap:wrap;">';
-        if(b.status !== 'confirmed') html += '<button onclick="changeBookingStatus(\'' + b.id + '\','confirmed'" style="padding:6px 14px;border:none;border-radius:8px;font-family:\'Cairo\',sans-serif;font-size:12px;font-weight:700;cursor:pointer;background:#00d4aa;color:#fff;">✅ تأكيد</button>';
-        if(b.status !== 'waiting') html += '<button onclick="changeBookingStatus(\'' + b.id + '\','waiting'" style="padding:6px 14px;border:none;border-radius:8px;font-family:\'Cairo\',sans-serif;font-size:12px;font-weight:700;cursor:pointer;background:#f5a623;color:#000;">🟡 انتظار</button>';
-        if(b.status !== 'cancelled') html += '<button onclick="changeBookingStatus(\'' + b.id + '\','cancelled'" style="padding:6px 14px;border:none;border-radius:8px;font-family:\'Cairo\',sans-serif;font-size:12px;font-weight:700;cursor:pointer;background:#e94560;color:#fff;">❌ إلغاء</button>';
+        if(b.status !== 'confirmed') html += '<button onclick="changeBookingStatus(\'' + b.id + '\',\'confirmed\')" style="padding:6px 14px;border:none;border-radius:8px;font-family:\'Cairo\',sans-serif;font-size:12px;font-weight:700;cursor:pointer;background:#00d4aa;color:#fff;">✅ تأكيد</button>';
+        if(b.status !== 'waiting') html += '<button onclick="changeBookingStatus(\'' + b.id + '\',\'waiting\')" style="padding:6px 14px;border:none;border-radius:8px;font-family:\'Cairo\',sans-serif;font-size:12px;font-weight:700;cursor:pointer;background:#f5a623;color:#000;">🟡 انتظار</button>';
+        if(b.status !== 'cancelled') html += '<button onclick="changeBookingStatus(\'' + b.id + '\',\'cancelled\')" style="padding:6px 14px;border:none;border-radius:8px;font-family:\'Cairo\',sans-serif;font-size:12px;font-weight:700;cursor:pointer;background:#e94560;color:#fff;">❌ إلغاء</button>';
         html += '<button onclick="deleteBooking(\'' + b.id + '\')" style="padding:6px 14px;border:none;border-radius:8px;font-family:\'Cairo\',sans-serif;font-size:12px;font-weight:700;cursor:pointer;background:rgba(255,255,255,.1);color:var(--muted);border:1px solid rgba(255,255,255,.1)!important;">🗑 حذف</button>';
         html += '</div></div>';
       });
