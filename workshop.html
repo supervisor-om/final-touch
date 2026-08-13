@@ -676,7 +676,6 @@ label{font-size:14px;}
     <div class="nav-item admin-only" onclick="openModal('modal-users')"><span class="nav-icon">👥</span> <span data-i18n="nav_users">إدارة المستخدمين</span></div>
     <div class="nav-item admin-only" onclick="openManageStages()"><span class="nav-icon">⚙️</span> إدارة الحالات</div>
     <div class="nav-section" style="margin-top:6px;"><span>👥 الموظفون</span></div>
-    <div class="nav-item" onclick="showPage('bookings')"><span class="nav-icon">📅</span> الحجوزات <span class="nav-badge" id="bk-pending-count">0</span></div>
     <div class="nav-item" onclick="window.location='attendance.html'"><span class="nav-icon">⏰</span> الدوام والإجازات</div>
   </nav>
   <div class="sidebar-footer">
@@ -1139,83 +1138,6 @@ label{font-size:14px;}
 
   </div>
 
-  <!-- BOOKINGS MANAGEMENT -->
-  <div class="page" id="page-bookings">
-    <div class="two-col-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px;">
-      <div class="card">
-        <div class="card-header"><div class="card-title">📊 ملخص الحجوزات</div></div>
-        <div class="card-body">
-          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
-            <div style="background:rgba(245,166,35,.1);border:1px solid rgba(245,166,35,.25);border-radius:12px;padding:16px;text-align:center;">
-              <div style="font-size:26px;font-weight:900;color:var(--gold);" id="bk-pending-count">0</div>
-              <div style="font-size:12px;color:var(--muted);">حجوزات جديدة</div>
-            </div>
-            <div style="background:rgba(79,172,254,.1);border:1px solid rgba(79,172,254,.25);border-radius:12px;padding:16px;text-align:center;">
-              <div style="font-size:26px;font-weight:900;color:var(--info);" id="bk-today-count">0</div>
-              <div style="font-size:12px;color:var(--muted);">اليوم</div>
-            </div>
-            <div style="background:rgba(0,212,170,.1);border:1px solid rgba(0,212,170,.25);border-radius:12px;padding:16px;text-align:center;">
-              <div style="font-size:26px;font-weight:900;color:var(--success);" id="bk-week-count">0</div>
-              <div style="font-size:12px;color:var(--muted);">هذا الأسبوع</div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-header"><div class="card-title">📋 رابط الحجز العمومي</div></div>
-        <div class="card-body" style="text-align:center;">
-          <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">شارك هذا الرابط للعملاء لحجز موعد</p>
-          <input type="text" id="bk-public-link" readonly style="text-align:left;direction:ltr;background:rgba(255,255,255,.04);border:1px dashed var(--border);padding:10px;border-radius:10px;font-size:13px;color:var(--info);width:100%;margin-bottom:12px;">
-          <button class="btn btn-outline btn-sm" onclick="copyBLink()">📋 نسخ الرابط</button>
-          <a href="booking.html" target="_blank" class="btn btn-primary btn-sm" style="margin-top:8px;display:inline-block;">🔍 معاينة</a>
-        </div>
-      </div>
-    </div>
-
-    <!-- ─── WEEKLY CALENDAR ─── -->
-    <div class="card">
-      <div class="card-header">
-        <div class="card-title">📅 تقويم الحجوزات الأسبوعي</div>
-        <div style="display:flex;gap:8px;align-items:center;">
-          <span style="display:flex;align-items:center;gap:4px;font-size:12px;color:var(--success);"><span style="width:10px;height:10px;border-radius:50%;background:var(--success);display:inline-block;"></span> متاح</span>
-          <span style="display:flex;align-items:center;gap:4px;font-size:12px;color:var(--gold);"><span style="width:10px;height:10px;border-radius:50%;background:var(--gold);display:inline-block;"></span> انتظار</span>
-          <span style="display:flex;align-items:center;gap:4px;font-size:12px;color:var(--danger);"><span style="width:10px;height:10px;border-radius:50%;background:var(--danger);display:inline-block;"></span> ممتلئ</span>
-        </div>
-      </div>
-      <div class="card-body">
-        <div id="booking-calendar" style="min-height:120px;">
-          <p style="text-align:center;color:var(--muted);padding:40px;">جاري التحميل...</p>
-        </div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-header" style="flex-wrap:wrap;gap:8px;">
-        <div class="card-title">📋 سجل الحجوزات</div>
-        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
-          <select id="bk-filter-status" onchange="renderBookings()" style="padding:8px;border-radius:10px;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:13px;">
-            <option value="">كل الحالات</option>
-            <option value="pending">⏳ جديدة</option>
-            <option value="confirmed">✅ مؤكدة</option>
-            <option value="arrived">🟢 وصلت</option>
-            <option value="done">🏁 مكتملة</option>
-            <option value="cancelled">❌ ملغية</option>
-          </select>
-        </div>
-      </div>
-      <div class="card-body" style="padding:0;">
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>الحجز#</th><th>العميل</th><th>السيارة</th><th>الخدمة</th><th>الأسبوع</th><th>الحالة</th><th>ملاحظات</th><th>إجراء</th></tr></thead>
-            <tbody id="bookings-table-body"></tbody>
-          </table>
-        </div>
-        <div id="bookings-empty" class="empty-state" style="display:none;padding:40px 20px;text-align:center;color:var(--muted);">
-          <div style="font-size:36px;">📭</div><p>لا توجد حجوزات</p>
-        </div>
-      </div>
-    </div>
-  </div>
 
 </div>
 
@@ -1436,8 +1358,9 @@ label{font-size:14px;}
         <input type="hidden" id="cp-method">
       </div>
       <div class="form-group">
-        <label>💵 المبلغ المستلم (ر.ع)</label>
+        <label>💵 الدفعة المستلمة الآن (ر.ع)</label>
         <input type="number" id="cp-amount" step="0.001" min="0" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:var(--input-bg,rgba(255,255,255,.06));color:var(--text);font-family:var(--font-main);font-size:15px;">
+        <div style="font-size:11px;color:var(--muted);margin-top:5px;">تُضاف هذه الدفعة إلى المدفوع سابقاً ولا تستبدله</div>
       </div>
       <input type="hidden" id="cp-car-id">
     </div>
@@ -1710,10 +1633,9 @@ function showPage(id){
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   document.getElementById('page-'+id).classList.add('active');
   document.querySelectorAll('.nav-item').forEach(n=>{if(n.getAttribute('onclick')&&n.getAttribute('onclick').includes("'"+id+"'"))n.classList.add('active');});
-  const titleKeys={dashboard:'nav_dashboard',cars:'nav_cars',delivered:'nav_delivered',alerts:'nav_alerts',maintenance:'nav_maintenance',services:'nav_services',invoices:'nav_invoices',expenses:'nav_expenses',reports:'nav_reports',customers:'nav_customers',closing:'nav_closing',bookings:'nav_bookings'};
-  document.getElementById('page-title').textContent=t(titleKeys[id]||'')||'الحجوزات';
+  const titleKeys={dashboard:'nav_dashboard',cars:'nav_cars',delivered:'nav_delivered',alerts:'nav_alerts',maintenance:'nav_maintenance',services:'nav_services',invoices:'nav_invoices',expenses:'nav_expenses',reports:'nav_reports',customers:'nav_customers',closing:'nav_closing'};
+  document.getElementById('page-title').textContent=t(titleKeys[id]||'')||'';
   renderAll();
-  if(id==='bookings'){ renderBookingCalendar(); renderBookings(); renderBookingBadges(); }
   if(document.getElementById('sidebar').classList.contains('open'))toggleSidebar();
 }
 function toggleSidebar(){
@@ -1835,6 +1757,8 @@ function applyQuickStatus(carId,stage){
     car.dateOut=today();
     const inv={id:state.invoiceCounter++,carId:car.id,owner:car.owner,plate:car.plate,model:car.model,service:car.service,amount:car.estimate||0,deposit:car.deposit||0,paid:car.paidTotal||0,date:today(),notes:car.notes||''};
     state.invoices.push(inv);
+  } else {
+    syncInvoiceFromCar(car);
   }
   saveState();
   if(car.stage!==prevStage) sendPushNotification(car);
@@ -1859,6 +1783,21 @@ function updateStageUI(){
     else if(i===currentStage){item.classList.add('active');dot.classList.add('active');dot.textContent=stages[i].icon;}
   });
   btnsRow.innerHTML=stages.map((s,i)=>`<button class="btn ${i===last?'btn-success':'btn-outline'} btn-sm" onclick="setStage(${i})">${s.icon} ${s.label}</button>`).join('');
+}
+// الفاتورة تُصدر عند التسليم بنسخة من مبالغ السيارة. أي تعديل لاحق على
+// مبالغ السيارة كان يترك الفاتورة على القيم القديمة إلى الأبد.
+function syncInvoiceFromCar(car){
+  const inv=state.invoices.find(i=>i.carId===car.id);
+  if(!inv)return null;
+  inv.amount=car.estimate||0;
+  inv.deposit=car.deposit||0;
+  inv.paid=car.paidTotal||0;
+  inv.owner=car.owner;
+  inv.plate=car.plate;
+  inv.model=car.model;
+  inv.service=car.service;
+  inv.notes=car.notes||'';
+  return inv;
 }
 function calcRemaining(){
   const total=parseFloat(document.getElementById('update-amount').value)||0;
@@ -1889,6 +1828,8 @@ function updateCar(){
     car.dateOut=today();
     const inv={id:state.invoiceCounter++,carId:car.id,owner:car.owner,plate:car.plate,model:car.model,service:car.service,amount:car.estimate,deposit:car.deposit||0,paid:car.paidTotal,date:today(),notes:car.notes};
     state.invoices.push(inv);
+  } else {
+    syncInvoiceFromCar(car);
   }
   saveState();closeModal('modal-update-car');
   if(car.stage!==prevStage) sendPushNotification(car);
@@ -2609,12 +2550,20 @@ function submitConfirmPayment(){
   if(amount<=0){alert('يرجى إدخال مبلغ صحيح');return;}
   const car=state.cars.find(c=>c.id===carId);
   if(!car)return;
+  // هذا الحقل يسجّل دفعة جديدة تُضاف للمدفوع، ولا يستبدل الإجمالي.
+  const remaining=Math.max(0,(car.estimate||0)-(car.paidTotal||0));
+  if(amount>remaining+0.001){
+    const msg='المبلغ المُدخل '+amount.toFixed(3)+' ر.ع أكبر من المتبقي '+remaining.toFixed(3)+' ر.ع.\n\n'
+      +'تنبيه: هذا الحقل يضيف دفعة جديدة إلى المدفوع ولا يستبدله.\n'
+      +'المدفوع سيصبح '+((car.paidTotal||0)+amount).toFixed(3)+' ر.ع.\n\nهل تريد المتابعة؟';
+    if(!confirm(msg))return;
+  }
   car.paidTotal=(car.paidTotal||0)+amount;
   car.paymentMethod=method;
   car.paymentConfirmed=true;
   car.paymentConfirmedAt=new Date().toISOString();
-  const inv=state.invoices.find(i=>i.carId===carId);
-  if(inv){inv.paid=car.paidTotal;inv.paymentMethod=method;}
+  const inv=syncInvoiceFromCar(car);
+  if(inv)inv.paymentMethod=method;
   saveState();
   closeModal('modal-confirm-payment');
   renderAll();
@@ -5068,8 +5017,6 @@ function deleteUser(idx) {
 // Run auth check after all scripts are parsed
 initAuth();
 </script>
-
-<script src="js/booking-manager.js"></script>
 
 <!-- ═══════════════════════════════════════════════════
      WHATSAPP NOTIFICATIONS — CallMeBot API

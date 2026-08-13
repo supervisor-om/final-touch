@@ -93,6 +93,8 @@ function applyQuickStatus(carId,stage){
     car.dateOut=today();
     const inv={id:state.invoiceCounter++,carId:car.id,owner:car.owner,plate:car.plate,model:car.model,service:car.service,amount:car.estimate||0,deposit:car.deposit||0,paid:car.paidTotal||0,date:today(),notes:car.notes||''};
     state.invoices.push(inv);
+  } else {
+    syncInvoiceFromCar(car);
   }
   saveState();
   if(car.stage!==prevStage) sendPushNotification(car);
@@ -118,6 +120,23 @@ function updateStageUI(){
   });
   btnsRow.innerHTML=stages.map((s,i)=>`<button class="btn ${i===last?'btn-success':'btn-outline'} btn-sm" onclick="setStage(${i})">${s.icon} ${s.label}</button>`).join('');
 }
+// الفاتورة تُصدر عند التسليم بنسخة من مبالغ السيارة. أي تعديل لاحق على
+// مبالغ السيارة كان يترك الفاتورة على القيم القديمة إلى الأبد — فتظهر
+// للعميل أرقام لا تطابق سجلّه. نُبقيهما متطابقين دائماً.
+function syncInvoiceFromCar(car){
+  const inv=state.invoices.find(i=>i.carId===car.id);
+  if(!inv)return null;
+  inv.amount=car.estimate||0;
+  inv.deposit=car.deposit||0;
+  inv.paid=car.paidTotal||0;
+  inv.owner=car.owner;
+  inv.plate=car.plate;
+  inv.model=car.model;
+  inv.service=car.service;
+  inv.notes=car.notes||'';
+  return inv;
+}
+
 function calcRemaining(){
   const total=parseFloat(document.getElementById('update-amount').value)||0;
   const paid=parseFloat(document.getElementById('update-paid').value)||0;
@@ -147,6 +166,8 @@ function updateCar(){
     car.dateOut=today();
     const inv={id:state.invoiceCounter++,carId:car.id,owner:car.owner,plate:car.plate,model:car.model,service:car.service,amount:car.estimate,deposit:car.deposit||0,paid:car.paidTotal,date:today(),notes:car.notes};
     state.invoices.push(inv);
+  } else {
+    syncInvoiceFromCar(car);
   }
   saveState();closeModal('modal-update-car');
   if(car.stage!==prevStage) sendPushNotification(car);

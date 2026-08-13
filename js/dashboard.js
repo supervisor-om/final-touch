@@ -264,12 +264,21 @@ function submitConfirmPayment(){
   if(amount<=0){alert('يرجى إدخال مبلغ صحيح');return;}
   const car=state.cars.find(c=>c.id===carId);
   if(!car)return;
+  // هذا الحقل يسجّل دفعة جديدة تُضاف للمدفوع، ولا يستبدل الإجمالي.
+  // إدخال المبلغ الكلي بدل المتبقي كان ينفخ المدفوع فوق قيمة الفاتورة.
+  const remaining=Math.max(0,(car.estimate||0)-(car.paidTotal||0));
+  if(amount>remaining+0.001){
+    const msg='المبلغ المُدخل '+amount.toFixed(3)+' ر.ع أكبر من المتبقي '+remaining.toFixed(3)+' ر.ع.\n\n'
+      +'تنبيه: هذا الحقل يضيف دفعة جديدة إلى المدفوع ولا يستبدله.\n'
+      +'المدفوع سيصبح '+((car.paidTotal||0)+amount).toFixed(3)+' ر.ع.\n\nهل تريد المتابعة؟';
+    if(!confirm(msg))return;
+  }
   car.paidTotal=(car.paidTotal||0)+amount;
   car.paymentMethod=method;
   car.paymentConfirmed=true;
   car.paymentConfirmedAt=new Date().toISOString();
-  const inv=state.invoices.find(i=>i.carId===carId);
-  if(inv){inv.paid=car.paidTotal;inv.paymentMethod=method;}
+  const inv=syncInvoiceFromCar(car);
+  if(inv)inv.paymentMethod=method;
   saveState();
   closeModal('modal-confirm-payment');
   renderAll();
