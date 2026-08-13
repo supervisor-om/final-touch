@@ -1,6 +1,6 @@
 // ارفع الرقم عند كل تعديل على الملفات المخزَّنة أدناه،
 // وإلا بقي الزوار السابقون على النسخة القديمة من الكاش.
-const CACHE_NAME = 'final-touch-v4';
+const CACHE_NAME = 'final-touch-v5';
 
 // Derive base path from service worker location (works on any subdirectory)
 const BASE = self.registration.scope;
@@ -16,7 +16,6 @@ const STATIC_ASSETS = [
   BASE + 'js/db.js',
   BASE + 'js/auth-attendance.js',
   BASE + 'js/attendance.js',
-  BASE + 'js/booking-manager.js',
   'https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Tajawal:wght@300;400;500;700;900&display=swap',
   'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'
 ];
