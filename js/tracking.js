@@ -1,6 +1,8 @@
+// رابط العميل يجب أن يفتح صفحة التتبع المستقلة track.html،
+// لا لوحة تحكم الورشة (index.html / workshop.html) التي تطلب تسجيل دخول.
 function getTrackingURL(car) {
-  const base = window.location.origin + window.location.pathname;
-  return base + '?track=' + encodeURIComponent(car.plate);
+  const dir = window.location.pathname.replace(/[^/]*$/, '');
+  return window.location.origin + dir + 'track.html?track=' + encodeURIComponent(car.plate);
 }
 
 function renderTrackingPage() {
@@ -102,8 +104,16 @@ function initCustomerTracking() {
   const plate  = params.get('track');
   if (!plate) return;
 
-  // Show the overlay
-  document.getElementById('customer-tracking-overlay').style.display = 'block';
+  // هذه الصفحة لوحة تحكم الورشة ولا تحتوي واجهة تتبّع للعميل.
+  // الروابط القديمة المرسلة للعملاء تصل إلى هنا — نحوّلها لصفحة التتبّع الصحيحة.
+  const overlay = document.getElementById('customer-tracking-overlay');
+  if (!overlay) {
+    const dir = window.location.pathname.replace(/[^/]*$/, '');
+    window.location.replace(dir + 'track.html?track=' + encodeURIComponent(plate));
+    return;
+  }
+
+  overlay.style.display = 'block';
   document.getElementById('trk-logo').src = 'data:image/png;base64,' + LOGO_B64;
 
   // Pre-fill and search

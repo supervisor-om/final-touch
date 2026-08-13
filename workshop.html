@@ -5,6 +5,12 @@
 /* حماية صفحة الورشة — العميل العادي يروح لحجز موعد */
 (function(){
   try{
+    // رابط تتبّع عميل (?track=) يجب أن يفتح صفحة التتبّع، لا صفحة الحجز
+    var trk = new URLSearchParams(location.search).get('track');
+    if(trk){
+      location.replace('track.html?track=' + encodeURIComponent(trk));
+      return;
+    }
     var sess = JSON.parse(sessionStorage.getItem('ft_session'));
     if(!sess && !location.search.includes('workshop') && !location.search.includes('admin')){
       location.replace('booking.html');
@@ -4023,9 +4029,10 @@ const STAGE_LABELS = ['استلام السيارة','تشخيص العطل','ب�
 const STAGE_DESCS  = ['تم استلام سيارتك في الورشة','يتم فحص وتشخيص العطل','الفنيون يعملون على إصلاح سيارتك','مرحلة الدهان والتلميع النهائي','سيارتك جاهزة، يمكنك المجيء لاستلامها 🎉','تم تسليم السيارة بنجاح ✅'];
 const STAGE_COLORS = ['#8892a4','#4facfe','#f5a623','#9b59b6','#00d4aa','#00d4aa'];
 
+// رابط العميل يفتح صفحة التتبّع المستقلة track.html، لا لوحة تحكم الورشة.
 function getTrackingURL(car) {
-  const base = window.location.origin + window.location.pathname;
-  return base + '?track=' + encodeURIComponent(car.plate);
+  const dir = window.location.pathname.replace(/[^/]*$/, '');
+  return window.location.origin + dir + 'track.html?track=' + encodeURIComponent(car.plate);
 }
 
 function renderTrackingPage() {

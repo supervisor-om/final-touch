@@ -107,7 +107,6 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
     <div class="search-icon">🔍</div>
     <div class="search-title">تتبع سيارتك</div>
     <div class="search-desc">أدخل رقم لوحة سيارتك لمتابعة حالة الإصلاح<br>لحظة بلحظة</div>
-        <div id="cloud-status" style="display:none;font-size:11px;color:#00d4aa;margin-bottom:10px;background:rgba(0,212,170,.08);border-radius:8px;padding:5px 12px;"></div>
     <div class="input-row">
       <input type="text" class="plate-input" id="plate-input"
         placeholder="رقم اللوحة..." autocomplete="off"
@@ -163,6 +162,19 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
         <span class="pay-label">⏳ المتبقي</span>
         <span id="r-remaining"></span>
       </div>
+      <button id="r-invoice-btn" onclick="toggleInvoice()"
+        style="margin-top:14px;width:100%;padding:12px 20px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);border-radius:12px;color:#eaeaea;font-family:'Cairo',sans-serif;font-size:13px;font-weight:800;cursor:pointer;">
+        🧾 عرض الفاتورة
+      </button>
+    </div>
+
+    <!-- Invoice -->
+    <div class="info-card" id="r-invoice-card" style="display:none;">
+      <div id="r-invoice-body"></div>
+      <button onclick="printInvoice()"
+        style="margin-top:16px;width:100%;padding:12px 20px;background:linear-gradient(135deg,#e94560,#ff6b35);border:none;border-radius:12px;color:#fff;font-family:'Cairo',sans-serif;font-size:13px;font-weight:800;cursor:pointer;">
+        🖨️ طباعة / حفظ PDF
+      </button>
     </div>
 
     <!-- Notes -->
@@ -200,6 +212,7 @@ const FB_BASE_URL = "https://firestore.googleapis.com/v1/projects/" + FB_PROJECT
 const FB_DOC_PATH = "workshop/data";
 
 let carsData = [];
+let invoicesData = [];
 
 function fromFirestore(val) {
   if (!val) return null;
@@ -227,6 +240,15 @@ function loadCars() {
   } catch(e) { return []; }
 }
 
+function loadInvoices() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return [];
+    const data = JSON.parse(raw);
+    return data.invoices || [];
+  } catch(e) { return []; }
+}
+
 async function initFirebaseTrack() {
   try {
     showCloudStatus('loading');
@@ -237,7 +259,8 @@ async function initFirebaseTrack() {
     const doc  = await res.json();
     const data = documentToData(doc);
     if (data && data.cars) {
-      carsData = data.cars;
+      carsData     = data.cars;
+      invoicesData = data.invoices || [];
       localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
       showCloudStatus('online');
     } else {
@@ -263,6 +286,10 @@ function showCloudStatus(state) {
 
 function getCars() {
   return carsData.length ? carsData : loadCars();
+}
+
+function getInvoices() {
+  return invoicesData.length ? invoicesData : loadInvoices();
 }
 
 const STAGES      = ['استلام السيارة','تشخيص العطل','بدء الإصلاح','الدهان والتشطيب','جاهزة للتسليم','تم التسليم'];
@@ -307,6 +334,7 @@ function doSearch() {
 function showResult(car) {
   document.getElementById('search-box').style.display  = 'none';
   document.getElementById('result-box').style.display  = 'block';
+  _invoiceCar = car;
 
   const stage   = car.stage || 0;
   const days    = Math.floor((Date.now() - new Date(car.dateIn)) / 864e5);
@@ -398,6 +426,102 @@ function showResult(car) {
   }
 }
 
+// ── الفاتورة ────────────────────────────────────────────────────────────────
+let _invoiceCar = null;
+
+// الفاتورة الرسمية تُنشأ فقط عند تسليم السيارة. قبل ذلك نعرض فاتورة مبدئية
+// مبنية على التقدير المسجّل في بطاقة السيارة.
+//
+// المطابقة بـ carId حصراً: توجد لوحات مكرّرة في السجلّات (مثل "000" و"0000")،
+// والمطابقة بالّلوحة قد تعرض فاتورة عميل آخر.
+function findInvoice(car) {
+  if (!car || !car.id) return null;
+  return getInvoices().find(function(inv) { return inv.carId === car.id; }) || null;
+}
+
+function money(n) { return (parseFloat(n) || 0).toFixed(3) + ' ر.ع'; }
+
+function buildInvoiceHTML(car) {
+  const inv    = findInvoice(car);
+  const isFinal = !!inv;
+  const amount = parseFloat((inv ? inv.amount  : car.estimate)  || 0);
+  const dep    = parseFloat((inv ? inv.deposit : car.deposit)   || 0);
+  const paid   = parseFloat((inv ? inv.paid    : car.paidTotal) || 0);
+  const rem    = Math.max(0, amount - paid);
+  const notes  = (inv ? inv.notes : car.notes) || '';
+
+  const rows = [
+    ['نوع الخدمة',   (inv ? inv.service : car.service) || '—'],
+    ['رقم اللوحة',   car.plate],
+    ['السيارة',      car.model || '—'],
+    ['المالك',       car.owner || '—'],
+    ['التاريخ',      fmtDate(inv ? inv.date : car.dateIn)],
+  ];
+
+  return ''
+    + '<div style="text-align:center;margin-bottom:18px;">'
+    +   '<div style="font-size:17px;font-weight:900;color:#fff;">اللمسة الأخيرة</div>'
+    +   '<div style="font-size:11px;color:#8892a4;letter-spacing:1px;">THE FINAL TOUCH</div>'
+    +   '<div style="margin-top:10px;font-size:14px;font-weight:800;color:' + (isFinal ? '#00d4aa' : '#f5a623') + ';">'
+    +     (isFinal ? '🧾 فاتورة رقم #' + inv.id : '📋 فاتورة مبدئية (تقديرية)')
+    +   '</div>'
+    +   (isFinal ? '' : '<div style="font-size:11px;color:#8892a4;margin-top:4px;">تصدر الفاتورة النهائية عند تسليم السيارة</div>')
+    + '</div>'
+    + '<div style="border-top:1px dashed rgba(255,255,255,.15);padding-top:14px;">'
+    + rows.map(function(r) {
+        return '<div style="display:flex;justify-content:space-between;padding:7px 0;font-size:13px;">'
+          + '<span style="color:#8892a4;">' + r[0] + '</span>'
+          + '<span style="color:#eaeaea;font-weight:700;">' + r[1] + '</span></div>';
+      }).join('')
+    + '</div>'
+    + '<div style="border-top:1px dashed rgba(255,255,255,.15);margin-top:12px;padding-top:14px;">'
+    +   '<div style="display:flex;justify-content:space-between;padding:7px 0;font-size:13px;"><span style="color:#8892a4;">المبلغ الإجمالي</span><span style="color:#fff;font-weight:800;">' + money(amount) + '</span></div>'
+    +   (dep > 0 ? '<div style="display:flex;justify-content:space-between;padding:7px 0;font-size:13px;"><span style="color:#8892a4;">العربون</span><span style="color:#4facfe;font-weight:700;">' + money(dep) + '</span></div>' : '')
+    +   '<div style="display:flex;justify-content:space-between;padding:7px 0;font-size:13px;"><span style="color:#8892a4;">المدفوع</span><span style="color:#00d4aa;font-weight:700;">' + money(paid) + '</span></div>'
+    +   '<div style="display:flex;justify-content:space-between;padding:12px 0 0;margin-top:8px;border-top:1px solid rgba(255,255,255,.12);font-size:15px;">'
+    +     '<span style="color:#8892a4;font-weight:700;">' + (rem > 0 ? 'المتبقي' : 'الحالة') + '</span>'
+    +     (rem > 0
+        ? '<span style="color:#e94560;font-weight:900;">' + money(rem) + '</span>'
+        : '<span style="color:#00d4aa;font-weight:900;">✅ مدفوعة بالكامل</span>')
+    +   '</div>'
+    + '</div>'
+    + (notes ? '<div style="margin-top:14px;padding-top:12px;border-top:1px dashed rgba(255,255,255,.15);font-size:12px;color:#8892a4;">📝 ' + notes + '</div>' : '')
+    + '<div style="margin-top:16px;text-align:center;font-size:10px;color:#4a5568;">مسقط، سلطنة عُمان</div>';
+}
+
+function toggleInvoice() {
+  const card = document.getElementById('r-invoice-card');
+  const btn  = document.getElementById('r-invoice-btn');
+  if (!card || !_invoiceCar) return;
+  const open = card.style.display !== 'none';
+  if (open) {
+    card.style.display = 'none';
+    btn.textContent = '🧾 عرض الفاتورة';
+  } else {
+    document.getElementById('r-invoice-body').innerHTML = buildInvoiceHTML(_invoiceCar);
+    card.style.display = 'block';
+    btn.textContent = '🧾 إخفاء الفاتورة';
+    card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+}
+
+function printInvoice() {
+  if (!_invoiceCar) return;
+  const w = window.open('', '_blank');
+  if (!w) { alert('الرجاء السماح بفتح النوافذ لطباعة الفاتورة'); return; }
+  w.document.write(
+    '<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8">'
+    + '<title>فاتورة ' + _invoiceCar.plate + '</title>'
+    + '<style>body{font-family:Tahoma,Arial,sans-serif;background:#16213e;color:#eaeaea;padding:28px;}'
+    + '.box{max-width:420px;margin:0 auto;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:24px;}'
+    + '@media print{body{background:#fff;color:#000;}.box{border-color:#ccc;background:#fff;}}</style>'
+    + '</head><body><div class="box">' + buildInvoiceHTML(_invoiceCar) + '</div></body></html>'
+  );
+  w.document.close();
+  w.focus();
+  setTimeout(function(){ w.print(); }, 400);
+}
+
 function goBack() {
   document.getElementById('search-box').style.display  = 'block';
   document.getElementById('result-box').style.display  = 'none';
@@ -405,23 +529,36 @@ function goBack() {
   document.getElementById('error-msg').style.display = 'none';
   document.getElementById('r-notes-card').style.display = 'none';
   document.getElementById('r-expected-box').style.display = 'none';
+  document.getElementById('r-invoice-card').style.display = 'none';
+  document.getElementById('r-invoice-btn').textContent = '🧾 عرض الفاتورة';
+  _invoiceCar = null;
+  // امسح ?track= حتى لا يعيد البحث نفسه عند تحديث الصفحة
+  if (window.location.search) history.replaceState(null, '', window.location.pathname);
 }
 </script>
 <script>
-window.addEventListener('load', async () => {
-  await initFirebaseTrack();
-});
+// فتح التتبّع مباشرة من الرابط المرسل للعميل: track.html?track=<اللوحة>
+function autoSearchFromURL() {
+  const params = new URLSearchParams(window.location.search);
+  const plate  = params.get('track') || params.get('plate');
+  if (!plate) return;
+  const input = document.getElementById('plate-input');
+  if (!input) return;
+  input.value = plate.trim();
+  doSearch();
+}
 
-// Init Firebase on page load
 window.addEventListener('load', async () => {
-  showCloudStatus('⏳ جاري تحميل البيانات...');
+  showCloudStatus('loading');
   await initFirebaseTrack();
+  autoSearchFromURL();
 });
 </script>
 <script>
+// مسار نسبي — الموقع منشور تحت /final-touch/ وليس جذر النطاق
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js')
+    navigator.serviceWorker.register('sw.js')
       .catch(() => {});
   });
 }
