@@ -2,18 +2,15 @@
 <html lang="ar" dir="rtl">
 <head>
 <script>
-/* حماية صفحة الورشة — العميل العادي يروح لحجز موعد */
+/* رابط تتبّع عميل (?track=) يفتح صفحة التتبّع مباشرة.
+   الزائر بلا جلسة يبقى هنا وتستقبله شاشة الدخول (#auth-overlay) التي
+   تظهر افتراضياً — كان التحويل إلى booking.html يجعل صفحة الحجز هي
+   الواجهة الرئيسية عند كل فتح، لأن sessionStorage يُمسح بإغلاق التبويب. */
 (function(){
   try{
-    // رابط تتبّع عميل (?track=) يجب أن يفتح صفحة التتبّع، لا صفحة الحجز
     var trk = new URLSearchParams(location.search).get('track');
     if(trk){
       location.replace('track.html?track=' + encodeURIComponent(trk));
-      return;
-    }
-    var sess = JSON.parse(sessionStorage.getItem('ft_session'));
-    if(!sess && !location.search.includes('workshop') && !location.search.includes('admin')){
-      location.replace('booking.html');
     }
   }catch(e){}
 })();
