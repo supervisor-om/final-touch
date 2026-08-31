@@ -572,6 +572,13 @@ label{font-size:14px;}
 [dir='ltr'] .sidebar{right:auto;left:0;border-left:none;border-right:1px solid var(--border);}
 [dir='ltr'] .main{margin-right:0;margin-left:270px;}
 @media(max-width:900px){[dir='ltr'] .sidebar{left:auto;right:0;transform:translateX(100%);}[dir='ltr'] .sidebar.open{transform:translateX(0);}[dir='ltr'] .main{margin-left:0;}}
+
+/* زر قراءة اللوحة بالتصوير */
+.scan-plate-btn{width:100%;margin-top:6px;padding:9px 12px;border:1px dashed rgba(0,212,170,.45);
+  background:rgba(0,212,170,.08);color:#00d4aa;border-radius:9px;font-family:var(--font-main);
+  font-size:12px;font-weight:800;cursor:pointer;transition:background .15s;}
+.scan-plate-btn:hover{background:rgba(0,212,170,.18);}
+.scan-plate-btn:active{transform:scale(.985);}
 </style>
 <!-- توافق Safari 12 (iOS 12.5): يجب أن يسبق الرسم الأوّل ليضيف الصنف no-flexgap -->
 <script src="js/compat.js"></script>
@@ -1220,7 +1227,7 @@ label{font-size:14px;}
 
       <!-- MAIN FIELDS -->
       <div class="form-grid">
-        <div class="form-group"><label data-i18n="lbl_plate_req">رقم اللوحة *</label><input type="text" id="car-plate" placeholder="مثال: 12345 ع م"></div>
+        <div class="form-group"><label data-i18n="lbl_plate_req">رقم اللوحة *</label><input type="text" id="car-plate" placeholder="مثال: 12345 ع م"><button type="button" class="scan-plate-btn" onclick="PLATE_SCAN.start()">📸 صوّر اللوحة واقرأ الرقم</button></div>
         <div class="form-group"><label data-i18n="lbl_owner_req">اسم المالك *</label><input type="text" id="car-owner" placeholder="الاسم الكامل"></div>
         <div class="form-group"><label data-i18n="lbl_phone_opt">رقم الهاتف</label><input type="text" id="car-phone" placeholder="مثال: 96812345678 أو 91234567"><div style="font-size:11px;color:#8892a4;margin-top:3px;">أدخل الرقم كاملاً مع كود الدولة للإشعارات (عُمان: 968XXXXXXXX)</div></div>
         <div class="form-group"><label data-i18n="lbl_car_model_opt">موديل السيارة</label><input type="text" id="car-model" placeholder="مثال: Toyota Camry 2022"></div>
@@ -2196,6 +2203,16 @@ function removePendingPhoto(i) {
   _pendingPhotos.splice(i, 1);
   renderPendingPhotos();
 }
+
+// تُستدعى من js/plate-scan.js بعد التصوير: نضمّ الصورة إلى صور الاستلام
+// حتى لو فشلت قراءة الرقم، فجهد التصوير لا يضيع.
+window.onPlateScanned = function (photoDataUrl, digits) {
+  if (!photoDataUrl) return;
+  if (_pendingPhotos.length >= 6) return;
+  _pendingPhotos.push(photoDataUrl);
+  renderPendingPhotos();
+};
+
 
 // ── إدارة الحالات ─────────────────────────────────────────────
 let _currentTplService = null;
@@ -5593,5 +5610,6 @@ function saveWaBotKey() {
   </div>
 </div>
 
+<script src="js/plate-scan.js"></script>
 </body>
 </html>

@@ -566,3 +566,10 @@ label{font-size:14px;}
 @media(max-width:480px) {
   .no-flexgap .filter-row > * + * { margin-top: 8px; margin-right: 0; }
 }
+
+/* زر قراءة اللوحة بالتصوير */
+.scan-plate-btn{width:100%;margin-top:6px;padding:9px 12px;border:1px dashed rgba(0,212,170,.45);
+  background:rgba(0,212,170,.08);color:#00d4aa;border-radius:9px;font-family:var(--font-main);
+  font-size:12px;font-weight:800;cursor:pointer;transition:background .15s;}
+.scan-plate-btn:hover{background:rgba(0,212,170,.18);}
+.scan-plate-btn:active{transform:scale(.985);}

@@ -400,6 +400,16 @@ function removePendingPhoto(i) {
   renderPendingPhotos();
 }
 
+// تُستدعى من js/plate-scan.js بعد التصوير: نضمّ الصورة إلى صور الاستلام
+// حتى لو فشلت قراءة الرقم، فجهد التصوير لا يضيع.
+window.onPlateScanned = function (photoDataUrl, digits) {
+  if (!photoDataUrl) return;
+  if (_pendingPhotos.length >= 6) return;
+  _pendingPhotos.push(photoDataUrl);
+  renderPendingPhotos();
+};
+
+
 // ── إدارة الحالات ─────────────────────────────────────────────
 let _currentTplService = null;
 
