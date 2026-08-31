@@ -125,7 +125,7 @@ function renderUsersList() {
         <div style="font-size:13px;font-weight:700;color:#fff;">@${u.username}</div>
         <div style="font-size:11px;margin-top:2px;">${roleLabel(u.role)}</div>
       </div>
-      ${u.username !== getSession()?.username
+      ${u.username !== (getSession()||{}).username
         ? `<button onclick="deleteUser(${i})" style="background:rgba(233,69,96,.15);border:1px solid rgba(233,69,96,.25);color:#e94560;border-radius:8px;padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer;">حذف</button>`
         : '<span style="font-size:11px;color:var(--muted);">الحساب الحالي</span>'}
     </div>`).join('');

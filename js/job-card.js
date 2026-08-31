@@ -293,7 +293,7 @@ function sendWelcomeMessage(car) {
       </div>
       <a href="${waUrl}" target="_blank" rel="noopener"
          style="background:#25d366;color:#fff;border-radius:10px;padding:8px 16px;font-size:13px;font-weight:900;text-decoration:none;white-space:nowrap;"
-         onclick="setTimeout(()=>document.getElementById('wa-welcome-banner')?.remove(),500)">
+         onclick="setTimeout(function(){var b=document.getElementById('wa-welcome-banner');if(b)b.remove();},500)">
         إرسال ▶
       </a>
       <button onclick="document.getElementById('wa-welcome-banner').remove()"
@@ -310,7 +310,7 @@ function sendWelcomeMessage(car) {
   }
 
   document.body.appendChild(banner);
-  setTimeout(() => banner?.remove(), 40000);
+  setTimeout(() => { if (banner) banner.remove(); }, 40000);
 }
 
 // ── إشعار WhatsApp — يعرض زر قابل للضغط لتجاوز popup blocker ──
@@ -364,7 +364,7 @@ function sendPushNotification(car) {
       const waUrl = 'whatsapp://send?phone=' + phone + '&text=' + encodeURIComponent(msg);
       actionHtml = `<a href="${waUrl}"
          style="background:#fff;color:#25d366;border-radius:10px;padding:8px 18px;font-size:13px;font-weight:900;text-decoration:none;white-space:nowrap;"
-         onclick="setTimeout(()=>document.getElementById('wa-notify-banner')?.remove(),500)">
+         onclick="setTimeout(function(){var b=document.getElementById('wa-notify-banner');if(b)b.remove();},500)">
         إرسال ▶
       </a>`;
     } else {
@@ -385,7 +385,7 @@ function sendPushNotification(car) {
       style="background:rgba(0,0,0,.15);border:none;color:#fff;border-radius:8px;width:28px;height:28px;cursor:pointer;font-size:16px;line-height:1;flex-shrink:0;">✕</button>
   `;
   document.body.appendChild(banner);
-  setTimeout(() => banner?.remove(), 30000);
+  setTimeout(() => { if (banner) banner.remove(); }, 30000);
 }
 
 // ── تفعيل إشعارات WhatsApp من صفحة التتبع ──────────────────

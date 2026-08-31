@@ -31,7 +31,7 @@ body{font-family:var(--font-main);background:var(--primary);color:var(--text);mi
 body::before{content:'';position:fixed;top:0;left:0;right:0;bottom:0;background:radial-gradient(ellipse at 20% 50%,rgba(233,69,96,.08) 0%,transparent 50%),radial-gradient(ellipse at 80% 20%,rgba(79,172,254,.08) 0%,transparent 50%),radial-gradient(ellipse at 50% 80%,rgba(245,166,35,.05) 0%,transparent 50%);pointer-events:none;z-index:0;}
 
 /* ── HEADER ── */
-.header{position:sticky;top:0;z-index:50;background:rgba(15,52,96,.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;}
+.header{position:-webkit-sticky;position:sticky;top:0;z-index:50;background:rgba(15,52,96,.85);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;}
 .page-title{font-family:var(--font-display);font-size:18px;font-weight:800;}
 .back-btn{padding:8px 16px;background:rgba(255,255,255,.08);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:var(--font-main);font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:6px;}
 .back-btn:hover{background:rgba(255,255,255,.15);}
@@ -49,7 +49,7 @@ body::before{content:'';position:fixed;top:0;left:0;right:0;bottom:0;background:
 @keyframes fadeIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
 
 /* ── CARDS ── */
-.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:18px;backdrop-filter:blur(10px);overflow:hidden;}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:18px;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);overflow:hidden;}
 .card-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
 .card-title{font-size:15px;font-weight:800;}
 .card-body{padding:20px;}
@@ -91,7 +91,7 @@ textarea{resize:vertical;min-height:80px;}
 .btn-outline:hover{background:rgba(255,255,255,.05);}
 
 /* ── TABLE ── */
-.table-wrap{overflow-x:auto;}
+.table-wrap{-webkit-overflow-scrolling:touch;overflow-x:auto;}
 table{width:100%;border-collapse:collapse;font-size:13px;}
 thead tr{background:rgba(255,255,255,.05);}
 th{padding:12px 14px;text-align:right;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;}
@@ -131,8 +131,8 @@ tr:hover td{background:rgba(255,255,255,.03);}
 .today-btn:hover{background:rgba(255,255,255,.1);}
 
 /* ── LOGIN OVERLAY ── */
-#auth-overlay{position:fixed;inset:0;z-index:9000;background:linear-gradient(135deg,#0a0f1e 0%,#0f1f3d 50%,#1a1a2e 100%);display:flex;align-items:center;justify-content:center;}
-.auth-box{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:24px;padding:36px 32px;width:100%;max-width:360px;backdrop-filter:blur(20px);text-align:center;}
+#auth-overlay{position:fixed;top:0;right:0;bottom:0;left:0;z-index:9000;background:linear-gradient(135deg,#0a0f1e 0%,#0f1f3d 50%,#1a1a2e 100%);display:flex;align-items:center;justify-content:center;}
+.auth-box{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:24px;padding:36px 32px;width:100%;max-width:360px;-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);text-align:center;}
 .auth-logo-title{font-family:var(--font-display);font-size:22px;font-weight:900;color:#fff;}
 .auth-logo-sub{font-size:11px;color:var(--muted);letter-spacing:2px;margin-top:4px;}
 .auth-field{margin-bottom:14px;text-align:right;}
@@ -145,6 +145,24 @@ tr:hover td{background:rgba(255,255,255,.03);}
 /* ── USER INFO ── */
 .user-bar{display:flex;align-items:center;gap:10px;padding:8px 14px;background:rgba(255,255,255,.04);border-radius:10px;margin-bottom:16px;}
 .user-bar .role-badge{font-size:11px;padding:3px 10px;border-radius:20px;font-weight:700;}
+
+
+</style>
+<!-- توافق Safari 12 (iOS 12.5): يجب أن يسبق الرسم الأوّل ليضيف الصنف no-flexgap -->
+<script src="js/compat.js"></script>
+<style>
+/* ==== توافق Safari 12 / iOS 12.5: gap في flexbox لم يصل قبل Safari 14.1 ====
+   js/compat.js يضيف الصنف no-flexgap عند غياب الدعم فقط. مولّد آلياً. */
+.no-flexgap .back-btn > * + * { margin-right: 6px; }
+.no-flexgap .tabs > * + * { margin-right: 4px; }
+.no-flexgap .clock-btn-area > * + * { margin-right: 24px; }
+.no-flexgap .clock-btn > * + * { margin-top: 12px; margin-right: 0; }
+.no-flexgap .form-group > * + * { margin-top: 6px; margin-right: 0; }
+.no-flexgap .btn > * + * { margin-right: 8px; }
+.no-flexgap .badge > * + * { margin-right: 4px; }
+.no-flexgap .filter-row > * + * { margin-right: 10px; }
+.no-flexgap .filter-row > * { margin-bottom: 10px; }
+.no-flexgap .user-bar > * + * { margin-right: 10px; }
 </style>
 </head>
 <body>

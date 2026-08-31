@@ -14,7 +14,7 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 body{font-family:'Cairo',sans-serif;background:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);min-height:100vh;color:#eaeaea;direction:rtl;}
-body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 50%,rgba(233,69,96,.1) 0%,transparent 50%),radial-gradient(ellipse at 80% 20%,rgba(79,172,254,.08) 0%,transparent 50%);pointer-events:none;}
+body::before{content:'';position:fixed;top:0;right:0;bottom:0;left:0;background:radial-gradient(ellipse at 20% 50%,rgba(233,69,96,.1) 0%,transparent 50%),radial-gradient(ellipse at 80% 20%,rgba(79,172,254,.08) 0%,transparent 50%);pointer-events:none;}
 .wrap{max-width:580px;margin:0 auto;padding:28px 16px;position:relative;z-index:1;}
 /* HEADER */
 .header{text-align:center;margin-bottom:24px;background:linear-gradient(180deg,#0f3460 0%,#16213e 100%);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:20px 16px 18px;}
@@ -22,7 +22,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .brand{font-family:'Tajawal',sans-serif;font-size:18px;font-weight:900;color:#fff;line-height:1.2;}
 .brand-sub{font-size:11px;color:#8892a4;letter-spacing:1px;margin-top:3px;}
 /* SEARCH BOX */
-.search-card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:24px;padding:32px 24px;text-align:center;margin-bottom:20px;backdrop-filter:blur(10px);}
+.search-card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:24px;padding:32px 24px;text-align:center;margin-bottom:20px;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);}
 .search-icon{font-size:48px;margin-bottom:14px;}
 .search-title{font-size:20px;font-weight:800;color:#fff;margin-bottom:6px;}
 .search-desc{font-size:13px;color:#8892a4;margin-bottom:24px;line-height:1.6;}
@@ -36,7 +36,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 /* RESULT */
 .result{display:none;}
 /* Info card */
-.info-card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:22px;margin-bottom:16px;backdrop-filter:blur(10px);}
+.info-card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:22px;margin-bottom:16px;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);}
 .car-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;}
 .car-plate{font-size:26px;font-weight:900;color:#fff;}
 .car-model{font-size:13px;color:#8892a4;margin-top:3px;}
@@ -53,7 +53,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .exp-label{font-size:12px;color:#8892a4;margin-bottom:4px;}
 .exp-date{font-size:17px;font-weight:900;}
 /* Stages */
-.stages-card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:22px;margin-bottom:16px;backdrop-filter:blur(10px);}
+.stages-card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:22px;margin-bottom:16px;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);}
 .stages-title{font-size:13px;font-weight:700;color:#8892a4;margin-bottom:18px;text-align:center;letter-spacing:.5px;}
 .stage-row{display:flex;align-items:center;gap:14px;padding:13px 14px;border-radius:14px;margin-bottom:8px;transition:all .3s;border:1px solid transparent;}
 .stage-row.done{background:rgba(0,212,170,.05);border-color:rgba(0,212,170,.2);}
@@ -75,7 +75,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .progress-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,#e94560,#f5a623,#00d4aa);transition:width .8s ease;}
 .progress-pct{font-size:12px;color:#8892a4;text-align:left;margin-top:5px;}
 /* Payment */
-.payment-card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:22px;margin-bottom:16px;backdrop-filter:blur(10px);}
+.payment-card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:22px;margin-bottom:16px;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);}
 .pay-row{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.06);font-size:14px;}
 .pay-row:last-child{border:none;padding-top:13px;margin-top:4px;}
 .pay-row.total-row{font-size:17px;font-weight:900;}
@@ -89,6 +89,14 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .back-btn:hover{background:rgba(255,255,255,.1);}
 /* footer */
 .footer{text-align:center;margin-top:24px;font-size:11px;color:#2d3748;padding-bottom:20px;}
+</style>
+<!-- توافق Safari 12 (iOS 12.5): يجب أن يسبق الرسم الأوّل ليضيف الصنف no-flexgap -->
+<script src="js/compat.js"></script>
+<style>
+/* ==== توافق Safari 12 / iOS 12.5: gap في flexbox لم يصل قبل Safari 14.1 ====
+   js/compat.js يضيف الصنف no-flexgap عند غياب الدعم فقط. مولّد آلياً. */
+.no-flexgap .input-row > * + * { margin-right: 10px; }
+.no-flexgap .stage-row > * + * { margin-right: 14px; }
 </style>
 </head>
 <body>

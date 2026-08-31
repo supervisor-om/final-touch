@@ -84,7 +84,7 @@ function renderBookingCalendar(){
 // ─── Booking Table ───
 function renderBookings(){
   var bookings = bkLoad().sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt));
-  var filter = document.getElementById('bk-filter-status')?.value || '';
+  var filter = (document.getElementById('bk-filter-status')||{}).value || '';
 
   if(filter) bookings = bookings.filter(b=>b.status===filter);
 

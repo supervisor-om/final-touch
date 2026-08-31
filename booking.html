@@ -21,8 +21,8 @@
 }
 *{margin:0;padding:0;box-sizing:border-box;}
 body{font-family:var(--font-main);background:var(--primary);color:var(--text);min-height:100vh;direction:rtl;}
-body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 50%,rgba(233,69,96,.08) 0%,transparent 50%),radial-gradient(ellipse at 80% 20%,rgba(79,172,254,.08) 0%,transparent 50%);pointer-events:none;z-index:0;}
-.header{padding:20px 0;text-align:center;border-bottom:1px solid var(--border);background:rgba(15,52,96,.5);backdrop-filter:blur(10px);position:relative;z-index:1;}
+body::before{content:'';position:fixed;top:0;right:0;bottom:0;left:0;background:radial-gradient(ellipse at 20% 50%,rgba(233,69,96,.08) 0%,transparent 50%),radial-gradient(ellipse at 80% 20%,rgba(79,172,254,.08) 0%,transparent 50%);pointer-events:none;z-index:0;}
+.header{padding:20px 0;text-align:center;border-bottom:1px solid var(--border);background:rgba(15,52,96,.5);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);position:relative;z-index:1;}
 .logo-img{width:90px;height:90px;object-fit:contain;display:block;margin:0 auto 8px;filter:drop-shadow(0 4px 20px rgba(233,69,96,.5));}
 .brand{font-family:var(--font-display);font-size:24px;font-weight:900;}
 .brand-sub{font-size:13px;color:var(--muted);margin-top:2px;}
@@ -31,7 +31,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .step{display:flex;align-items:center;gap:6px;padding:8px 16px;border-radius:24px;background:rgba(255,255,255,.05);border:1px solid var(--border);font-size:13px;font-weight:700;color:var(--muted);transition:all .3s;}
 .step.active{background:linear-gradient(135deg,var(--accent),#ff6b35);color:#fff;border-color:transparent;}
 .step.done{background:rgba(0,212,170,.1);border-color:rgba(0,212,170,.3);color:var(--success);}
-.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:16px;overflow:hidden;backdrop-filter:blur(10px);}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:16px;overflow:hidden;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);}
 .card-header{padding:16px 20px;border-bottom:1px solid var(--border);font-size:15px;font-weight:800;}
 .card-body{padding:20px;}
 .services-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
@@ -96,6 +96,21 @@ textarea{resize:vertical;min-height:70px;}
 .flash.success{background:rgba(0,212,170,.15);border:1px solid var(--success);color:var(--success);}
 .flash.error{background:rgba(233,69,96,.15);border:1px solid var(--danger);color:var(--danger);}
 .warn-box{background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.25);border-radius:10px;padding:12px 16px;margin:16px 0;font-size:13px;color:var(--warning);text-align:center;}
+
+
+</style>
+<!-- توافق Safari 12 (iOS 12.5): يجب أن يسبق الرسم الأوّل ليضيف الصنف no-flexgap -->
+<script src="js/compat.js"></script>
+<style>
+/* ==== توافق Safari 12 / iOS 12.5: gap في flexbox لم يصل قبل Safari 14.1 ====
+   js/compat.js يضيف الصنف no-flexgap عند غياب الدعم فقط. مولّد آلياً. */
+.no-flexgap .steps > * + * { margin-right: 8px; }
+.no-flexgap .steps > * { margin-bottom: 8px; }
+.no-flexgap .step > * + * { margin-right: 6px; }
+.no-flexgap .week-card .wk-cars > * + * { margin-right: 6px; }
+.no-flexgap .form-group > * + * { margin-top: 6px; margin-right: 0; }
+.no-flexgap .back-link > * + * { margin-right: 6px; }
+.no-flexgap .whatsapp-btn > * + * { margin-right: 8px; }
 </style>
 </head>
 <body>

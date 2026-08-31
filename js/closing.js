@@ -232,7 +232,7 @@ function confirmCloseMonth(){
   }
   const d=getMonthlyData(monthStr);
   const session=getSession();
-  const notes=(document.getElementById('close-month-notes')?.value||'').trim();
+  const notes=((document.getElementById('close-month-notes')||{}).value||'').trim();
   const rec={
     id:'cl_'+Date.now(),
     month:monthStr,
@@ -323,7 +323,7 @@ function viewClosingDetails(id){
     <!-- Tab: Cars -->
     <div id="cd-tab-cars" style="display:none;padding-top:14px;">
       ${allCars.length?`
-      <div style="overflow-x:auto;margin-bottom:16px;">
+      <div style="-webkit-overflow-scrolling:touch;overflow-x:auto;margin-bottom:16px;">
         <table style="width:100%;border-collapse:collapse;font-size:12px;">
           <thead><tr style="background:rgba(255,255,255,.05);">
             <th style="padding:8px 6px;text-align:right;color:var(--muted);">اللوحة</th>
@@ -357,7 +357,7 @@ function viewClosingDetails(id){
     <!-- Tab: Expenses -->
     <div id="cd-tab-expenses" style="display:none;padding-top:14px;">
       ${expenses.length?`
-      <div style="overflow-x:auto;">
+      <div style="-webkit-overflow-scrolling:touch;overflow-x:auto;">
         <table style="width:100%;border-collapse:collapse;font-size:12px;">
           <thead><tr style="background:rgba(255,255,255,.05);">
             <th style="padding:8px 6px;text-align:right;color:var(--muted);">التاريخ</th>
@@ -384,7 +384,7 @@ function viewClosingDetails(id){
     <!-- Tab: Services -->
     <div id="cd-tab-services" style="display:none;padding-top:14px;">
       ${Object.keys(byService).length?`
-      <div style="overflow-x:auto;margin-bottom:16px;">
+      <div style="-webkit-overflow-scrolling:touch;overflow-x:auto;margin-bottom:16px;">
         <table style="width:100%;border-collapse:collapse;font-size:12px;">
           <thead><tr style="background:rgba(255,255,255,.05);">
             <th style="padding:8px 6px;text-align:right;color:var(--muted);">الخدمة</th>
@@ -548,7 +548,7 @@ function exportPDF(){
 <!-- ═══════════════════════════════════════════
      CUSTOMER TRACKING OVERLAY
 ═══════════════════════════════════════════ -->
-<div id="customer-tracking-overlay" style="display:none;position:fixed;inset:0;z-index:9999;background:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);overflow-y:auto;direction:rtl;font-family:'Cairo',sans-serif;">
+<div id="customer-tracking-overlay" style="display:none;position:fixed;inset:0;z-index:9999;background:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);-webkit-overflow-scrolling:touch;overflow-y:auto;direction:rtl;font-family:'Cairo',sans-serif;">
   <div style="max-width:560px;margin:0 auto;padding:30px 20px;">
 
     <!-- Header -->

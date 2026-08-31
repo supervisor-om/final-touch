@@ -114,9 +114,9 @@ function renderInvoicesTable(){
 }
 
 function renderExpensesTable(){
-  const search=(document.getElementById('exp-search')?.value||'').toLowerCase();
-  const fType=document.getElementById('exp-filter-type')?.value||'';
-  const fMonth=document.getElementById('exp-filter-month')?.value||'';
+  const search=((document.getElementById('exp-search')||{}).value||'').toLowerCase();
+  const fType=(document.getElementById('exp-filter-type')||{}).value||'';
+  const fMonth=(document.getElementById('exp-filter-month')||{}).value||'';
 
   // Apply filters
   let filtered=[...state.expenses].sort((a,b)=>(b.date||'').localeCompare(a.date||''));
@@ -196,8 +196,8 @@ function clearExpFilters(){
 }
 
 function exportExpensesPDF(){
-  const fMonth=document.getElementById('exp-filter-month')?.value||'';
-  const fType=document.getElementById('exp-filter-type')?.value||'';
+  const fMonth=(document.getElementById('exp-filter-month')||{}).value||'';
+  const fType=(document.getElementById('exp-filter-type')||{}).value||'';
   let filtered=[...state.expenses].sort((a,b)=>(b.date||'').localeCompare(a.date||''));
   if(fMonth)filtered=filtered.filter(e=>(e.date||'').startsWith(fMonth));
   if(fType)filtered=filtered.filter(e=>e.type===fType);

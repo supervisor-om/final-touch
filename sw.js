@@ -1,6 +1,6 @@
 // ارفع الرقم عند كل تعديل على الملفات المخزَّنة أدناه،
 // وإلا بقي الزوار السابقون على النسخة القديمة من الكاش.
-const CACHE_NAME = 'final-touch-v5';
+const CACHE_NAME = 'final-touch-v6';
 
 // Derive base path from service worker location (works on any subdirectory)
 const BASE = self.registration.scope;
@@ -13,6 +13,7 @@ const STATIC_ASSETS = [
   BASE + 'manifest.json',
   BASE + 'icon-192.png',
   BASE + 'icon-512.png',
+  BASE + 'js/compat.js',
   BASE + 'js/db.js',
   BASE + 'js/auth-attendance.js',
   BASE + 'js/attendance.js',
@@ -61,8 +62,10 @@ self.addEventListener('install', event => {
     caches.open(CACHE_NAME).then(cache => {
       const localAssets  = STATIC_ASSETS.filter(url => !url.startsWith('http'));
       const externalAssets = STATIC_ASSETS.filter(url => url.startsWith('http'));
+      // Promise.allSettled غير موجود في Safari 12 (iOS 12.5) — استدعاؤه يُفشل
+      // تثبيت الـ service worker كلّه. كل وعد هنا يبتلع خطأه أصلاً، فـ Promise.all يكفي.
       return cache.addAll(localAssets).then(() =>
-        Promise.allSettled(
+        Promise.all(
           externalAssets.map(url =>
             fetch(url, { mode: 'no-cors' })
               .then(res => cache.put(url, res))

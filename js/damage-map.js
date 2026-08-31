@@ -187,7 +187,8 @@ function refreshDamageMap(idPrefix, damageMap) {
     listEl.outerHTML = buildDamageList(damageMap, idPrefix, false);
   } else {
     // Append list after SVG wrap
-    const container = document.querySelector(`#${idPrefix}-wrap`)?.closest('.damage-map-container');
+    const wrap = document.querySelector(`#${idPrefix}-wrap`);
+    const container = wrap ? wrap.closest('.damage-map-container') : null;
     if (container) {
       const old = container.querySelector('.damage-list');
       if (old) old.remove();

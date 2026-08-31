@@ -59,7 +59,21 @@ function loadState(){
     if(!state.monthlyClosings)state.monthlyClosings=[];
   }}catch(e){}
 }
-function saveState(){localStorage.setItem('finaltouchv2',JSON.stringify(state));}
+// سفاري على iOS يرمي هنا في التصفّح الخاص وعند امتلاء الحصّة (٥ ميجابايت فقط).
+// الرمية غير الملتقَطة كانت تُجهض العملية التي استدعت الحفظ في منتصفها.
+var _saveWarned = false;
+function saveState(){
+  try{
+    localStorage.setItem('finaltouchv2',JSON.stringify(state));
+  }catch(e){
+    console.warn('[saveState] تعذّر الحفظ محلياً:', e && e.name);
+    if(!_saveWarned){
+      _saveWarned = true;
+      alert('⚠️ تعذّر الحفظ على هذا الجهاز (ذاكرة المتصفّح ممتلئة أو التصفّح خاص).\n'
+        + 'بياناتك ما زالت تُحفظ في السحابة، لكن لا تعتمد على هذا الجهاز وحده.');
+    }
+  }
+}
 loadState();
 syncStageArrays();
 

@@ -166,3 +166,11 @@
 .jc-damage-part { font-weight: 700; min-width: 130px; }
 .jc-damage-sev  { color: #888; min-width: 60px; }
 .jc-damage-desc { flex: 1; color: #444; }
+
+
+/* ==== توافق Safari 12 / iOS 12.5: gap في flexbox لم يصل قبل Safari 14.1 ====
+   js/compat.js يضيف الصنف no-flexgap عند غياب الدعم فقط. مولّد آلياً. */
+.no-flexgap .damage-list > * + * { margin-top: 6px; margin-right: 0; }
+.no-flexgap .damage-item > * + * { margin-right: 10px; }
+.no-flexgap #modal-damage-part .severity-opts > * + * { margin-right: 8px; }
+.no-flexgap .jc-damage-row > * + * { margin-right: 8px; }

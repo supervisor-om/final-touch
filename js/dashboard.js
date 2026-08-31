@@ -50,9 +50,9 @@ function renderDashboard(){
 function renderCarsTable(){
   const session=getSession();
   const isAdmin=session&&session.role==='admin';
-  const search=(document.getElementById('search-cars')?.value||'').toLowerCase();
-  const fs=document.getElementById('filter-status')?.value||'';
-  const fv=document.getElementById('filter-service')?.value||'';
+  const search=((document.getElementById('search-cars')||{}).value||'').toLowerCase();
+  const fs=(document.getElementById('filter-status')||{}).value||'';
+  const fv=(document.getElementById('filter-service')||{}).value||'';
   let cars=state.cars.filter(c=>c.status!=='delivered');
   if(search)cars=cars.filter(c=>c.plate.toLowerCase().includes(search)||c.owner.toLowerCase().includes(search)||(c.model||'').toLowerCase().includes(search));
   if(fs)cars=cars.filter(c=>c.status===fs);
@@ -155,9 +155,9 @@ function renderDeliveredTable(){
   }
 
   // Filters
-  const search=(document.getElementById('del-search')?.value||'').toLowerCase();
-  const fService=document.getElementById('del-filter-service')?.value||'';
-  const fMonth=document.getElementById('del-filter-month')?.value||'';
+  const search=((document.getElementById('del-search')||{}).value||'').toLowerCase();
+  const fService=(document.getElementById('del-filter-service')||{}).value||'';
+  const fMonth=(document.getElementById('del-filter-month')||{}).value||'';
 
   let delivered=state.cars.filter(c=>c.status==='delivered');
   if(search) delivered=delivered.filter(c=>(c.plate||'').toLowerCase().includes(search)||(c.owner||'').toLowerCase().includes(search));

@@ -56,7 +56,7 @@ function editCar(id){
 // QUICK STATUS CHANGE (click badge in table)
 function quickStatus(carId,e){
   e.stopPropagation();
-  document.getElementById('qs-popup')?.remove();
+  const _el=document.getElementById('qs-popup'); if(_el)_el.remove();
   const car=state.cars.find(c=>c.id===carId);
   if(!car)return;
   const popup=document.createElement('div');
@@ -81,7 +81,7 @@ function quickStatus(carId,e){
   popup.style.visibility='';
   setTimeout(()=>document.addEventListener('click',closeQsPopup,{once:true}),0);
 }
-function closeQsPopup(){document.getElementById('qs-popup')?.remove();}
+function closeQsPopup(){const _el=document.getElementById('qs-popup'); if(_el)_el.remove();}
 function applyQuickStatus(carId,stage){
   closeQsPopup();
   const car=state.cars.find(c=>c.id===carId);

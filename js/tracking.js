@@ -91,11 +91,17 @@ function sendWAById(carId) {
 }
 
 function copyLink(url) {
-  navigator.clipboard.writeText(url).then(() => {
-    alert('✅ تم نسخ الرابط!');
-  }).catch(() => {
-    prompt('انسخ الرابط:', url);
-  });
+  // navigator.clipboard غير موجود في Safari 12 (iOS 12.5) ولا في أي صفحة بلا HTTPS.
+  // الاستدعاء المباشر يرمي فوراً قبل أن يُنتج وعداً، فلا يلتقطه catch أبداً.
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(url).then(function () {
+      alert('✅ تم نسخ الرابط!');
+    }).catch(function () {
+      prompt('انسخ الرابط:', url);
+    });
+    return;
+  }
+  prompt('انسخ الرابط:', url);
 }
 
 // ── CUSTOMER TRACKING PAGE (standalone) ─────────────────────────────────────
