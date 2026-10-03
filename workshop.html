@@ -902,6 +902,7 @@ label{font-size:14px;}
         <select id="exp-filter-type" onchange="renderExpensesTable()" style="padding:8px 12px;border-radius:10px;border:1px solid var(--border);background:var(--card);color:var(--text);font-family:var(--font-main);font-size:13px;">
           <option value="">جميع الأنواع</option>
           <option value="قطع غيار">قطع الغيار</option>
+          <option value="أصباغ">أصباغ ومواد دهان</option>
           <option value="مرافق">مرافق وتشغيل</option>
           <option value="رواتب">رواتب وعمالة</option>
           <option value="إيجار">إيجار</option>
@@ -1532,6 +1533,7 @@ label{font-size:14px;}
         <div class="form-group"><label>النوع</label>
           <select id="exp-type">
             <option value="قطع غيار">🔧 قطع الغيار</option>
+            <option value="أصباغ">🎨 أصباغ ومواد دهان</option>
             <option value="مرافق">💡 مرافق وتشغيل</option>
             <option value="رواتب">👷 رواتب وعمالة</option>
             <option value="إيجار">🏠 إيجار</option>
@@ -2755,7 +2757,7 @@ function renderExpensesTable(){
     const receipts=loadExpReceipts();
     tbody.innerHTML=filtered.map(e=>{
       const receipt=receipts[e.id];
-      const typeEmoji={قطع:'🔧','مرافق':'💡','رواتب':'👷','إيجار':'🏠','أدوات':'🛠️','أخرى':'📦'};
+      const typeEmoji={قطع:'🔧','أصباغ':'🎨','مرافق':'💡','رواتب':'👷','إيجار':'🏠','أدوات':'🛠️','أخرى':'📦'};
       const emoji=Object.keys(typeEmoji).find(k=>e.type.startsWith(k));
       return`<tr>
         <td style="white-space:nowrap;font-size:12px;">${formatDate(e.date)}</td>

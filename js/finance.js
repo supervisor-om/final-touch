@@ -155,7 +155,7 @@ function renderExpensesTable(){
     const receipts=loadExpReceipts();
     tbody.innerHTML=filtered.map(e=>{
       const receipt=receipts[e.id];
-      const typeEmoji={قطع:'🔧','مرافق':'💡','رواتب':'👷','إيجار':'🏠','أدوات':'🛠️','أخرى':'📦'};
+      const typeEmoji={قطع:'🔧','أصباغ':'🎨','مرافق':'💡','رواتب':'👷','إيجار':'🏠','أدوات':'🛠️','أخرى':'📦'};
       const emoji=Object.keys(typeEmoji).find(k=>e.type.startsWith(k));
       return`<tr>
         <td style="white-space:nowrap;font-size:12px;">${formatDate(e.date)}</td>
