@@ -75,12 +75,14 @@ function addPayment(car, opts) {
   ensurePayments(car);
   var amount = _r3(opts.amount);
   if (!amount) return null;
+  var date = opts.date || today();
+  if (!assertDatesOpen([date], 'تسجيل الدفعة')) return null;
   var p = {
     id: genId(),
     type: opts.type || (amount < 0 ? 'adjustment' : 'payment'),
     amount: amount,
     method: opts.method || '',
-    date: opts.date || today(),
+    date: date,
     at: new Date().toISOString(),
     by: _payUser()
   };
@@ -252,6 +254,36 @@ function renderAging() {
         '</td><td style="color:' + color + ';font-weight:700;">' + r.days + ' يوم</td><td><strong style="color:var(--danger);">' + fmt(r.rem) + '</strong></td></tr>';
     }).join('') + '</tbody></table></div>';
   document.getElementById('aging-body').innerHTML = html;
+}
+
+// ── قفل الأشهر المُغلقة ──────────────────────────────────────────────
+// الإغلاق الساري (غير المُعاد فتحه) يمنع أي تعديل مالي بتاريخ ذلك الشهر:
+// مصروفات، دفعات، تسليم (إصدار فاتورة)، تعديل مبلغ سيارة مُسلَّمة فيه، حذف أو إرجاع.
+// التعديل يتطلّب إعادة فتح الشهر (للمدير، بسبب مكتوب يبقى في سجل الإغلاق).
+function activeClosing(month) {
+  return (state.monthlyClosings || []).find(function (c) { return c.month === month && !c.reopened; }) || null;
+}
+function isDateLocked(date) { return !!(date && activeClosing(String(date).slice(0, 7))); }
+function assertDatesOpen(dates, what) {
+  for (var i = 0; i < dates.length; i++) {
+    if (isDateLocked(dates[i])) {
+      var m = String(dates[i]).slice(0, 7);
+      alert('🔒 لا يمكن ' + what + ': شهر ' + (typeof getMonthLabel === 'function' ? getMonthLabel(m) : m) + ' مُغلق.\n' +
+        'للتعديل أعِد فتح الشهر من صفحة «الإغلاق الشهري» (للمدير، ويُسجَّل السبب).');
+      return false;
+    }
+  }
+  return true;
+}
+function reopenClosing(id) {
+  if (!requireAdmin()) return;
+  var rec = (state.monthlyClosings || []).find(function (c) { return c.id === id; });
+  if (!rec || rec.reopened) return;
+  var reason = prompt('سبب إعادة فتح شهر ' + rec.monthLabel + ' (يُحفظ في سجل الإغلاق):', '');
+  if (!reason || !reason.trim()) { if (reason !== null) alert('يجب كتابة السبب'); return; }
+  rec.reopened = { at: new Date().toISOString(), by: _payUser(), reason: reason.trim() };
+  saveState();
+  renderAll();
 }
 
 function renderPaymentsPanels() {

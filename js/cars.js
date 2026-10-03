@@ -4,6 +4,7 @@ function addCar(){
   if(!plate||!owner){alert('يرجى إدخال رقم اللوحة واسم المالك');return;}
   const estimate=parseFloat(document.getElementById('car-estimate').value)||0;
   const deposit=parseFloat(document.getElementById('car-deposit').value)||0;
+  if(deposit>0&&!assertDatesOpen([today()],'تسجيل الدفعة المقدّمة'))return;
   const svcType=document.getElementById('car-service').value;
   const tplStages=state.stageTemplates[svcType]?JSON.parse(JSON.stringify(state.stageTemplates[svcType])):null;
   const car={id:genId(),plate,owner,phone:document.getElementById('car-phone').value.trim(),model:document.getElementById('car-model').value.trim(),km:document.getElementById('car-km').value.trim(),service:svcType,estimate,deposit,paidTotal:0,payments:[],notes:document.getElementById('car-notes').value.trim(),expectedDate:document.getElementById('car-expected-date').value||'',status:'waiting',stage:0,stages:tplStages,dateIn:today(),dateOut:null,damageMap:window._addCarDamageMap?[...window._addCarDamageMap]:[]};
@@ -88,6 +89,7 @@ function applyQuickStatus(carId,stage){
   closeQsPopup();
   const car=state.cars.find(c=>c.id===carId);
   if(!car)return;
+  if(statusFromStage(stage,getCarStages(car))==='delivered'&&!car.dateOut&&!assertDatesOpen([today()],'تسليم السيارة'))return;
   const prevStage=car.stage;
   car.stage=stage;
   car.status=statusFromStage(stage,getCarStages(car));
@@ -155,6 +157,12 @@ function updateCar(){
   // حقل «المدفوع» لم يعد يُستبدل: الفرق يُسجَّل في سجل الدفعات بتاريخ اليوم.
   ensurePayments(car);
   const paidDiff=Math.round(((parseFloat(document.getElementById('update-paid').value)||0)-(car.paidTotal||0))*1000)/1000;
+  // قفل الشهر المُغلق: دفعة/تسليم اليوم، أو تعديل مبلغ سيارة سُلّمت في شهر مُغلق.
+  const _lockDates=[];
+  if(paidDiff)_lockDates.push(today());
+  if(statusFromStage(currentStage,getCarStages(car))==='delivered'&&!car.dateOut)_lockDates.push(today());
+  if(car.dateOut&&Math.abs((parseFloat(document.getElementById('update-amount').value)||0)-(car.estimate||0))>0.0005)_lockDates.push(car.dateOut);
+  if(!assertDatesOpen(_lockDates,'حفظ التعديل المالي'))return;
   if(paidDiff<0&&!confirm('سيُسجَّل تصحيح بالسالب '+(-paidDiff).toFixed(3)+' ر.ع في سجل الدفعات (استرجاع للعميل أو تصحيح خطأ إدخال). هل تريد المتابعة؟'))return;
   const prevStage=car.stage;
   car.stage=currentStage;
@@ -278,8 +286,8 @@ function loadExpReceipts(){try{return JSON.parse(localStorage.getItem(EXP_RECEIP
 function saveExpReceipts(r){try{localStorage.setItem(EXP_RECEIPTS_KEY,JSON.stringify(r));}catch(e){alert('مساحة التخزين ممتلئة.');}}
 function getExpReceipt(id){return loadExpReceipts()[id]||null;}
 
-function deleteCar(id){const _dc=getSession();if(!_dc||(_dc.role!=='admin'&&_dc.role!=='accountant')){alert(t('msg_admin_only_delete'));return;}if(!confirm(t('msg_confirm_delete_car')))return;state.cars=state.cars.filter(c=>c.id!==id);saveState();renderAll();}
-function deleteExpense(id){if(!requireAdmin())return;if(!confirm('حذف المصروف؟'))return;state.expenses=state.expenses.filter(e=>e.id!==id);setExpReceipt(id,null);saveState();renderExpensesTable();}
+function deleteCar(id){const _dc=getSession();if(!_dc||(_dc.role!=='admin'&&_dc.role!=='accountant')){alert(t('msg_admin_only_delete'));return;}const _car=state.cars.find(c=>c.id===id);if(_car&&!assertDatesOpen([_car.dateOut].concat((_car.payments||[]).map(p=>p.date)),'حذف السيارة'))return;if(!confirm(t('msg_confirm_delete_car')))return;state.cars=state.cars.filter(c=>c.id!==id);saveState();renderAll();}
+function deleteExpense(id){if(!requireAdmin())return;const _e=state.expenses.find(x=>x.id===id);if(_e&&!assertDatesOpen([_e.date],'حذف المصروف'))return;if(!confirm('حذف المصروف؟'))return;state.expenses=state.expenses.filter(e=>e.id!==id);setExpReceipt(id,null);saveState();renderExpensesTable();}
 function deleteService(id){if(!confirm(t('msg_confirm_delete_service')))return;state.services=state.services.filter(s=>s.id!==id);saveState();renderAll();}
 function deleteOrder(id){if(!confirm(t('msg_confirm_delete_order')))return;state.orders=state.orders.filter(o=>o.id!==id);saveState();renderAll();}
 

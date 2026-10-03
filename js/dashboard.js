@@ -216,6 +216,8 @@ function clearDeliveredFilters(){
 
 function restoreCarToWorkshop(id){
   if(!requireAdmin())return;
+  const _rc=state.cars.find(c=>c.id===id);
+  if(_rc&&!assertDatesOpen([_rc.dateOut],'إرجاع السيارة (حذف فاتورتها)'))return;
   if(!confirm('إعادة هذه السيارة إلى قسم "السيارات في الورشة"؟\nسيتم حذف الفاتورة المرتبطة بها.'))return;
   const car=state.cars.find(c=>c.id===id);
   if(!car)return;
@@ -263,6 +265,7 @@ function submitConfirmPayment(){
   const method=document.getElementById('cp-method').value;
   const amount=parseFloat(document.getElementById('cp-amount').value)||0;
   if(!method){alert('يرجى اختيار طريقة الدفع');return;}
+  if(!assertDatesOpen([today()],'تسجيل الدفعة'))return;
   if(amount<=0){alert('يرجى إدخال مبلغ صحيح');return;}
   const car=state.cars.find(c=>c.id===carId);
   if(!car)return;

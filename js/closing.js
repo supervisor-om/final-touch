@@ -148,7 +148,8 @@ function _renderClosingList(){
     const profitIcon=c.grossProfit>=0?'📈':'📉';
     return`<div style="border-bottom:1px solid var(--border);padding:16px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
       <div style="flex:1;min-width:160px;">
-        <div style="font-size:14px;font-weight:700;color:var(--text);">${c.monthLabel}</div>
+        <div style="font-size:14px;font-weight:700;color:var(--text);">${c.reopened?'🔓':'🔒'} ${c.monthLabel}${c.reopened?' <span style="font-size:11px;color:#ff6432;">(أُعيد فتحه)</span>':''}</div>
+        ${c.reopened?`<div style="font-size:11px;color:#ff6432;margin-top:4px;background:rgba(255,100,50,.08);padding:4px 8px;border-radius:8px;">🔓 أعاد فتحه ${c.reopened.by||'—'} في ${formatDate(c.reopened.at)} — السبب: ${c.reopened.reason}</div>`:''}
         <div style="font-size:11px;color:var(--muted);margin-top:2px;">${t('lbl_closed_at')}: ${formatDate(c.closedAt)} • ${t('lbl_closed_by')}: ${c.closedBy||'—'}</div>
         ${c.notes?`<div style="font-size:11px;color:var(--info);margin-top:4px;background:rgba(79,172,254,.08);padding:4px 8px;border-radius:8px;">📝 ${c.notes}</div>`:''}
         <div style="display:flex;gap:10px;margin-top:6px;flex-wrap:wrap;">
@@ -175,8 +176,8 @@ function _renderClosingList(){
       </div>
       <div style="display:flex;gap:6px;flex-wrap:wrap;">
         <button class="btn btn-outline btn-sm" onclick="viewClosingDetails('${c.id}')">${t('btn_view_details')}</button>
-        <button class="btn btn-outline btn-sm" onclick="recalcClosing('${c.id}')" title="إعادة الحساب">🔄</button>
-        <button class="btn btn-danger btn-sm" onclick="deleteClosing('${c.id}')">🗑️</button>
+        ${c.reopened?`<button class="btn btn-danger btn-sm" onclick="deleteClosing('${c.id}')" title="حذف السجل">🗑️</button>`:`<button class="btn btn-outline btn-sm" onclick="recalcClosing('${c.id}')" title="إعادة الحساب">🔄</button>
+        <button class="btn btn-outline btn-sm" onclick="reopenClosing('${c.id}')" title="إعادة فتح الشهر للتعديل">🔓 إعادة فتح</button>`}
       </div>
     </div>`;
   }).join('');
@@ -200,7 +201,7 @@ function previewCloseMonth(monthStr){
     return;
   }
   const d=getMonthlyData(monthStr);
-  const alreadyClosed=state.monthlyClosings&&state.monthlyClosings.some(c=>c.month===monthStr);
+  const alreadyClosed=!!activeClosing(monthStr);
   const warn=document.getElementById('close-month-warning');
   if(alreadyClosed){
     warn.style.display='block';
@@ -227,7 +228,7 @@ function previewCloseMonth(monthStr){
 function confirmCloseMonth(){
   const monthStr=document.getElementById('close-month-input').value;
   if(!monthStr){alert(t('lbl_select_month_first'));return;}
-  if(state.monthlyClosings&&state.monthlyClosings.some(c=>c.month===monthStr)){
+  if(activeClosing(monthStr)){
     alert(t('lbl_already_closed'));return;
   }
   const d=getMonthlyData(monthStr);
@@ -451,6 +452,8 @@ function switchClosingTab(tab, btn){
 
 function deleteClosing(id){
   if(!requireAdmin())return;
+  const _cl=(state.monthlyClosings||[]).find(c=>c.id===id);
+  if(_cl&&!_cl.reopened){alert('🔒 أعِد فتح الشهر أولاً؛ الإغلاق الساري لا يُحذف.');return;}
   if(!confirm('حذف هذا الإغلاق؟'))return;
   state.monthlyClosings=state.monthlyClosings.filter(c=>c.id!==id);
   // يُحفظ المعرّف المحذوف ليُزامَن، وإلا أعاده دمج السحابة من جهاز آخر.

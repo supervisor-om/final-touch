@@ -43,6 +43,7 @@ function calcChange(cur, prev){
 
 // Re-calculate and update a closing record in-place
 function recalcClosing(id){
+  if(!requireAdmin())return;
   const rec=state.monthlyClosings&&state.monthlyClosings.find(c=>c.id===id);
   if(!rec)return;
   if(!confirm(`إعادة حساب إغلاق ${rec.monthLabel}؟ سيتم تحديث جميع الأرقام من البيانات الحالية.`))return;

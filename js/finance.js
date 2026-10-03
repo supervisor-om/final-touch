@@ -45,6 +45,8 @@ function saveExpenseForm(){
   const date=document.getElementById('exp-date').value||today();
   const notes=document.getElementById('exp-notes').value.trim();
   const editingId=document.getElementById('exp-editing-id').value;
+  const _old=editingId?state.expenses.find(e=>e.id===editingId):null;
+  if(!assertDatesOpen([date].concat(_old?[_old.date]:[]),'حفظ المصروف'))return;
 
   // Handle receipt image
   const imgEl=document.getElementById('exp-receipt-img');
@@ -159,8 +161,8 @@ function renderExpensesTable(){
         `<span style="font-size:11px;color:var(--muted);">—</span>`}</td>
         <td>
           <div style="display:flex;gap:5px;">
-            <button class="btn btn-outline btn-sm" onclick="editExpense('${e.id}')">✏️</button>
-            <button class="btn btn-danger btn-sm" onclick="deleteExpense('${e.id}')">🗑️</button>
+            ${isDateLocked(e.date)?`<span title="الشهر مُغلق" style="font-size:14px;">🔒</span>`:`<button class="btn btn-outline btn-sm" onclick="editExpense('${e.id}')">✏️</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteExpense('${e.id}')">🗑️</button>`}
           </div>
         </td>
       </tr>`;

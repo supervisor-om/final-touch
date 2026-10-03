@@ -225,7 +225,9 @@ function mergeClosings(remote) {
   const del = new Set([...(state.deletedClosingIds || []), ...((remote && remote.deletedClosingIds) || [])]);
   const byId = {};
   [...(state.monthlyClosings || []), ...((remote && remote.monthlyClosings) || [])].forEach(c => {
-    if (c && c.id && !del.has(c.id)) byId[c.id] = c;
+    if (!c || !c.id || del.has(c.id)) return;
+    const prev = byId[c.id];
+    if (!prev || !(prev.reopened && !c.reopened)) byId[c.id] = c;
   });
   state.monthlyClosings = Object.values(byId);
   state.deletedClosingIds = [...del];
