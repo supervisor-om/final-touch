@@ -1655,13 +1655,14 @@ const today=()=>localISODate(new Date());
 // الحذف المالي (مصروف، إغلاق، إلغاء تسليم) للمدير وحده.
 function requireAdmin(){var s=(typeof getSession==='function')?getSession():null;if(!s||s.role!=='admin'){alert('⛔ هذا الإجراء متاح للمدير فقط');return false;}return true;}
 const genId=()=>Date.now()+Math.random().toString(36).substr(2,5);
-function formatDate(d){if(!d)return'—';return new Date(d).toLocaleDateString('ar-OM',{year:'numeric',month:'short',day:'numeric'});}
+function formatDate(d){if(!d)return'—';return new Date(d).toLocaleDateString((typeof currentLang!=='undefined'&&currentLang==='en')?'en-GB':'ar-OM',{year:'numeric',month:'short',day:'numeric'});}
 function daysSince(d){if(!d)return 0;return Math.floor((Date.now()-new Date(d))/(1000*60*60*24));}
 </script>
 <script src="js/payments.js"></script>
 <script src="js/profit.js"></script>
 <script src="js/partners-report.js"></script>
 <script src="js/mobile.js"></script>
+<script src="js/i18n-dom.js"></script>
 <script>
 
 function statusBadge(s){
@@ -4990,7 +4991,12 @@ function setLang(lang) {
   });
   var btn = document.getElementById('lang-toggle-btn');
   if (btn) btn.textContent = lang === 'ar' ? '🌐 EN' : '🌐 عربي';
+  // إعادة رسم المحتوى المبني بالكود ثم ترجمة/استعادة كل النصوص
+  if (typeof renderAll === 'function') { try { renderAll(); } catch (e) {} }
+  if (typeof domI18nApply === 'function') domI18nApply(lang);
 }
+// اللغة المحفوظة لم تكن تُطبَّق عند فتح الصفحة
+document.addEventListener('DOMContentLoaded', function () { if (currentLang === 'en') setTimeout(function () { setLang('en'); }, 0); });
 
 // ── Auth helpers (no top-level const to avoid script-block conflicts) ─
 function getUsers() {

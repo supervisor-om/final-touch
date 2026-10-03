@@ -225,6 +225,11 @@ function setLang(lang) {
   });
   var btn = document.getElementById('lang-toggle-btn');
   if (btn) btn.textContent = lang === 'ar' ? '🌐 EN' : '🌐 عربي';
+  // إعادة رسم المحتوى المبني بالكود ثم ترجمة/استعادة كل النصوص
+  if (typeof renderAll === 'function') { try { renderAll(); } catch (e) {} }
+  if (typeof domI18nApply === 'function') domI18nApply(lang);
 }
+// اللغة المحفوظة لم تكن تُطبَّق عند فتح الصفحة
+document.addEventListener('DOMContentLoaded', function () { if (currentLang === 'en') setTimeout(function () { setLang('en'); }, 0); });
 
 // ── Auth helpers (no top-level const to avoid script-block conflicts) ─

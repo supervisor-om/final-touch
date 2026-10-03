@@ -85,7 +85,7 @@ const today=()=>localISODate(new Date());
 // الحذف المالي (مصروف، إغلاق، إلغاء تسليم) للمدير وحده.
 function requireAdmin(){var s=(typeof getSession==='function')?getSession():null;if(!s||s.role!=='admin'){alert('⛔ هذا الإجراء متاح للمدير فقط');return false;}return true;}
 const genId=()=>Date.now()+Math.random().toString(36).substr(2,5);
-function formatDate(d){if(!d)return'—';return new Date(d).toLocaleDateString('ar-OM',{year:'numeric',month:'short',day:'numeric'});}
+function formatDate(d){if(!d)return'—';return new Date(d).toLocaleDateString((typeof currentLang!=='undefined'&&currentLang==='en')?'en-GB':'ar-OM',{year:'numeric',month:'short',day:'numeric'});}
 function daysSince(d){if(!d)return 0;return Math.floor((Date.now()-new Date(d))/(1000*60*60*24));}
 
 function statusBadge(s){
