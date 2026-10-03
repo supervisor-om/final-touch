@@ -257,7 +257,7 @@ function dmapSaveDamage() {
     part: partId,
     desc: desc,
     severity: sev,
-    date: new Date().toISOString().split('T')[0]
+    date: localISODate(new Date())
   });
 
   closeModal('modal-damage-part');

@@ -1645,7 +1645,12 @@ loadState();
 syncStageArrays();
 
 const fmt=(n)=>parseFloat(n||0).toFixed(3)+' ر.ع';
-const today=()=>new Date().toISOString().split('T')[0];
+// التاريخ بتوقيت الجهاز (عُمان) لا بتوقيت غرينتش: toISOString كان يسجّل
+// ما يُدخل بين ١٢ و٤ فجراً بتاريخ الأمس، وآخر ليلة في الشهر على الشهر السابق.
+const localISODate=(d)=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const today=()=>localISODate(new Date());
+// الحذف المالي (مصروف، إغلاق، إلغاء تسليم) للمدير وحده.
+function requireAdmin(){var s=(typeof getSession==='function')?getSession():null;if(!s||s.role!=='admin'){alert('⛔ هذا الإجراء متاح للمدير فقط');return false;}return true;}
 const genId=()=>Date.now()+Math.random().toString(36).substr(2,5);
 function formatDate(d){if(!d)return'—';return new Date(d).toLocaleDateString('ar-OM',{year:'numeric',month:'short',day:'numeric'});}
 function daysSince(d){if(!d)return 0;return Math.floor((Date.now()-new Date(d))/(1000*60*60*24));}
@@ -1909,7 +1914,6 @@ function generateReceipt(invId){
       <div class="receipt-row"><span>المبلغ الكلي</span><span>${parseFloat(inv.amount).toFixed(3)} ر.ع</span></div>
       <div class="receipt-row paid"><span>✅ المدفوع</span><span>${parseFloat(inv.paid||0).toFixed(3)} ر.ع</span></div>
       ${remaining>0?`<div class="receipt-row remaining"><span>⏳ المتبقي</span><span>${remaining.toFixed(3)} ر.ع</span></div>`:''}
-      <div class="receipt-row total"><span>💰 الإجمالي</span><span>${parseFloat(inv.amount).toFixed(3)} ر.ع</span></div>
       <div class="receipt-footer">
         <div>${remaining<=0?'✅ تم الدفع بالكامل':'⏳ يوجد مبلغ متبقي'}</div>
         <div style="margin-top:6px;">شكراً لثقتكم بورشة اللمسة الأخيرة 🔧</div>
@@ -2078,7 +2082,7 @@ function viewReceipt(src){
 
 // DELETE
 function deleteCar(id){const _dc=getSession();if(!_dc||(_dc.role!=='admin'&&_dc.role!=='accountant')){alert(t('msg_admin_only_delete'));return;}if(!confirm(t('msg_confirm_delete_car')))return;state.cars=state.cars.filter(c=>c.id!==id);saveState();renderAll();}
-function deleteExpense(id){if(!confirm('حذف المصروف؟'))return;state.expenses=state.expenses.filter(e=>e.id!==id);setExpReceipt(id,null);saveState();renderExpensesTable();}
+function deleteExpense(id){if(!requireAdmin())return;if(!confirm('حذف المصروف؟'))return;state.expenses=state.expenses.filter(e=>e.id!==id);setExpReceipt(id,null);saveState();renderExpensesTable();}
 function deleteService(id){if(!confirm(t('msg_confirm_delete_service')))return;state.services=state.services.filter(s=>s.id!==id);saveState();renderAll();}
 function deleteOrder(id){if(!confirm(t('msg_confirm_delete_order')))return;state.orders=state.orders.filter(o=>o.id!==id);saveState();renderAll();}
 
@@ -2557,6 +2561,7 @@ function clearDeliveredFilters(){
 }
 
 function restoreCarToWorkshop(id){
+  if(!requireAdmin())return;
   if(!confirm('إعادة هذه السيارة إلى قسم "السيارات في الورشة"؟\nسيتم حذف الفاتورة المرتبطة بها.'))return;
   const car=state.cars.find(c=>c.id===id);
   if(!car)return;
@@ -3635,8 +3640,12 @@ function switchClosingTab(tab, btn){
 }
 
 function deleteClosing(id){
+  if(!requireAdmin())return;
   if(!confirm('حذف هذا الإغلاق؟'))return;
   state.monthlyClosings=state.monthlyClosings.filter(c=>c.id!==id);
+  // يُحفظ المعرّف المحذوف ليُزامَن، وإلا أعاده دمج السحابة من جهاز آخر.
+  if(!state.deletedClosingIds)state.deletedClosingIds=[];
+  if(state.deletedClosingIds.indexOf(id)===-1)state.deletedClosingIds.push(id);
   saveState();
   renderMonthlyClosing();
 }
@@ -3954,7 +3963,7 @@ function setCarTemplate(brand, arName, enName) {
 function setDeliveryDays(days) {
   const d = new Date();
   d.setDate(d.getDate() + days);
-  const iso = d.toISOString().split('T')[0];
+  const iso = localISODate(d);
   const inp = document.getElementById('car-expected-date');
   if (inp) inp.value = iso;
   document.querySelectorAll('.day-btn').forEach(b => b.style.background = '');
@@ -4411,19 +4420,33 @@ async function loadFromCloud() {
         alertDays:      data.alertDays      || state.alertDays,
         updatedAt:      data.updatedAt,
       });
+      mergeClosings(data);
       syncStageArrays();
       _origSaveState(); // save locally only — don't re-upload to cloud
       renderAll();
       showSyncStatus('synced');
       showSyncBanner('ok', '🔄 تم استقبال تحديثات جديدة من السحابة');
     } else {
-      // Local is newer → push to cloud
+      // Local is newer → push to cloud (بعد ضمّ إغلاقات الأجهزة الأخرى كي لا تُمسح)
+      mergeClosings(data);
       await saveToCloud(true);
     }
   } catch(e) {
     console.warn('Load error:', e.message);
     showSyncStatus('offline');
   }
+}
+
+// الإغلاقات الشهرية سجلّ تاريخي: تُضمّ من الطرفين بالمعرّف بدل أن يستبدل
+// أحدهما الآخر، ويُستبعد ما حُذف صراحةً (deletedClosingIds).
+function mergeClosings(remote) {
+  const del = new Set([...(state.deletedClosingIds || []), ...((remote && remote.deletedClosingIds) || [])]);
+  const byId = {};
+  [...(state.monthlyClosings || []), ...((remote && remote.monthlyClosings) || [])].forEach(c => {
+    if (c && c.id && !del.has(c.id)) byId[c.id] = c;
+  });
+  state.monthlyClosings = Object.values(byId);
+  state.deletedClosingIds = [...del];
 }
 
 // ── Save to cloud ────────────────────────────────────────────────────────────
@@ -4438,6 +4461,8 @@ async function saveToCloud(immediate = false) {
     invoices:       state.invoices,
     invoiceCounter: state.invoiceCounter,
     alertDays:      state.alertDays,
+    monthlyClosings:   state.monthlyClosings   || [],
+    deletedClosingIds: state.deletedClosingIds || [],
     updatedAt:      new Date().toISOString(),
   };
 

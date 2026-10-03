@@ -202,19 +202,33 @@ async function loadFromCloud() {
         alertDays:      data.alertDays      || state.alertDays,
         updatedAt:      data.updatedAt,
       });
+      mergeClosings(data);
       syncStageArrays();
       _origSaveState(); // save locally only — don't re-upload to cloud
       renderAll();
       showSyncStatus('synced');
       showSyncBanner('ok', '🔄 تم استقبال تحديثات جديدة من السحابة');
     } else {
-      // Local is newer → push to cloud
+      // Local is newer → push to cloud (بعد ضمّ إغلاقات الأجهزة الأخرى كي لا تُمسح)
+      mergeClosings(data);
       await saveToCloud(true);
     }
   } catch(e) {
     console.warn('Load error:', e.message);
     showSyncStatus('offline');
   }
+}
+
+// الإغلاقات الشهرية سجلّ تاريخي: تُضمّ من الطرفين بالمعرّف بدل أن يستبدل
+// أحدهما الآخر، ويُستبعد ما حُذف صراحةً (deletedClosingIds).
+function mergeClosings(remote) {
+  const del = new Set([...(state.deletedClosingIds || []), ...((remote && remote.deletedClosingIds) || [])]);
+  const byId = {};
+  [...(state.monthlyClosings || []), ...((remote && remote.monthlyClosings) || [])].forEach(c => {
+    if (c && c.id && !del.has(c.id)) byId[c.id] = c;
+  });
+  state.monthlyClosings = Object.values(byId);
+  state.deletedClosingIds = [...del];
 }
 
 // ── Save to cloud ────────────────────────────────────────────────────────────
@@ -229,6 +243,8 @@ async function saveToCloud(immediate = false) {
     invoices:       state.invoices,
     invoiceCounter: state.invoiceCounter,
     alertDays:      state.alertDays,
+    monthlyClosings:   state.monthlyClosings   || [],
+    deletedClosingIds: state.deletedClosingIds || [],
     updatedAt:      new Date().toISOString(),
   };
 

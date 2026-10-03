@@ -450,8 +450,12 @@ function switchClosingTab(tab, btn){
 }
 
 function deleteClosing(id){
+  if(!requireAdmin())return;
   if(!confirm('حذف هذا الإغلاق؟'))return;
   state.monthlyClosings=state.monthlyClosings.filter(c=>c.id!==id);
+  // يُحفظ المعرّف المحذوف ليُزامَن، وإلا أعاده دمج السحابة من جهاز آخر.
+  if(!state.deletedClosingIds)state.deletedClosingIds=[];
+  if(state.deletedClosingIds.indexOf(id)===-1)state.deletedClosingIds.push(id);
   saveState();
   renderMonthlyClosing();
 }

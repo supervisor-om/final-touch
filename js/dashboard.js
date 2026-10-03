@@ -214,6 +214,7 @@ function clearDeliveredFilters(){
 }
 
 function restoreCarToWorkshop(id){
+  if(!requireAdmin())return;
   if(!confirm('إعادة هذه السيارة إلى قسم "السيارات في الورشة"؟\nسيتم حذف الفاتورة المرتبطة بها.'))return;
   const car=state.cars.find(c=>c.id===id);
   if(!car)return;

@@ -78,7 +78,12 @@ loadState();
 syncStageArrays();
 
 const fmt=(n)=>parseFloat(n||0).toFixed(3)+' ر.ع';
-const today=()=>new Date().toISOString().split('T')[0];
+// التاريخ بتوقيت الجهاز (عُمان) لا بتوقيت غرينتش: toISOString كان يسجّل
+// ما يُدخل بين ١٢ و٤ فجراً بتاريخ الأمس، وآخر ليلة في الشهر على الشهر السابق.
+const localISODate=(d)=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const today=()=>localISODate(new Date());
+// الحذف المالي (مصروف، إغلاق، إلغاء تسليم) للمدير وحده.
+function requireAdmin(){var s=(typeof getSession==='function')?getSession():null;if(!s||s.role!=='admin'){alert('⛔ هذا الإجراء متاح للمدير فقط');return false;}return true;}
 const genId=()=>Date.now()+Math.random().toString(36).substr(2,5);
 function formatDate(d){if(!d)return'—';return new Date(d).toLocaleDateString('ar-OM',{year:'numeric',month:'short',day:'numeric'});}
 function daysSince(d){if(!d)return 0;return Math.floor((Date.now()-new Date(d))/(1000*60*60*24));}

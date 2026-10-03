@@ -200,7 +200,6 @@ function generateReceipt(invId){
       <div class="receipt-row"><span>المبلغ الكلي</span><span>${parseFloat(inv.amount).toFixed(3)} ر.ع</span></div>
       <div class="receipt-row paid"><span>✅ المدفوع</span><span>${parseFloat(inv.paid||0).toFixed(3)} ر.ع</span></div>
       ${remaining>0?`<div class="receipt-row remaining"><span>⏳ المتبقي</span><span>${remaining.toFixed(3)} ر.ع</span></div>`:''}
-      <div class="receipt-row total"><span>💰 الإجمالي</span><span>${parseFloat(inv.amount).toFixed(3)} ر.ع</span></div>
       <div class="receipt-footer">
         <div>${remaining<=0?'✅ تم الدفع بالكامل':'⏳ يوجد مبلغ متبقي'}</div>
         <div style="margin-top:6px;">شكراً لثقتكم بورشة اللمسة الأخيرة 🔧</div>
@@ -274,7 +273,7 @@ function saveExpReceipts(r){try{localStorage.setItem(EXP_RECEIPTS_KEY,JSON.strin
 function getExpReceipt(id){return loadExpReceipts()[id]||null;}
 
 function deleteCar(id){const _dc=getSession();if(!_dc||(_dc.role!=='admin'&&_dc.role!=='accountant')){alert(t('msg_admin_only_delete'));return;}if(!confirm(t('msg_confirm_delete_car')))return;state.cars=state.cars.filter(c=>c.id!==id);saveState();renderAll();}
-function deleteExpense(id){if(!confirm('حذف المصروف؟'))return;state.expenses=state.expenses.filter(e=>e.id!==id);setExpReceipt(id,null);saveState();renderExpensesTable();}
+function deleteExpense(id){if(!requireAdmin())return;if(!confirm('حذف المصروف؟'))return;state.expenses=state.expenses.filter(e=>e.id!==id);setExpReceipt(id,null);saveState();renderExpensesTable();}
 function deleteService(id){if(!confirm(t('msg_confirm_delete_service')))return;state.services=state.services.filter(s=>s.id!==id);saveState();renderAll();}
 function deleteOrder(id){if(!confirm(t('msg_confirm_delete_order')))return;state.orders=state.orders.filter(o=>o.id!==id);saveState();renderAll();}
 
@@ -557,7 +556,7 @@ function setCarTemplate(brand, arName, enName) {
 function setDeliveryDays(days) {
   const d = new Date();
   d.setDate(d.getDate() + days);
-  const iso = d.toISOString().split('T')[0];
+  const iso = localISODate(d);
   const inp = document.getElementById('car-expected-date');
   if (inp) inp.value = iso;
   document.querySelectorAll('.day-btn').forEach(b => b.style.background = '');

@@ -8,7 +8,7 @@ function nowISO()  { return new Date().toISOString(); }
 function fmtDate(iso) { if(!iso) return '—'; return new Date(iso).toLocaleDateString('ar-OM'); }
 function fmtTime(iso) { if(!iso) return '—'; return new Date(iso).toLocaleTimeString('ar-OM',{hour:'2-digit',minute:'2-digit'}); }
 function fmtDT(iso)   { if(!iso) return '—'; return fmtDate(iso) + ' ' + fmtTime(iso); }
-function todayStr()   { return new Date().toISOString().split('T')[0]; }
+function todayStr()   { var d = new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
 function daysDiff(a,b){
   var d1=new Date(a), d2=new Date(b);
   return Math.max(1, Math.ceil((d2 - d1) / (1000*60*60*24)) + 1);
