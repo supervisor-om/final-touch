@@ -1,0 +1,79 @@
+/* ══════════════════════════════════════════════════════════════════
+   توافق الجوال — يُحمَّل آخر شيء في الصفحة ليغلب كتلة «تكبير الخطوط»
+   العامة التي كانت تأتي بعد استعلامات الجوال فتلغيها.
+   ══════════════════════════════════════════════════════════════════ */
+
+@media (max-width: 900px) {
+  /* سفاري iOS يكبّر الصفحة عند لمس أي حقل خطّه أقل من 16px ولا يعيدها */
+  input, select, textarea { font-size: 16px !important; }
+
+  /* الشريط العلوي: عنوان بسطر واحد، وأزرار مدمجة */
+  .topbar { gap: 8px; }
+  .topbar > div:first-child { flex: 1; min-width: 0; gap: 8px !important; }
+  .page-title { font-size: 16px !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .topbar-actions { flex-shrink: 0; }
+  #lang-toggle-btn { padding: 5px 9px !important; font-size: 11px !important; }
+  #topbar-add-car-btn { padding: 8px 11px !important; font-size: 13px !important; white-space: nowrap; }
+
+  /* زر طيّ القائمة كان يبرز من حافة الشاشة والقائمة مخفية */
+  .collapse-btn, #sidebar-collapse-btn { display: none !important; }
+
+  canvas { max-width: 100% !important; height: auto !important; }
+  img { max-width: 100%; }
+  .modal-body { overflow-x: hidden; }
+  .modal-footer { padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px)) !important; }
+
+  /* أهداف لمس مريحة */
+  .btn-sm { min-height: 36px; }
+  .modal-close { width: 40px !important; height: 40px !important; }
+
+  .stat-value { font-size: 22px !important; }
+  .card-title { font-size: 15px !important; }
+  .modal-title { font-size: 17px !important; }
+}
+
+@media (max-width: 480px) {
+  /* بطاقات الإحصاء: عمودان مدمجان بدل بطاقة كاملة لكل رقم */
+  .stats-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 8px !important; }
+  .stat-card { padding: 12px !important; }
+  .stat-icon { font-size: 20px !important; }
+  .stat-value { font-size: 17px !important; word-break: break-word; line-height: 1.3; }
+  .stat-label { font-size: 12px !important; }
+
+  body, td { font-size: 14px; }
+  .tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; flex-wrap: nowrap !important; }
+  .tabs .tab { white-space: nowrap; flex-shrink: 0; }
+}
+
+/* ── الجداول تتحول إلى بطاقات على الجوال ──────────────────────────
+   js/mobile.js يضع data-label لكل خلية من عنوان عمودها. */
+@media (max-width: 640px) {
+  .table-wrap { overflow-x: visible; }
+  .table-wrap table, .table-wrap tbody, .table-wrap tr, .table-wrap td { display: block; width: 100%; }
+  .table-wrap table { min-width: 0 !important; }
+  .table-wrap thead { display: none; }
+  .table-wrap tr {
+    margin: 0 0 10px; padding: 6px 12px;
+    border: 1px solid rgba(255,255,255,.09); border-radius: 12px;
+    background: rgba(255,255,255,.03) !important;
+  }
+  .table-wrap tr:hover td, .table-wrap tr:nth-child(even) td { background: transparent !important; }
+  .table-wrap td {
+    display: flex; justify-content: space-between; align-items: center; gap: 12px;
+    padding: 7px 0 !important; border: none !important;
+    border-bottom: 1px dashed rgba(255,255,255,.07) !important;
+    text-align: left; min-height: 0; white-space: normal;
+  }
+  .table-wrap td:last-child { border-bottom: none !important; }
+  .table-wrap td::before {
+    content: attr(data-label); flex-shrink: 0; max-width: 45%;
+    font-size: 12px; font-weight: 700; color: var(--muted, #8892a4); text-align: right;
+  }
+  .table-wrap td:not([data-label])::before, .table-wrap td[data-label=""]::before { display: none; }
+  .table-wrap td:not([data-label]), .table-wrap td[data-label=""] { justify-content: flex-end; }
+  /* صف «لا توجد بيانات» يمتد على كل الأعمدة */
+  .table-wrap td[data-label="#"] { display: none !important; }
+  .table-wrap td[colspan] { display: block; text-align: center; }
+  .table-wrap td[colspan]::before { display: none; }
+  .table-wrap td > div[style*="display:flex"] { flex-wrap: wrap; justify-content: flex-end; }
+}
