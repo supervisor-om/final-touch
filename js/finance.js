@@ -216,7 +216,7 @@ function exportExpensesPDF(){
   .badge{background:#eee;padding:2px 8px;border-radius:12px;font-size:11px;}
   </style></head><body>
   <h1>💸 ${title}</h1>
-  <p>تاريخ التقرير: ${new Date().toLocaleDateString('ar-SA')} — عدد السجلات: ${filtered.length}</p>
+  <p>تاريخ التقرير: ${new Date().toLocaleDateString('ar-OM')} — عدد السجلات: ${filtered.length}</p>
   <table><tr><th>التاريخ</th><th>البيان</th><th>النوع</th><th>المبلغ</th><th>ملاحظات</th></tr>
   ${filtered.map(e=>`<tr><td>${e.date}</td><td>${e.desc}</td><td><span class="badge">${e.type}</span></td><td style="color:red;font-weight:700;">${e.amount.toFixed(3)} ر.ع</td><td style="font-size:12px;color:#555;">${e.notes||'—'}</td></tr>`).join('')}
   <tr><td colspan="3" style="text-align:center;font-weight:700;">الإجمالي</td><td class="total">${total.toFixed(3)} ر.ع</td><td></td></tr>

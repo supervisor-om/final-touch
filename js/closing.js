@@ -534,7 +534,7 @@ function exportPDF(){
   <style>body{font-family:'Cairo',sans-serif;padding:40px;direction:rtl;}h1{color:#1a1a2e;border-bottom:3px solid #e94560;padding-bottom:10px;}table{width:100%;border-collapse:collapse;margin-top:16px;}th{background:#1a1a2e;color:white;padding:10px;}td{padding:8px;border:1px solid #ddd;}.total{font-weight:900;color:#e94560;font-size:18px;}.profit{color:${profit>=0?'#00b894':'#e94560'};}</style></head>
   <body>
   <h1>📊 التقرير المالي - اللمسة الأخيرة</h1>
-  <p>تاريخ التقرير: ${new Date().toLocaleDateString('ar-SA')}</p>
+  <p>تاريخ التقرير: ${new Date().toLocaleDateString('ar-OM')}</p>
   <h2>ملخص مالي</h2>
   <table><tr><th>البيان</th><th>القيمة</th></tr>
   <tr><td>إجمالي الإيرادات</td><td style="color:green;">${revenue.toFixed(3)} ر.ع</td></tr>

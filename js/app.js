@@ -80,7 +80,7 @@ syncStageArrays();
 const fmt=(n)=>parseFloat(n||0).toFixed(3)+' ر.ع';
 const today=()=>new Date().toISOString().split('T')[0];
 const genId=()=>Date.now()+Math.random().toString(36).substr(2,5);
-function formatDate(d){if(!d)return'—';return new Date(d).toLocaleDateString('ar-SA',{year:'numeric',month:'short',day:'numeric'});}
+function formatDate(d){if(!d)return'—';return new Date(d).toLocaleDateString('ar-OM',{year:'numeric',month:'short',day:'numeric'});}
 function daysSince(d){if(!d)return 0;return Math.floor((Date.now()-new Date(d))/(1000*60*60*24));}
 
 function statusBadge(s){

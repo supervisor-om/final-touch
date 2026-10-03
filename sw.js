@@ -1,6 +1,6 @@
 // ارفع الرقم عند كل تعديل على الملفات المخزَّنة أدناه،
 // وإلا بقي الزوار السابقون على النسخة القديمة من الكاش.
-const CACHE_NAME = 'final-touch-v8';
+const CACHE_NAME = 'final-touch-v9';
 
 // Derive base path from service worker location (works on any subdirectory)
 const BASE = self.registration.scope;

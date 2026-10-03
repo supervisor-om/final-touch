@@ -123,7 +123,7 @@ function renderBookings(){
     } else {
       statusActions = '<span style="font-size:11px;color:var(--muted);">—</span>';
     }
-    var created = new Date(b.createdAt).toLocaleDateString('ar-SA',{month:'numeric',day:'numeric'});
+    var created = new Date(b.createdAt).toLocaleDateString('ar-OM',{month:'numeric',day:'numeric'});
     return '<tr>'+
       '<td><strong>'+b.id+'</strong>'+posDot+'</td>'+
       '<td><div>'+b.customerName+'</div><div style="font-size:12px;color:var(--muted);">'+b.phone+'</div></td>'+

@@ -184,7 +184,7 @@ function renderDeliveredTable(){
 
   let html='';
   Object.entries(groups).sort((a,b)=>b[0].localeCompare(a[0])).forEach(([month,cars])=>{
-    const label=month==='0000-00'?'غير محدد':new Date(month+'-15').toLocaleDateString('ar-SA',{year:'numeric',month:'long'});
+    const label=month==='0000-00'?'غير محدد':new Date(month+'-15').toLocaleDateString('ar-OM',{year:'numeric',month:'long'});
     const monthTotal=cars.reduce((s,c)=>s+(c.paidTotal||0),0);
     const collapsed=localStorage.getItem('del_collapsed_'+month)==='1';
     html+=`<tr onclick="toggleDeliveredMonth('${month}')" style="cursor:pointer;background:rgba(79,172,254,.07);border-top:2px solid rgba(79,172,254,.18);">

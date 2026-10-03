@@ -68,7 +68,7 @@ let saveTimeout  = null;
 let lastSaveHash = '';
 
 try {
-  document.getElementById('today-date').textContent=new Date().toLocaleDateString('ar-SA',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  document.getElementById('today-date').textContent=new Date().toLocaleDateString('ar-OM',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
   document.getElementById('exp-date').value=today();
   renderAll();
 } catch(e) { console.warn('Init render error:', e); }

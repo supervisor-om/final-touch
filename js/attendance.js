@@ -5,8 +5,8 @@
 
 // ── Helpers ───────────────────────────────
 function nowISO()  { return new Date().toISOString(); }
-function fmtDate(iso) { if(!iso) return '—'; return new Date(iso).toLocaleDateString('ar-SA'); }
-function fmtTime(iso) { if(!iso) return '—'; return new Date(iso).toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit'}); }
+function fmtDate(iso) { if(!iso) return '—'; return new Date(iso).toLocaleDateString('ar-OM'); }
+function fmtTime(iso) { if(!iso) return '—'; return new Date(iso).toLocaleTimeString('ar-OM',{hour:'2-digit',minute:'2-digit'}); }
 function fmtDT(iso)   { if(!iso) return '—'; return fmtDate(iso) + ' ' + fmtTime(iso); }
 function todayStr()   { return new Date().toISOString().split('T')[0]; }
 function daysDiff(a,b){
@@ -183,7 +183,7 @@ function updateClockUI(){
     lblOut.textContent = 'نظرة عامة';
   }
 
-  document.getElementById('today-date').textContent = new Date().toLocaleDateString('ar-SA',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  document.getElementById('today-date').textContent = new Date().toLocaleDateString('ar-OM',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
 }
 
 // ── Today entries table ─────────────────
