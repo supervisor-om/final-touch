@@ -85,7 +85,10 @@ function getMonthlyData(monthStr){
   const delivered = allCars.filter(c=>c.status==='delivered');
   const carryOver = allCars.filter(c=>c.status!=='delivered');
   const totalEstimate = allCars.reduce((s,c)=>s+(c.estimate||0),0);
-  const totalPaid = allCars.reduce((s,c)=>s+(c.paidTotal||0),0);
+  // الإيراد = ما قُبض فعلاً في هذا الشهر (بتاريخ الدفعة)، أياً كان شهر دخول السيارة.
+  const monthPays = paymentsWhere(d=>d.startsWith(monthStr));
+  const totalPaid = Math.round(monthPays.reduce((s,x)=>s+x.p.amount,0)*1000)/1000;
+  const totalRemaining = allCars.reduce((s,c)=>s+Math.max(0,(c.estimate||0)-(c.paidTotal||0)),0);
   const monthExpenses = state.expenses.filter(e=>(e.date||'').startsWith(monthStr));
   const totalExpenses = monthExpenses.reduce((s,e)=>s+(e.amount||0),0);
   const grossProfit = totalPaid - totalExpenses;
@@ -96,13 +99,17 @@ function getMonthlyData(monthStr){
     const svc = c.service||'أخرى';
     if(!byService[svc])byService[svc]={count:0,amount:0};
     byService[svc].count++;
-    byService[svc].amount+=(c.paidTotal||0);
+  });
+  monthPays.forEach(x=>{
+    const svc = x.car.service||'أخرى';
+    if(!byService[svc])byService[svc]={count:0,amount:0};
+    byService[svc].amount+=x.p.amount;
   });
   return {
     carsReceived:allCars.length, carsDelivered:delivered.length, carsCarryOver:carryOver.length,
     carryOverCarIds:carryOver.map(c=>c.id), deliveredCarIds:delivered.map(c=>c.id),
     allCarIds:allCars.map(c=>c.id),
-    totalEstimate, totalPaid, totalRemaining:totalEstimate-totalPaid,
+    totalEstimate, totalPaid, totalRemaining,
     expenseIds:monthExpenses.map(e=>e.id), totalExpenses, grossProfit, profitMargin,
     byService
   };

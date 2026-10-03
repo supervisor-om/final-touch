@@ -6,8 +6,9 @@ function addCar(){
   const deposit=parseFloat(document.getElementById('car-deposit').value)||0;
   const svcType=document.getElementById('car-service').value;
   const tplStages=state.stageTemplates[svcType]?JSON.parse(JSON.stringify(state.stageTemplates[svcType])):null;
-  const car={id:genId(),plate,owner,phone:document.getElementById('car-phone').value.trim(),model:document.getElementById('car-model').value.trim(),km:document.getElementById('car-km').value.trim(),service:svcType,estimate,deposit,paidTotal:deposit,notes:document.getElementById('car-notes').value.trim(),expectedDate:document.getElementById('car-expected-date').value||'',status:'waiting',stage:0,stages:tplStages,dateIn:today(),dateOut:null,damageMap:window._addCarDamageMap?[...window._addCarDamageMap]:[]};
+  const car={id:genId(),plate,owner,phone:document.getElementById('car-phone').value.trim(),model:document.getElementById('car-model').value.trim(),km:document.getElementById('car-km').value.trim(),service:svcType,estimate,deposit,paidTotal:0,payments:[],notes:document.getElementById('car-notes').value.trim(),expectedDate:document.getElementById('car-expected-date').value||'',status:'waiting',stage:0,stages:tplStages,dateIn:today(),dateOut:null,damageMap:window._addCarDamageMap?[...window._addCarDamageMap]:[]};
   state.cars.push(car);
+  if(deposit>0)addPayment(car,{amount:deposit,type:'deposit'});
   // حفظ الصور المؤقتة مرتبطة بالسيارة الجديدة
   if (_pendingPhotos.length) {
     setCarPhotos(car.id, { reception: [..._pendingPhotos], delivery: [] });
@@ -46,6 +47,7 @@ function editCar(id){
   const stageBtns=document.getElementById('stage-buttons-row');
   if(stageBtns)stageBtns.style.display='flex';
   updateStageUI();calcRemaining();
+  renderPaymentLog(car);
   // تحميل صور السيارة
   renderPhotoGrid(id,'reception','photo-grid-reception');
   renderPhotoGrid(id,'delivery','photo-grid-delivery');
@@ -150,11 +152,15 @@ function calcRemaining(){
 function updateCar(){
   const car=state.cars.find(c=>c.id===state.currentEditCar);
   if(!car)return;
+  // حقل «المدفوع» لم يعد يُستبدل: الفرق يُسجَّل في سجل الدفعات بتاريخ اليوم.
+  ensurePayments(car);
+  const paidDiff=Math.round(((parseFloat(document.getElementById('update-paid').value)||0)-(car.paidTotal||0))*1000)/1000;
+  if(paidDiff<0&&!confirm('سيُسجَّل تصحيح بالسالب '+(-paidDiff).toFixed(3)+' ر.ع في سجل الدفعات (استرجاع للعميل أو تصحيح خطأ إدخال). هل تريد المتابعة؟'))return;
   const prevStage=car.stage;
   car.stage=currentStage;
   car.status=statusFromStage(currentStage,getCarStages(car));
   car.estimate=parseFloat(document.getElementById('update-amount').value)||0;
-  car.paidTotal=parseFloat(document.getElementById('update-paid').value)||0;
+  if(paidDiff)addPayment(car,{amount:paidDiff,method:((document.getElementById('update-payment-method')||{}).value||''),note:'من نافذة تعديل السيارة'});
   const pmSave=document.getElementById('update-payment-method');
   if(pmSave)car.paymentMethod=pmSave.value||car.paymentMethod||'';
   car.notes=document.getElementById('update-notes').value;

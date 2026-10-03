@@ -1654,6 +1654,9 @@ function requireAdmin(){var s=(typeof getSession==='function')?getSession():null
 const genId=()=>Date.now()+Math.random().toString(36).substr(2,5);
 function formatDate(d){if(!d)return'—';return new Date(d).toLocaleDateString('ar-OM',{year:'numeric',month:'short',day:'numeric'});}
 function daysSince(d){if(!d)return 0;return Math.floor((Date.now()-new Date(d))/(1000*60*60*24));}
+</script>
+<script src="js/payments.js"></script>
+<script>
 
 function statusBadge(s){
   return {waiting:'<span class="badge badge-waiting">⏳ انتظار</span>',progress:'<span class="badge badge-progress">🔧 إصلاح</span>',done:'<span class="badge badge-done">✅ جاهزة</span>',delivered:'<span class="badge badge-delivered">📦 مُسلَّمة</span>'}[s]||s;
@@ -1725,8 +1728,9 @@ function addCar(){
   const deposit=parseFloat(document.getElementById('car-deposit').value)||0;
   const svcType=document.getElementById('car-service').value;
   const tplStages=state.stageTemplates[svcType]?JSON.parse(JSON.stringify(state.stageTemplates[svcType])):null;
-  const car={id:genId(),plate,owner,phone:document.getElementById('car-phone').value.trim(),model:document.getElementById('car-model').value.trim(),km:document.getElementById('car-km').value.trim(),service:svcType,estimate,deposit,paidTotal:deposit,notes:document.getElementById('car-notes').value.trim(),expectedDate:document.getElementById('car-expected-date').value||'',status:'waiting',stage:0,stages:tplStages,dateIn:today(),dateOut:null};
+  const car={id:genId(),plate,owner,phone:document.getElementById('car-phone').value.trim(),model:document.getElementById('car-model').value.trim(),km:document.getElementById('car-km').value.trim(),service:svcType,estimate,deposit,paidTotal:0,payments:[],notes:document.getElementById('car-notes').value.trim(),expectedDate:document.getElementById('car-expected-date').value||'',status:'waiting',stage:0,stages:tplStages,dateIn:today(),dateOut:null};
   state.cars.push(car);
+  if(deposit>0)addPayment(car,{amount:deposit,type:'deposit'});
   // حفظ الصور المؤقتة مرتبطة بالسيارة الجديدة
   if (_pendingPhotos.length) {
     setCarPhotos(car.id, { reception: [..._pendingPhotos], delivery: [] });
@@ -1764,6 +1768,7 @@ function editCar(id){
   const stageBtns=document.getElementById('stage-buttons-row');
   if(stageBtns)stageBtns.style.display='flex';
   updateStageUI();calcRemaining();
+  renderPaymentLog(car);
   // تحميل صور السيارة
   renderPhotoGrid(id,'reception','photo-grid-reception');
   renderPhotoGrid(id,'delivery','photo-grid-delivery');
@@ -1864,11 +1869,15 @@ function calcRemaining(){
 function updateCar(){
   const car=state.cars.find(c=>c.id===state.currentEditCar);
   if(!car)return;
+  // حقل «المدفوع» لم يعد يُستبدل: الفرق يُسجَّل في سجل الدفعات بتاريخ اليوم.
+  ensurePayments(car);
+  const paidDiff=Math.round(((parseFloat(document.getElementById('update-paid').value)||0)-(car.paidTotal||0))*1000)/1000;
+  if(paidDiff<0&&!confirm('سيُسجَّل تصحيح بالسالب '+(-paidDiff).toFixed(3)+' ر.ع في سجل الدفعات (استرجاع للعميل أو تصحيح خطأ إدخال). هل تريد المتابعة؟'))return;
   const prevStage=car.stage;
   car.stage=currentStage;
   car.status=statusFromStage(currentStage,getCarStages(car));
   car.estimate=parseFloat(document.getElementById('update-amount').value)||0;
-  car.paidTotal=parseFloat(document.getElementById('update-paid').value)||0;
+  if(paidDiff)addPayment(car,{amount:paidDiff,method:((document.getElementById('update-payment-method')||{}).value||''),note:'من نافذة تعديل السيارة'});
   const pmSave=document.getElementById('update-payment-method');
   if(pmSave)car.paymentMethod=pmSave.value||car.paymentMethod||'';
   car.notes=document.getElementById('update-notes').value;
@@ -2347,6 +2356,7 @@ function getAlertedCars(){return state.cars.filter(c=>c.status!=='delivered'&&da
 
 // RENDER ALL
 function renderAll(){
+  if(typeof renderPaymentsPanels==='function')renderPaymentsPanels();
   renderDashboard();renderCarsTable();renderDeliveredTable();renderAlertsTable();
   renderOrdersTable();renderServicesTable();renderInvoicesTable();renderExpensesTable();
   renderReports();renderCustomers();renderMonthlyClosing();updateBadges();
@@ -2620,7 +2630,7 @@ function submitConfirmPayment(){
       +'المدفوع سيصبح '+((car.paidTotal||0)+amount).toFixed(3)+' ر.ع.\n\nهل تريد المتابعة؟';
     if(!confirm(msg))return;
   }
-  car.paidTotal=(car.paidTotal||0)+amount;
+  addPayment(car,{amount:amount,method:method,type:'payment'});
   car.paymentMethod=method;
   car.paymentConfirmed=true;
   car.paymentConfirmedAt=new Date().toISOString();
@@ -2972,7 +2982,10 @@ function getMonthlyData(monthStr){
   const delivered = allCars.filter(c=>c.status==='delivered');
   const carryOver = allCars.filter(c=>c.status!=='delivered');
   const totalEstimate = allCars.reduce((s,c)=>s+(c.estimate||0),0);
-  const totalPaid = allCars.reduce((s,c)=>s+(c.paidTotal||0),0);
+  // الإيراد = ما قُبض فعلاً في هذا الشهر (بتاريخ الدفعة)، أياً كان شهر دخول السيارة.
+  const monthPays = paymentsWhere(d=>d.startsWith(monthStr));
+  const totalPaid = Math.round(monthPays.reduce((s,x)=>s+x.p.amount,0)*1000)/1000;
+  const totalRemaining = allCars.reduce((s,c)=>s+Math.max(0,(c.estimate||0)-(c.paidTotal||0)),0);
   const monthExpenses = state.expenses.filter(e=>(e.date||'').startsWith(monthStr));
   const totalExpenses = monthExpenses.reduce((s,e)=>s+(e.amount||0),0);
   const grossProfit = totalPaid - totalExpenses;
@@ -2983,13 +2996,17 @@ function getMonthlyData(monthStr){
     const svc = c.service||'أخرى';
     if(!byService[svc])byService[svc]={count:0,amount:0};
     byService[svc].count++;
-    byService[svc].amount+=(c.paidTotal||0);
+  });
+  monthPays.forEach(x=>{
+    const svc = x.car.service||'أخرى';
+    if(!byService[svc])byService[svc]={count:0,amount:0};
+    byService[svc].amount+=x.p.amount;
   });
   return {
     carsReceived:allCars.length, carsDelivered:delivered.length, carsCarryOver:carryOver.length,
     carryOverCarIds:carryOver.map(c=>c.id), deliveredCarIds:delivered.map(c=>c.id),
     allCarIds:allCars.map(c=>c.id),
-    totalEstimate, totalPaid, totalRemaining:totalEstimate-totalPaid,
+    totalEstimate, totalPaid, totalRemaining,
     expenseIds:monthExpenses.map(e=>e.id), totalExpenses, grossProfit, profitMargin,
     byService
   };

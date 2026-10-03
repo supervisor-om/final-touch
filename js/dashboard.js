@@ -1,5 +1,6 @@
 // RENDER ALL
 function renderAll(){
+  if(typeof renderPaymentsPanels==='function')renderPaymentsPanels();
   renderDashboard();renderCarsTable();renderDeliveredTable();renderAlertsTable();
   renderOrdersTable();renderServicesTable();renderInvoicesTable();renderExpensesTable();
   renderReports();renderCustomers();renderMonthlyClosing();updateBadges();
@@ -274,7 +275,7 @@ function submitConfirmPayment(){
       +'المدفوع سيصبح '+((car.paidTotal||0)+amount).toFixed(3)+' ر.ع.\n\nهل تريد المتابعة؟';
     if(!confirm(msg))return;
   }
-  car.paidTotal=(car.paidTotal||0)+amount;
+  addPayment(car,{amount:amount,method:method,type:'payment'});
   car.paymentMethod=method;
   car.paymentConfirmed=true;
   car.paymentConfirmedAt=new Date().toISOString();
