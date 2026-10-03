@@ -695,7 +695,7 @@ function exportPDF(){
 function switchTab(btn,targetId){
   btn.closest('.page').querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   btn.classList.add('active');
-  ['report-financial','report-services','report-cars'].forEach(id=>{
+  ['report-financial','report-services','report-cars','report-profit'].forEach(id=>{
     const el=document.getElementById(id);if(el)el.style.display=id===targetId?'':'none';
   });
 }

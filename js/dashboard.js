@@ -1,6 +1,7 @@
 // RENDER ALL
 function renderAll(){
   if(typeof renderPaymentsPanels==='function')renderPaymentsPanels();
+  if(typeof renderProfitReport==='function')renderProfitReport();
   renderDashboard();renderCarsTable();renderDeliveredTable();renderAlertsTable();
   renderOrdersTable();renderServicesTable();renderInvoicesTable();renderExpensesTable();
   renderReports();renderCustomers();renderMonthlyClosing();updateBadges();

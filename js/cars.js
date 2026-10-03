@@ -49,6 +49,7 @@ function editCar(id){
   if(stageBtns)stageBtns.style.display='flex';
   updateStageUI();calcRemaining();
   renderPaymentLog(car);
+  renderCarProfit(car);
   // تحميل صور السيارة
   renderPhotoGrid(id,'reception','photo-grid-reception');
   renderPhotoGrid(id,'delivery','photo-grid-delivery');

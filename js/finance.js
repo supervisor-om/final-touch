@@ -9,6 +9,10 @@ function openAddExpenseModal(){
   document.getElementById('exp-receipt-preview').style.display='none';
   document.getElementById('exp-receipt-none').style.display='';
   document.getElementById('exp-receipt-file').value='';
+  // من نافذة السيارة («➕ إضافة تكلفة») تأتي السيارة مختارة مسبقاً.
+  setupExpenseCarSelect(window._expPresetCar||'');
+  window._expReturnCar=window._expPresetCar||'';
+  window._expPresetCar='';
   openModal('modal-add-expense');
 }
 
@@ -33,6 +37,8 @@ function editExpense(id){
     document.getElementById('exp-receipt-none').style.display='';
   }
   document.getElementById('exp-receipt-file').value='';
+  setupExpenseCarSelect(e.carId||'');
+  window._expReturnCar='';
   openModal('modal-add-expense');
 }
 
@@ -44,6 +50,7 @@ function saveExpenseForm(){
   const type=document.getElementById('exp-type').value;
   const date=document.getElementById('exp-date').value||today();
   const notes=document.getElementById('exp-notes').value.trim();
+  const carId=(document.getElementById('exp-car')||{}).value||'';
   const editingId=document.getElementById('exp-editing-id').value;
   const _old=editingId?state.expenses.find(e=>e.id===editingId):null;
   if(!assertDatesOpen([date].concat(_old?[_old.date]:[]),'حفظ المصروف'))return;
@@ -55,7 +62,7 @@ function saveExpenseForm(){
   if(editingId){
     // Edit existing
     const idx=state.expenses.findIndex(e=>e.id===editingId);
-    if(idx>=0){state.expenses[idx]={...state.expenses[idx],desc,type,amount,date,notes};}
+    if(idx>=0){state.expenses[idx]={...state.expenses[idx],desc,type,amount,date,notes,carId};}
     if(newReceipt)setExpReceipt(editingId,newReceipt);
     else if(!document.getElementById('exp-receipt-preview').style.display||document.getElementById('exp-receipt-preview').style.display==='none'){
       // user removed receipt
@@ -64,12 +71,13 @@ function saveExpenseForm(){
   } else {
     // New expense
     const id=genId();
-    state.expenses.push({id,desc,type,amount,date,notes});
+    state.expenses.push({id,desc,type,amount,date,notes,carId});
     if(newReceipt)setExpReceipt(id,newReceipt);
   }
   saveState();
   closeModal('modal-add-expense');
   renderExpensesTable();
+  if(window._expReturnCar){const _rc=state.cars.find(c=>c.id===window._expReturnCar);window._expReturnCar='';if(_rc)renderCarProfit(_rc);}
 }
 
 function previewExpenseReceipt(input){
@@ -153,6 +161,7 @@ function renderExpensesTable(){
         <td style="white-space:nowrap;font-size:12px;">${formatDate(e.date)}</td>
         <td>
           <div style="font-weight:600;">${e.desc}</div>
+          ${e.carId?`<div style="font-size:11px;color:var(--info);margin-top:2px;">🚗 ${carLabelById(e.carId)}</div>`:''}
           ${e.notes?`<div style="font-size:11px;color:var(--muted);margin-top:2px;">📝 ${e.notes}</div>`:''}
         </td>
         <td><span class="badge badge-maint">${typeEmoji[emoji]||'📦'} ${e.type}</span></td>
