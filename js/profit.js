@@ -325,6 +325,7 @@ function profitData(period) {
 
 function renderProfitReport() {
   _ensurePaintInvoiceButton();
+  if (typeof _ensurePartnersButtons === 'function') _ensurePartnersButtons();
   var el = _ensureProfitTab();
   if (!el) return;
   var period = _profitMonth || today().slice(0, 7);
@@ -338,7 +339,8 @@ function renderProfitReport() {
     '<div class="card-title">💹 ربحية الأعمال (حسب تاريخ التسليم)</div><div style="display:flex;gap:6px;align-items:center;">' +
     '<input type="month" id="profit-month" value="' + (period === 'all' ? '' : period) + '" style="padding:6px 10px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--text);font-family:inherit;" onchange="_profitMonth=this.value||\'all\';renderProfitReport()">' +
     '<button class="btn btn-outline btn-sm" onclick="_profitMonth=\'all\';renderProfitReport()">كل الفترات</button>' +
-    '<button class="btn btn-outline btn-sm" onclick="openPaintInvoiceModal()">🧾 توزيع فاتورة أصباغ</button></div></div><div class="card-body">' +
+    '<button class="btn btn-outline btn-sm" onclick="openPaintInvoiceModal()">🧾 توزيع فاتورة أصباغ</button>' +
+    '<button class="btn btn-outline btn-sm" onclick="openPartnersReport()">📄 تقرير الشركاء</button></div></div><div class="card-body">' +
     '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;">' +
       tile('فواتير السيارات المُسلَّمة', d.revenue, 'var(--info)') + tile('التكاليف المباشرة', d.cost, 'var(--danger)') + tile('🎨 منها أصباغ ' + pct(d.paint, d.revenue), d.paint, '#c77dff') +
       tile('مجمل الربح ' + pct(d.gross, d.revenue), d.gross, d.gross >= 0 ? 'var(--success)' : 'var(--danger)') +

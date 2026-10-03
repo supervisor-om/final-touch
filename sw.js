@@ -1,6 +1,6 @@
 // ارفع الرقم عند كل تعديل على الملفات المخزَّنة أدناه،
 // وإلا بقي الزوار السابقون على النسخة القديمة من الكاش.
-const CACHE_NAME = 'final-touch-v15';
+const CACHE_NAME = 'final-touch-v16';
 
 // Derive base path from service worker location (works on any subdirectory)
 const BASE = self.registration.scope;
@@ -17,6 +17,7 @@ const STATIC_ASSETS = [
   BASE + 'js/plate-scan.js',
   BASE + 'js/payments.js',
   BASE + 'js/profit.js',
+  BASE + 'js/partners-report.js',
   BASE + 'js/db.js',
   BASE + 'js/auth-attendance.js',
   BASE + 'js/attendance.js',

@@ -200,6 +200,7 @@ async function loadFromCloud() {
         invoices:       data.invoices       || state.invoices,
         invoiceCounter: data.invoiceCounter || state.invoiceCounter,
         alertDays:      data.alertDays      || state.alertDays,
+        partners:       data.partners       || state.partners,
         updatedAt:      data.updatedAt,
       });
       mergeClosings(data);
@@ -245,6 +246,7 @@ async function saveToCloud(immediate = false) {
     invoices:       state.invoices,
     invoiceCounter: state.invoiceCounter,
     alertDays:      state.alertDays,
+    partners:       state.partners || [],
     monthlyClosings:   state.monthlyClosings   || [],
     deletedClosingIds: state.deletedClosingIds || [],
     updatedAt:      new Date().toISOString(),

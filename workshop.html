@@ -1659,6 +1659,7 @@ function daysSince(d){if(!d)return 0;return Math.floor((Date.now()-new Date(d))/
 </script>
 <script src="js/payments.js"></script>
 <script src="js/profit.js"></script>
+<script src="js/partners-report.js"></script>
 <script>
 
 function statusBadge(s){
@@ -4466,6 +4467,7 @@ async function loadFromCloud() {
         invoices:       data.invoices       || state.invoices,
         invoiceCounter: data.invoiceCounter || state.invoiceCounter,
         alertDays:      data.alertDays      || state.alertDays,
+        partners:       data.partners       || state.partners,
         updatedAt:      data.updatedAt,
       });
       mergeClosings(data);
@@ -4511,6 +4513,7 @@ async function saveToCloud(immediate = false) {
     invoices:       state.invoices,
     invoiceCounter: state.invoiceCounter,
     alertDays:      state.alertDays,
+    partners:       state.partners || [],
     monthlyClosings:   state.monthlyClosings   || [],
     deletedClosingIds: state.deletedClosingIds || [],
     updatedAt:      new Date().toISOString(),
